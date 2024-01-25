@@ -1,0 +1,7 @@
+{
+  "name": "vue-nsl",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

@@ -1,113 +1,138 @@
 <template>
   <ion-app>
-    <ion-split-pane content-id="main-content">
-      <ion-menu content-id="main-content" type="overlay">
-        <ion-content>
-          <ion-list id="inbox-list">
-            <ion-list-header>Inbox</ion-list-header>
-            <ion-note>hi@ionicframework.com</ion-note>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button autohide="false" menu="side-menu"></ion-menu-button>
+        </ion-buttons>
+        <ion-title v-if="selectedIndex > -1">{{ appPages[selectedIndex].title }}</ion-title>
+        
+      </ion-toolbar>
+    </ion-header>
 
-            <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
-                <ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
-          </ion-list>
+    <ion-menu content-id="main-content" menu-id="side-menu">
 
-          <ion-list id="labels-list">
-            <ion-list-header>Labels</ion-list-header>
-
-            <ion-item v-for="(label, index) in labels" lines="none" :key="index">
-              <ion-icon aria-hidden="true" slot="start" :ios="bookmarkOutline" :md="bookmarkSharp"></ion-icon>
-              <ion-label>{{ label }}</ion-label>
+      <ion-content>
+        <ion-list id="inbox-list">
+          <ion-item class="ion-margin-bottom">
+           <ion-row class="ion-justify-content-center ion-align-items-center"> 
+            <ion-avatar class="ion-justify-content-center ion-align-items-center">
+              <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
+            </ion-avatar>
+          </ion-row>  
+          <ion-row class="ion-justify-content-center ion-align-items-center">   
+            <ion-title class="ion-justify-content-center ion-align-items-center">Nome do Usuário</ion-title>
+          </ion-row>
+          </ion-item>
+          <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
+            <ion-item v-if="p.labelMenu!=null" @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false"
+              class="hydrated" :class="{ selected: selectedIndex === i }">
+              <!--<ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>-->
+              <ion-label>{{ p.labelMenu }}</ion-label>
             </ion-item>
-          </ion-list>
-        </ion-content>
-      </ion-menu>
-      <ion-router-outlet id="main-content"></ion-router-outlet>
-    </ion-split-pane>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+
+
   </ion-app>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {
   IonApp,
+  IonAvatar,
   IonContent,
-  IonIcon,
   IonItem,
   IonLabel,
   IonList,
-  IonListHeader,
   IonMenu,
   IonMenuToggle,
-  IonNote,
   IonRouterOutlet,
-  IonSplitPane,
+  IonCol,
+  IonRow,
+  IonTitle,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton
 } from '@ionic/vue';
-import { ref } from 'vue';
-import {
-  archiveOutline,
-  archiveSharp,
-  bookmarkOutline,
-  bookmarkSharp,
-  heartOutline,
-  heartSharp,
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  trashOutline,
-  trashSharp,
-  warningOutline,
-  warningSharp,
-} from 'ionicons/icons';
+import { ref } from 'vue'
+
+
 
 const selectedIndex = ref(0);
 const appPages = [
   {
-    title: 'Inbox',
-    url: '/folder/Inbox',
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    title: 'Cadastro de Usuário',
+    labelMenu: 'Usuário',
+    url: '/folder/Usuario',
+    //iosIcon: null,
+    //mdIcon: null,
   },
   {
-    title: 'Outbox',
-    url: '/folder/Outbox',
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
+    title: 'Cadastro de Organizador',
+    labelMenu: 'Organizador',
+    url: '/folder/Organizador',
+    //iosIcon: null,
+    //mdIcon: null,
   },
   {
-    title: 'Favorites',
-    url: '/folder/Favorites',
-    iosIcon: heartOutline,
-    mdIcon: heartSharp,
+    title: 'Cadastro de Eventos',
+    labelMenu: 'Eventos',
+    url: '/folder/Evento',
+    //iosIcon: paperPlaneOutline,
+    //mdIcon: paperPlaneSharp,
   },
   {
-    title: 'Archived',
-    url: '/folder/Archived',
-    iosIcon: archiveOutline,
-    mdIcon: archiveSharp,
+    title: 'Cadastro de Categorias',
+    labelMenu: 'Categorias',
+    url: '/folder/Categoria',
+    // iosIcon: archiveOutline,
+    // mdIcon: archiveSharp,
   },
   {
-    title: 'Trash',
-    url: '/folder/Trash',
-    iosIcon: trashOutline,
-    mdIcon: trashSharp,
+    title: 'Cadastro de Juizes',
+    labelMenu: 'Juizes',
+    url: '/folder/Juiz',
+    //iosIcon: heartOutline,
+    //mdIcon: heartSharp,
   },
   {
-    title: 'Spam',
-    url: '/folder/Spam',
-    iosIcon: warningOutline,
-    mdIcon: warningSharp,
+    title: 'Cadastro de Atletas',
+    labelMenu: 'Atletas',
+    url: '/folder/Atletas',
+    // iosIcon: trashOutline,
+    // mdIcon: trashSharp,
+  },
+  {
+    title: 'Cadastro de Baterias',
+    labelMenu: 'Baterias',
+    url: '/folder/Bateria',
+    // iosIcon: warningOutline,
+    // mdIcon: warningSharp,
+  },
+  {
+    title: 'Teste',
+    labelMenu: 'Teste',
+    url: '/folder/teste',
+    // iosIcon: warningOutline,
+    // mdIcon: warningSharp,
   },
 ];
+
+
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
 const path = window.location.pathname.split('folder/')[1];
 if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.title.toLowerCase() === path.toLowerCase());
 }
+
+
 </script>
 
 <style scoped>

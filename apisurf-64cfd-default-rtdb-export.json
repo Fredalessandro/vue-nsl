@@ -1,0 +1,13 @@
+{
+  "Sequencia": {
+    "usuario": {
+      "codigo": 12
+    }
+  },
+  "Usuarios": {
+    "12": {
+      "id": 12,
+      "nome": "TESTE"
+    }
+  }
+}

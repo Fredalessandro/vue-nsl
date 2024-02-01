@@ -30,10 +30,10 @@ class FirebaseService {
     }
   }
 
-  static async incrementarCodigo() {
+  static async incrementarCodigo(path) {
     try {
-      const idDoDocumento = 'usuario'; // Substitua pelo ID real do documento
-      const databaseRef = firebase.database().ref('Sequencia/' + idDoDocumento);
+       // Substitua pelo ID real do documento
+      const databaseRef = firebase.database().ref('Sequencia/' + path);
 
       // Use once para buscar o documento uma vez
       const snapshot = await databaseRef.once('value');
@@ -60,12 +60,10 @@ class FirebaseService {
     }
   
   }
-  static async getSequencia() {
-     let dados;
-     const snapshot = await this.database.ref('sequencia').once('value');
+  static async getSequencia(idDoDocumento) {
+    let dados;
+     const snapshot = await this.database.ref('Sequencia/' + idDoDocumento).once('value');
      dados.value = snapshot ? Object.values(snapshot) : [];
-
-
     return dados;
   }
 
@@ -75,7 +73,32 @@ class FirebaseService {
   }
 
   static async setData(path, data) {
-    await this.database.ref(path).set(data);
+    
+    try {
+      await this.database.ref(path).set(data);
+      console.log('Document insert successfully!');
+    } catch (error) {
+      console.error('Error updating document: ', error);
+    }
   }
+  
+  static async updateData(path, documentId, data) {
+    try {
+      await this.database.ref(path+documentId).update(data);
+      console.log('Document updated successfully!');
+    } catch (error) {
+      console.error('Error updating document: ', error);
+    }
+  }
+
+  async deleteData(path, documentId) {
+    try {
+      await this.database.ref(path+documentId).delete();
+      console.log('Document deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting document: ', error);
+    }
+  }
+
 }
 export default FirebaseService

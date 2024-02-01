@@ -37,7 +37,7 @@ import {
   IonCard,
   IonCardContent
 } from "@ionic/vue";
-import Bateria from "../../model/Bateria";
+
 export default {
   name: "Organograma",
   components: {
@@ -53,8 +53,6 @@ export default {
     IonCardContent
   },
   setup() {
-    
-
     const dados = ref([]);
     dados.valeu = dadosBaterias;
     return { dadosBaterias };

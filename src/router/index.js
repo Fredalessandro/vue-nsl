@@ -11,8 +11,8 @@ const routes = [
     component: () => import ('../views/usuario/UsuarioListaPage.vue')
   },
   {
-    path: '/folder/Organizador',
-    component: () => import ('../views/OrganizadorPage.vue')
+    path: '/folder/Categoria',
+    component: () => import ('../views/categoria/CategoriaListaPage.vue')
   },
   {
     path: '/folder/Organizador',
@@ -24,7 +24,7 @@ const routes = [
   },
   {
     path: '/folder/Bateria',
-    component: () => import ('../views/bateria/BateriaOrganograma.vue')
+    component: () => import ('../views/bateria/Bateria.vue')
   },
   
 

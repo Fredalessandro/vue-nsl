@@ -1,8 +1,10 @@
 export default class Categoria {
     // Define properties of your model     
-    constructor(nome, descricao, idadeMaxima, open){
-        this.nome         = nome;
+    constructor(id, descricao, idade, atletas, regra){
+        this.id           = id;
         this.descricao    = descricao;
-        this.idadeMaxima  = idadeMaxima;
+        this.idade        = idade;
+        this.regra        = regra;
+        this.atletas      = atletas;
     }
 }

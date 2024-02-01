@@ -15,8 +15,7 @@
     bairro= '',
     cidade= '',
     uf= '',
-    tipo= '',
-    isChecked) {
+    tipo= '') {
     this.id=id;              
     this.nome=nome;
     this.email=email;
@@ -30,8 +29,7 @@
     this.bairro=bairro;
     this.cidade=cidade;
     this.uf=uf;
-    this.tipo=tipo;
-    this.isChecked=isChecked;  
+    this.tipo=tipo;  
   }
 }
 

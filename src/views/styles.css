@@ -51,3 +51,16 @@ ion-col {
     background-color: #128cf7; /* White text color */
     
   }
+
+  .default-alert{
+    --background: #f2f4f6!important;   
+    --color:#070404!important;
+    --border-radius:10px!important;
+   }
+
+  .custom-icon-action {
+    font-size: 20px;
+    margin-right: 8px;
+    margin-left: 8px;
+    cursor: pointer;
+  }

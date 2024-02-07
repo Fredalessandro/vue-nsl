@@ -1,6 +1,6 @@
 export default class Categoria {
     // Define properties of your model     
-    constructor(id, descricao, idade, atletas, regra){
+    constructor(id='', descricao='', idade='', regra='', atletas=null){
         this.id           = id;
         this.descricao    = descricao;
         this.idade        = idade;

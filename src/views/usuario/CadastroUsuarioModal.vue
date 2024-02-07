@@ -43,9 +43,9 @@
           </ion-item>
 
       </ion-content>
-      <ion-footer>
-        <div class="ion-text-center" style="margin-bottom: 2%;position: absolute; bottom: 0; width: 100%;">
-            <ion-button @click="salvarUsuarioEdicao">Salvar</ion-button>
+      <ion-footer fixed>
+        <div class="ion-text-center" style=" bottom: 0; width: 100%;">
+            <ion-button @click="salvarEdicao">Salvar</ion-button>
         </div>    
       </ion-footer>
     </ion-modal>
@@ -59,27 +59,27 @@
 
 
   export default {    
-    
     props: ['isModalOpen','usuarioEdicao'],
-    emits: ['fechar-modal', 'salvar-usuarioEdicao'],
+    emits: ['fechar-modal', 'salvarEdicao'],
     components: {
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
     IonButton, IonFooter,
-    IonButtons, IonInput, IonItem, IonLabel
+    IonButtons, IonInput, IonItem, IonLabel,
+    Usuario
   },
     data() {
       return {
          // Instância de um novo usuário
-        seuModelo: ''
-      };
+        seuModelo: '',
+      }
     },
     methods: {
       fecharModal() {
         this.$emit('fechar-modal');
       },
-      salvarUsuarioEdicao() {
+      salvarEdicao() {
         // Valide os campos ou realize a lógica de salvamento
-        this.$emit('salvar-novoUsuario', this.usuarioEdicao);
+        this.$emit('salvarEdicao', this.usuarioEdicao);
         this.fecharModal();
       },
       async consultarCep() {
@@ -102,4 +102,4 @@
   --width: 80%; /* Set your custom width here */
   --heigth: auto;
   }
-  </style>../../service/CepService
+  </style>

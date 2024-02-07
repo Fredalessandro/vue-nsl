@@ -31,5 +31,22 @@
     this.uf=uf;
     this.tipo=tipo;  
   }
+
+  static clone(usuario) {
+        return new Usuario(usuario.id,             
+          usuario.nome,
+          usuario.email,
+          usuario.telefone,
+          usuario.cpf,
+          usuario.dataNascimento,
+          usuario.cep,
+          usuario.endereco,
+          usuario.numero,
+          usuario.complemento,
+          usuario.bairro,
+          usuario.cidade,
+          usuario.uf,
+          usuario.tipo);
+  }
 }
 

@@ -14,17 +14,18 @@
       <ion-grid>
         <ion-row class="ion-align-items-start">
           <ion-col size=0.5>id</ion-col>
-          <ion-col>Nome</ion-col>
-          <ion-col size=3>e-mail</ion-col>
+          <ion-col>Evento</ion-col>
+          <ion-col size=3>Local</ion-col>
           <ion-col size=2>Telefone</ion-col>
           <ion-col size=1.08>CPF</ion-col>
-          <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
+          <ion-col size=0.80 style="text-align: center;"><ion-checkbox :v-model="isCheckedAll"></ion-checkbox></ion-col>
         </ion-row>
         <ion-row>
           <ion-col style="text-align: left;">Endereço</ion-col>
         </ion-row>
         <div v-for="(usuario, index) in filteredItems" :key="usuario.key" class="ion-align-items-start">
-          <ion-row>
+          <ion-row @click="handleRowClick(usuario)">
+            <IonRippleEffect></IonRippleEffect>
             <ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ usuario.id }}</ion-col>
             <ion-col style="text-align: left;"
@@ -35,52 +36,49 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ usuario.telefone }}</ion-col>
             <ion-col size=1.08 style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ usuario.cpf }}</ion-col>
-            <ion-col size=0.80 style="text-align: center;margin-block: initial;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" class="ion-justify-content-between">
-              <ion-icon @click="presentAlertConfirm(usuario)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small" class="custom-icon-action"></ion-icon>
-              <ion-icon @click="handleRowClick(usuario)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small" class="custom-icon-action"></ion-icon>
+            <ion-col size=0.80 style="text-align: center;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
+              <ion-icon @click="" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="10px"></ion-icon>
               <!--<ion-button :size="3" class="round-button" @click="handleFabButtonClick('Button 1')">
                 <ion-checkbox :v-model="usuario.isChecked"></ion-checkbox>
                   <ion-icon :icon="iconDelete" style="color: black;" size="10px"></ion-icon>
-                </ion-button>-->
+               </ion-button>-->
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row @click="handleRowClick(usuario)">
+            <IonRippleEffect></IonRippleEffect>
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              {{ usuario.endereco + " - "+ usuario.numero +", "+ usuario.bairro + ", " + usuario.cidade + ", " + usuario.uf }}</ion-col>
+              {{ usuario.endereco + ", " + usuario.bairro + ", " + usuario.cidade + ", " + usuario.uf }}</ion-col>
           </ion-row>
         </div>
       </ion-grid>
-     
-      
     </ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
-          <!--<ion-button class="round-button" @click="handleFabButtonClick('Button 1')">
+          <ion-button class="round-button" @click="handleFabButtonClick('Button 1')">
             <ion-icon :icon="iconDelete" style="color: black;" size="large"></ion-icon>
-          </ion-button>-->
-          <ion-button class="round-button" @click="abrirModal(true)">
+          </ion-button>
+          <ion-button class="round-button" @click="abrirModal()">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroUsuarioModal :is-modal-open="modalAberta" :usuarioEdicao="this.usuarioEdicao" @fechar-modal="fecharModal"
-      @salvarEdicao="handleSalvar" />
-    
+    <CadastroUsuarioModal :is-modal-open="modalAberta" :usuarioEdicao="usuario" @fechar-modal="fecharModal"
+      @salvar-novoUsuario="handleSalvarUsuario" />
 </ion-page>
 </template>
 
 <script >
-import { alertController } from '@ionic/core'
+import { ref,  onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon, IonFooter, IonButtons, IonCheckbox, IonRippleEffect, IonCard
 } from '@ionic/vue';
-import { add,document, create, trash } from 'ionicons/icons';
+import { add,document, trash } from 'ionicons/icons';
 import CadastroUsuarioModal from '@/views/usuario/CadastroUsuarioModal.vue';
-import FirebaseService  from '@/database/FirebaseService.js';
+import  FirebaseService  from '@/database/FirebaseService.js';
 import Sequencia from '@/model/Sequencia';
 import Usuario from '../../model/Usuario';
 import '../styles.css';
@@ -97,19 +95,17 @@ export default {
       iconAdd: add,
       iconDocumet: document,
       iconDelete: trash,
-      iconEdit: create,
       searchTerm: '',
       isCheckedAll: false,
       filteredItems: [],
       items: [],
       usuario: new Usuario(null),
-      usuarioEdicao: new Usuario(),
       menuState: true,
       modalAberta: false,
       sequencia: Sequencia
     };
   },
-   watch: {
+  watch: {
     searchTerm: 'searchItems',
   },
   created() {
@@ -135,12 +131,12 @@ export default {
         this.searchItems();
       });
     },
-    abrirModal(novo) {
-      if (novo) {
-        let dadosEdicao = new Usuario(null);  
-        this.usuarioEdicao = dadosEdicao;
-      } 
-      this.modalAberta = true; 
+    handleDeleteClick(idUsuario) {
+      console.log('Delete clicked! ' + idUsuario);
+    },
+    abrirModal() {
+      this.modalAberta = true;
+      //this.$router.push({ name: 'UsuarioCadastro', params: { parametros:'$this.usuarios'} });
     },
     fecharModal() {
       this.modalAberta = false;
@@ -148,26 +144,10 @@ export default {
     handleRowClick(usuario) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + usuario.nome);
-      let dadosEdicao = new Usuario(
-        usuario.id,
-        usuario.nome,
-        usuario.email,
-        usuario.telefone,
-        usuario.cpf,
-        usuario.dataNascimento,
-        usuario.cep,
-        usuario.endereco,
-        usuario.numero,
-        usuario.complemento,
-        usuario.bairro,
-        usuario.cidade,
-        usuario.uf,
-        usuario.tipo
-      );
-      this.usuarioEdicao = dadosEdicao;
-      this.abrirModal(false);
+      this.usuario = usuario;
+      this.abrirModal();
     },
-    async handleSalvar(usuario) {
+    async handleSalvarUsuario(usuario) {
       // Lógica para salvar o usuário
       try {
         // Gravar o documento no banco de dados local
@@ -184,46 +164,11 @@ export default {
           });
         }
       } catch (error) {
-        console.error('Erro ao gravar localmente=', error);
+        console.error('Erro ao gravar localmente:', error);
       }
+      // this.usuarios.push(usuario);
+      // console.log('Usuário salvo:', JSON.stringify(usuario));
 
-    },
-    presentAlertConfirm(usuario) {
-      return alertController
-        .create({
-          header: 'Confirma!',
-          message: 'Exclusão do usuário '+usuario.nome+' ?',
-          cssClass : 'default-alert',
-          buttons: [
-            {
-              text: 'Não',
-              role: 'cancel',
-              handler: blah => {
-                console.log('Confirm Cancel:', usuario.nome)
-              },
-            },
-            {
-              text: 'Sim',
-              handler: () => {
-                try {
-                  // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Usuarios/', usuario.id);
-                } catch (error) {
-                  console.error('Erro ao delete registro:', error);
-                }
-                console.log('Confirm Okay', usuario.nome)
-              },
-            },
-          ],
-        })
-        .then(a => a.present())
-    },
-    handleYes() {
-      
-
-      console.log('Ação confirmada');
-      // Coloque a lógicaque você deseja executar ao clicar em "Sim"
-      this.mostrarYesNoAlert = false;
     }
   },
 }

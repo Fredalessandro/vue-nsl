@@ -8,7 +8,7 @@ class FirebaseService {
     apiKey: "AIzaSyDs7aTdlcDuutBnrjK25ky7xwouiK1wbsA",
     authDomain: "apisurf-64cfd.firebaseapp.com",
     //databaseURL: "https://apisurf-64cfd-default-rtdb.firebaseio.com",
-    databaseURL: "http://localhost:9000/?ns=apisurf-64cfd", 
+    databaseURL: "http://127.0.0.1:9000/?ns=apisurf-64cfd-default-rtdb", 
     projectId: "apisurf-64cfd",
     storageBucket: "apisurf-64cfd.appspot.com",
     messagingSenderId: "8261911800",
@@ -60,6 +60,7 @@ class FirebaseService {
     }
   
   }
+
   static async getSequencia(idDoDocumento) {
     let dados;
      const snapshot = await this.database.ref('Sequencia/' + idDoDocumento).once('value');
@@ -72,8 +73,7 @@ class FirebaseService {
     return snapshot.toJSON();
   }
 
-  static async setData(path, data) {
-    
+  static async setData(path, data) { 
     try {
       await this.database.ref(path).set(data);
       console.log('Document insert successfully!');
@@ -91,13 +91,16 @@ class FirebaseService {
     }
   }
 
-  async deleteData(path, documentId) {
-    try {
-      await this.database.ref(path+documentId).delete();
-      console.log('Document deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting document: ', error);
-    }
+ static async deleteData(path, documentId) {
+    
+      await this.database.ref(path+documentId).remove()
+      .then(() => {
+        console.log('Data deleted successfully');
+      })
+      .catch((error) => {
+        console.error('Error deleting data:', error);
+      });
+
   }
 
 }

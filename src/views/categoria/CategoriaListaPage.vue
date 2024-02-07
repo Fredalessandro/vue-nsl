@@ -3,22 +3,22 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Usuários</ion-title>
+        <ion-title>Lista de Categorias</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="search"></ion-searchbar>
+      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchItems" ></ion-searchbar>
       
       <ion-grid>
         <ion-row class="ion-align-items-start">
           <ion-col size=0.5>id</ion-col>
           <ion-col>Descrição</ion-col>
           <ion-col size=3>Regra aplicada para idade</ion-col>
-          <ion-col size=0.80 style="text-align: center;"><ion-checkbox :v-model="isCheckedAll"></ion-checkbox></ion-col>
+          <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
-        <div v-for="(categoria, index) in dados" :key="categoria.id" class="ion-align-items-start">
+        <div v-for="(categoria, index) in filteredItems" :key="categoria.id" class="ion-align-items-start">
           <ion-row>
             <ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ categoria.id }}</ion-col>
@@ -28,7 +28,8 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{categoria.regra+' '+ categoria.idade+' anos' }}</ion-col>
             <ion-col size=0.80 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-checkbox :v-model="categoria.isChecked"></ion-checkbox>
+              <ion-icon @click="presentAlertConfirm(categoria)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon @click="handleRowClick(categoria)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
             </ion-col>
           </ion-row>
         </div>
@@ -37,170 +38,155 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
-          <ion-button class="round-button" @click="handleFabButtonClick('Button 1')">
-            <ion-icon :icon="iconDelete" style="color: black;" size="large"></ion-icon>
-          </ion-button>
-          <ion-button class="round-button" @click="abrirModal()">
+          <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastrocategoriaModal  :is-modal-open="modalAberta" @fechar-modal="fecharModal" @salvar-novoCategoria="handleSalvarCategoria" />
+    <CadastroCategoriaModal  :is-modal-open="modalAberta" @fechar-modal="fecharModal" @salvar-novo="handleSalvar" />
 </ion-page>
 </template>
 
 <script >
+import { alertController } from '@ionic/core'
 import { ref,  onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
-import { add,document, trash } from 'ionicons/icons';
-import CadastrocategoriaModal from '@/views/categoria/CadastrocategoriaModal.vue';
+import { add,document, create, trash } from 'ionicons/icons';
+import CadastroCategoriaModal from '@/views/categoria/CadastrocategoriaModal.vue';
 import  FirebaseService  from '@/database/FirebaseService.js';
 import Sequencia from '@/model/Sequencia';
 import '../styles.css';
+import Categoria from '../../model/Categoria';
 
 export default {
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
     IonButtons, IonCheckbox,
-    CadastrocategoriaModal
-  },
-  setup() {
-    // Variável de estado para armazenar os dados
-    
-    const dados = ref([]);
-
-    // Função para buscar os dados
-    const fetchData = async () => {
-      // Simule uma chamada à API ou use o FirebaseService
-       //const result = await FirebaseService.getData('categorias');
-       
-       //dados.value = Object.values(result);
-       //console.log(dados.value)
-
-       const databaseRef = FirebaseService.database.ref('Categorias');
-
-        // Use o listener 'on' para observar alterações em tempo real
-        databaseRef.on('value', (snapshot) => {
-          const dadosFirebase = snapshot.val();
-          console.log('Dados do Firebase em tempo real:', dadosFirebase);
-
-          dados.value = dadosFirebase;
-          
-        });
-      // Exemplo com dados fictícios
-      /*setTimeout(() => {
-        dados.value = [
-          { id: 1, nome: 'Item 1' },
-          { id: 2, nome: 'Item 2' },
-          // ... outros dados
-        ];
-      }, 1000);*/
-    };
-
-    // Chamada à função fetchData após a montagem do componente
-    onMounted(fetchData);
-
-    // Retorna dados para serem usados no template
-    return {
-      dados,
-    };
+    CadastroCategoriaModal
   },
   data() {
     return {
       iconAdd: add,
       iconDocumet: document,
       iconDelete: trash,
-      searchTerm: '',   
-      isCheckedAll: false,  
-      categorias: [],
+      iconEdit: create,
+      searchTerm: '',
+      isCheckedAll: false,
+      filteredItems: [],
+      items: [],
+      categoria: new Categoria(null),
+      categoriaEdicao: new Categoria(),
       menuState: true,
       modalAberta: false,
-      sequencia : Sequencia
+      sequencia: Sequencia
     };
   },
-  computed: {
-     filteredList() {
-      try {
-        // Obter todos os documentos do banco de dados local
-        if (this.searchTerm.toLocaleLowerCase() === "") return this.categorias;
-        const searchTermLower = this.searchTerm.toLocaleLowerCase();
-        return this.categorias.filter(
-          (item) => {
-            if (item) {
-              item.descricao.toLocaleLowerCase().includes(searchTermLower)
-              //item.email.toLocaleLowerCase().includes(searchTermLower) ||
-              //item.endereco.toLocaleLowerCase().includes(searchTermLower) ||
-              //item.bairro.toLocaleLowerCase().includes(searchTermLower) ||
-              //item.cidade.toLocaleLowerCase().includes(searchTermLower) ||
-              //item.uf.toLocaleLowerCase().includes(searchTermLower)
-            }
-          }
-
-        );
-      } catch (error) {
-        console.error('Erro ao ler localmente:', error);
-        return [];
-      }
-
-    },
+   watch: {
+    searchTerm: 'searchItems',
+  },
+  created() {
+    this.fetchItems();
   },
   methods: {
-    search() {
-      // Handle search logic if needed
+    searchItems() {
+      this.filteredItems = this.items.filter((item) =>
+        item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     },
-    handleFabClick() {
-      // Logic to be executed when the footer button is clicked
+    fetchItems() {
+      const itemsRef = FirebaseService.database.ref('Categorias');
+      itemsRef.on('value', (snapshot) => {
+        this.items = [];
+        snapshot.forEach((childSnapshot) => {
+          const item = {
+            key: childSnapshot.key,
+            ...childSnapshot.val(),
+          };
+          this.items.push(item);
+        });
+        this.searchItems();
+      });
     },
-    // eslint-disable-next-line no-unused-vars
-    handleFabButtonClick(valeu){
-
-    },
-    abrirModal() {
-      this.modalAberta = true;
-      //this.$router.push({ name: 'categoriaCadastro', params: { parametros:'$this.categorias'} });
+    abrirModal(novo) {
+      if (novo) {
+        let dadosEdicao = new Categoria(null);  
+        this.categoriaEdicao = dadosEdicao;
+      } 
+      this.modalAberta = true; 
     },
     fecharModal() {
       this.modalAberta = false;
     },
-    async handleSalvarCategoria(categoria) {
+    handleRowClick(categoria) {
+      // Your click event handling logic goes here
+      console.log('Row clicked! ' + categoria.nome);
+      let dadosEdicao = new Categoria(
+        categoria.id,
+        categoria.descricao,
+        categoria.idade,
+        categoria.regra,
+        null
+      );
+      this.categoriaEdicao = dadosEdicao;
+      this.abrirModal(false);
+    },
+    async handleSalvar(categoria) {
       // Lógica para salvar o usuário
       try {
         // Gravar o documento no banco de dados local
-       //postcategoria(categoria);
 
-       
-       await FirebaseService.incrementarCodigo('categoria').then(value =>{
-             categoria.id = value;
-             console.log('Incremento', categoria.id);
-             categoria.atletas = [];
-            /*const dadosParaGrava = {
-                    id: categoria.id,
-                    descricao: categoria.descricao,
-                    idade: categoria.idade,
-                    regra: categoria.regra
-                    
-            } */
+        if (categoria.id != null) {
+          await FirebaseService.updateData('Categorias/', categoria.id, categoria);
+        } else {
+          await FirebaseService.incrementarCodigo('categoria').then(value => {
+            categoria.id = value;
+            console.log('Incremento', categoria.id);
 
-            FirebaseService.setData('Categorias/'+value,categoria);
+            FirebaseService.setData('Categorias/' + value, categoria);
 
-            categoria = null;
-
-       });
-      
-
-
+          });
+        }
       } catch (error) {
-        console.error('Erro ao gravar localmente:', error);
+        console.error('Erro ao gravar localmente=', error);
       }
-      // this.categorias.push(categoria);
-      // console.log('Usuário salvo:', JSON.stringify(categoria));
 
-    }},
+    },
+    presentAlertConfirm(categoria) {
+      return alertController
+        .create({
+          header: 'Confirma!',
+          message: 'Exclusão da categoria '+categoria.descricao+' ?',
+          cssClass : 'default-alert',
+          buttons: [
+            {
+              text: 'Não',
+              role: 'cancel',
+              handler: blah => {
+                console.log('Confirm Cancel:', categoria.nome)
+              },
+            },
+            {
+              text: 'Sim',
+              handler: () => {
+                try {
+                  // Gravar o documento no banco de dados local
+                  FirebaseService.deleteData('Categorias/', categoria.id);
+                } catch (error) {
+                  console.error('Erro ao delete registro:', error);
+                }
+                console.log('Confirm Okay', categoria.descricao)
+              },
+            },
+          ],
+        })
+        .then(a => a.present())
+    },
+  },
 }
 
 </script>

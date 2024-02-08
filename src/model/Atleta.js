@@ -1,13 +1,47 @@
 export default class Atleta {
-    constructor(id,nome, chaveador, dataNascimento){
-        this.id        = id;
-        this.nome      = nome;
-        this.chaveador = chaveador;
-        this.dataNascimento = dataNascimento;
-    }
+  constructor(id,nome,email,telefone,cpf,dataNascimento,cep,endereco,
+    numero,complemento,bairro,cidade,uf,tipo,rankEstadual,rankNacional) {
+    this.id = id;
+    this.nome = nome;
+    this.email = email;
+    this.telefone = telefone;
+    this.cpf = cpf;
+    this.dataNascimento = dataNascimento;
+    this.cep = cep;
+    this.endereco = endereco;
+    this.numero = numero;
+    this.complemento = complemento;
+    this.bairro = bairro;
+    this.cidade = cidade;
+    this.uf = uf;
+    this.tipo = tipo;
+    this.rankEstadual=rankEstadual;
+    this.rankNacional=rankNacional;
+  }
+}
+  /*static clone(atleta) {
+    return new Atleta(
+      atleta.id,
+      atleta.nome,
+      atleta.email,
+      atleta.telefone,
+      atleta.cpf,
+      atleta.dataNascimento,
+      atleta.cep,
+      atleta.endereco,
+      atleta.numero,
+      atleta.complemento,
+      atleta.bairro,
+      atleta.cidade,
+      atleta.uf,
+      atleta.tipo,
+      atleta.rankEstadual,
+      atleta.rankNacional
+    );
+  }
 }
 
-const atletas = [
+/*const atletas = [
    Atleta(1 ,'Atleta 1 ',true ,'01/01/2019'),
    Atleta(2 ,'Atleta 2 ',false,'01/01/2019'),
    Atleta(3 ,'Atleta 3 ',false,'01/01/2019'),
@@ -47,4 +81,4 @@ const atletas = [
    Atleta(30,'Atleta 30',false,'01/01/2019'),
    Atleta(31,'Atleta 31',false,'01/01/2019'),
    Atleta(32,'Atleta 32',true ,'01/01/2019'),
-]
+]*/

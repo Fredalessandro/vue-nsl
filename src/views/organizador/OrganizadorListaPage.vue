@@ -1,9 +1,9 @@
-<!-- src/views/ListaEventos.vue -->
+<!-- src/views/ListaOrganizadors.vue -->
 <template>
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Eventos</ion-title>
+        <ion-title>Lista de Organizadores</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -11,27 +11,21 @@
 
       <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchItems" ></ion-searchbar>
       
-      <ion-grid>
+      <ion-grid >
         <ion-row class="ion-align-items-start">
           <ion-col size=0.5>id</ion-col>
-          <ion-col size=4>Evento</ion-col>
-          <ion-col >Local</ion-col>
-          <ion-col size=2>Periodo</ion-col>
-          <ion-col size=2>Status</ion-col>
+          <ion-col >Nome</ion-col>
+          <ion-col >E-mail</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems" :key="objeto.id" class="ion-align-items-start">
           <ion-row>
             <ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>
-            <ion-col size=4 style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.evento }}</ion-col>
-            <ion-col  style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.local }}</ion-col>
-            <ion-col size=2 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.dataInicio+' a '+ objeto.dataFinal }}</ion-col>
-            <ion-col size=2 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.status }}</ion-col>  
+            <ion-col style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.nome }}</ion-col>
+            <ion-col style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.email }}</ion-col>
             <ion-col size=0.8 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
               <ion-icon @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
@@ -50,7 +44,7 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroEventoModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+    <CadastroOrganizadorModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
 </ion-page>
 </template>
 
@@ -62,18 +56,18 @@ import {
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
 import { add,document, create, trash } from 'ionicons/icons';
-import CadastroEventoModal from '@/views/Evento/CadastroEventoModal.vue';
+import CadastroOrganizadorModal from '@/views/Organizador/CadastroOrganizadorModal.vue';
 import  FirebaseService  from '@/database/FirebaseService.js';
 import Sequencia from '@/model/Sequencia';
 import '../styles.css';
-import Evento from '../../model/Evento';
+import Organizador from '../../model/Organizador';
 
 export default {
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
     IonButtons, IonCheckbox,
-    CadastroEventoModal
+    CadastroOrganizadorModal
   },
   data() {
     return {
@@ -85,8 +79,8 @@ export default {
       isCheckedAll: false,
       filteredItems: [],
       items: [],
-      objeto: new Evento(null),
-      objetoEdicao: new Evento(),
+      objeto: new Organizador(null),
+      objetoEdicao: new Organizador(),
       menuState: true,
       modalAberta: false,
       sequencia: Sequencia
@@ -101,11 +95,11 @@ export default {
   methods: {
     searchItems() {
       this.filteredItems = this.items.filter((item) =>
-        item.evento.toLowerCase().includes(this.searchTerm.toLowerCase())
+        item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     },
     fetchItems() {
-      const itemsRef = FirebaseService.database.ref('Eventos');
+      const itemsRef = FirebaseService.database.ref('Organizadores');
       itemsRef.on('value', (snapshot) => {
         this.items = [];
         snapshot.forEach((childSnapshot) => {
@@ -120,7 +114,7 @@ export default {
     },
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Evento(null);  
+        let dadosEdicao = new Organizador(null);  
         this.objetoEdicao = dadosEdicao;
       } 
       this.modalAberta = true; 
@@ -131,13 +125,10 @@ export default {
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.nome);
-      let dadosEdicao = new Evento(
+      let dadosEdicao = new Organizador(
         objeto.id,
-        objeto.evento,
-        objeto.local,
-        objeto.dataInicio,
-        objeto.dataFinal,
-        objeto.status
+        objeto.nome,
+        objeto.email
       );
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -148,13 +139,13 @@ export default {
         // Gravar o documento no banco de dados local
 
         if (objeto.id != null) {
-          await FirebaseService.updateData('Eventos/', objeto.id, objeto);
+          await FirebaseService.updateData('Organizadores/', objeto.id, objeto);
         } else {
-          await FirebaseService.incrementarCodigo('evento').then(value => {
+          await FirebaseService.incrementarCodigo('organizador').then(value => {
             objeto.id = value;
             console.log('Incremento', objeto.id);
 
-            FirebaseService.setData('Eventos/' + value, objeto);
+            FirebaseService.setData('Organizadores/' + value, objeto);
 
           });
         }
@@ -167,14 +158,14 @@ export default {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão da Evento '+objeto.evento+' ?',
+          message: 'Exclusão da Organizador '+objeto.nome+' ?',
           cssClass : 'default-alert',
           buttons: [
             {
               text: 'Não',
               role: 'cancel',
               handler: blah => {
-                console.log('Confirm Cancel:', objeto.evento)
+                console.log('Confirm Cancel:', objeto.nome)
               },
             },
             {
@@ -182,11 +173,11 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Eventos/', objeto.id);
+                  FirebaseService.deleteData('Organizadores/', objeto.id);
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
-                console.log('Confirm Okay', objeto.descricao)
+                console.log('Confirm Okay', objeto.nome)
               },
             },
           ],
@@ -197,4 +188,16 @@ export default {
 }
 
 </script>
+<style scoped>
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* You might need to adjust the height based on your layout */
+}
 
+.centered-items {
+  text-align: center;
+  /* Additional styling for the centered content */
+}
+</style>

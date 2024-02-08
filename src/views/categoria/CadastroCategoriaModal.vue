@@ -1,7 +1,7 @@
 <!-- CadastrocategoriaEdicaoModal.vue -->
 
 <template>
-    <ion-modal :is-open="isModalOpen" @ionModalDidDismiss="fecharModal" style="--height:40%; --width: 40%;">
+    <ion-modal :is-open="isModalOpen" @ionModalDidDismiss="fecharModal" style="--height:80%; --width: 80%;">
 
         
       <ion-header>
@@ -69,7 +69,7 @@
         selectedOption: null,
         options: [
         { label: 'Até', value: 'Até' },
-        { label: 'A partir de ', value: 'A partir de' },
+        { label: 'A partir de', value: 'A partir de' },
         // Adicione mais opções conforme necessário
       ]
       };
@@ -80,7 +80,7 @@
       },
       salvarEdicao() {
         // Valide os campos ou realize a lógica de salvamento
-        this.$emit('salvar-Edicao', this.categoriaEdicao);
+        this.$emit('salvarEdicao', this.categoriaEdicao);
         this.fecharModal();
       }
     }
@@ -89,9 +89,3 @@
   }; 
   
   </script>
-  <style scoped>
-  .custom-modal {
-  --width: 80%; /* Set your custom width here */
-  --heigth: auto;
-  }
-  </style>

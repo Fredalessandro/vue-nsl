@@ -6,7 +6,6 @@
           <ion-menu-button autohide="false" menu="side-menu"></ion-menu-button>
         </ion-buttons>
         <ion-title v-if="selectedIndex > -1">{{ appPages[selectedIndex].title }}</ion-title>
-        
       </ion-toolbar>
     </ion-header>
 
@@ -62,42 +61,54 @@ import {
 } from '@ionic/vue';
 import { ref } from 'vue'
 
-
-
 const selectedIndex = ref(0);
 const appPages = [
   {
-    title: 'Cadastro de Usuário',
-    labelMenu: 'Usuário',
-    url: '/folder/Usuario',
+    title: 'Cadastro de Usuários',
+    labelMenu: 'Usuários',
+    url: '/folder/Usuarios',
     //iosIcon: null,
     //mdIcon: null,
   },
   {
-    title: 'Cadastro de Organizador',
-    labelMenu: 'Organizador',
-    url: '/folder/Organizador',
+    title: 'Cadastro de Organizadores',
+    labelMenu: 'Organizadores',
+    url: '/folder/Organizadores',
     //iosIcon: null,
     //mdIcon: null,
   },
   {
     title: 'Cadastro de Eventos',
     labelMenu: 'Eventos',
-    url: '/folder/Evento',
+    url: '/folder/Eventos',
     //iosIcon: paperPlaneOutline,
     //mdIcon: paperPlaneSharp,
   },
   {
     title: 'Cadastro de Categorias',
     labelMenu: 'Categorias',
-    url: '/folder/Categoria',
+    url: '/folder/Categorias',
     // iosIcon: archiveOutline,
     // mdIcon: archiveSharp,
   },
   {
+    title: 'Cadastro de Baterias',
+    labelMenu: 'Baterias',
+    url: '/folder/Baterias',
+    // iosIcon: warningOutline,
+    // mdIcon: warningSharp,
+  },
+  {
+    title: 'Cadastro de Filiação',
+    labelMenu: 'Filiações',
+    url: '/folder/Filiacoes',
+    //iosIcon: heartOutline,
+    //mdIcon: heartSharp,
+  },
+  {
     title: 'Cadastro de Juizes',
     labelMenu: 'Juizes',
-    url: '/folder/Juiz',
+    url: '/folder/Juizes',
     //iosIcon: heartOutline,
     //mdIcon: heartSharp,
   },
@@ -107,13 +118,6 @@ const appPages = [
     url: '/folder/Atletas',
     // iosIcon: trashOutline,
     // mdIcon: trashSharp,
-  },
-  {
-    title: 'Cadastro de Baterias',
-    labelMenu: 'Baterias',
-    url: '/folder/Bateria',
-    // iosIcon: warningOutline,
-    // mdIcon: warningSharp,
   },
   {
     title: 'Teste',
@@ -127,9 +131,9 @@ const appPages = [
 
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
-const path = window.location.pathname.split('folder/')[1];
+const path = window.location.pathname;
 if (path !== undefined) {
-  selectedIndex.value = appPages.findIndex((page) => page.title.toLowerCase() === path.toLowerCase());
+  selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
 }
 
 

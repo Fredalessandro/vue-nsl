@@ -7,23 +7,27 @@ const routes = [
     redirect: '/folder/Inbox'
   },
   {
-    path: '/folder/Usuario',
+    path: '/folder/Usuarios',
     component: () => import ('../views/usuario/UsuarioListaPage.vue')
   },
   {
-    path: '/folder/Categoria',
-    component: () => import ('../views/categoria/CategoriaListaPage.vue')
+    path: '/folder/Organizadores',
+    component: () => import ('../views/organizador/OrganizadorListaPage.vue')
   },
   {
-    path: '/folder/Organizador',
-    component: () => import ('../views/OrganizadorPage.vue')
+    path: '/folder/Eventos',
+    component: () => import ('../views/evento/EventoListaPage.vue')
   },
   {
-    path: '/folder/Evento',
-    component: () => import ('../views/EventoPage.vue')
+    path: '/folder/Categorias',
+    component: () => import ('../views/categoria/CategoriaListaPage.vue'),
   },
   {
-    path: '/folder/Bateria',
+    path: '/folder/Atletas',
+    component: () => import ('../views/atleta/AtletaListaPage.vue'),
+  },
+  {
+    path: '/folder/Baterias',
     component: () => import ('../views/bateria/Bateria.vue')
   },
   

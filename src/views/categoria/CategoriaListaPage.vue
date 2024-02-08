@@ -44,7 +44,7 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroCategoriaModal  :is-modal-open="modalAberta" @fechar-modal="fecharModal" @salvar-novo="handleSalvar" />
+    <CadastroCategoriaModal  :is-modal-open="modalAberta" :categoriaEdicao="this.categoriaEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
 </ion-page>
 </template>
 
@@ -95,7 +95,7 @@ export default {
   methods: {
     searchItems() {
       this.filteredItems = this.items.filter((item) =>
-        item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
+        item.descricao.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     },
     fetchItems() {

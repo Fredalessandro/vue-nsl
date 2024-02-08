@@ -1,12 +1,10 @@
 <!-- CadastroobjetoEdicaoModal.vue -->
 
 <template>
-  <ion-modal :is-open="isModalOpen" @ionModalDidDismiss="fecharModal" style="--height:80%; --width: 80%;">
-
-      
+  <ion-modal :is-open="isModalOpen" @ionModalDidDismiss="fecharModal" style="--height:80%; --width: 80%;">  
     <ion-header>
       <ion-toolbar>
-        <ion-title>Cadastro de Eventos</ion-title>
+        <ion-title>Cadastro de Organizadors</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="fecharModal">Fechar</ion-button>
         </ion-buttons>
@@ -19,27 +17,13 @@
         </ion-item>
 
         <ion-item>
-          <ion-input style="margin-right: 5px; width: 350px;" :maxlength="40" label="Evento" v-model="objetoEdicao.evento" required></ion-input>
+          <ion-input style="margin-right: 5px; width: 400px;" :maxlength="50" label="Nome" v-model="objetoEdicao.nome" required></ion-input>
         </ion-item>
        
         <ion-item>
-          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Local" v-model="objetoEdicao.local" required></ion-input>
+          <ion-input style="margin-right: 5px; width: 400px;" :maxlength="250" label="E-mail" v-model="objetoEdicao.email" required></ion-input>
         </ion-item>
-        
-        <ion-item>       
-          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="Periodo de " type="date" v-model="objetoEdicao.dataInicio" required></ion-input>
-          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="A " type="date" v-model="objetoEdicao.dataFinal" required></ion-input>
-        </ion-item>       
-        
-        <ion-item>
-          <ion-label>Status</ion-label><br/>
-          <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.status">
-              <ion-select-option v-for="option in options" :key="option.value" :value="option.value">
-                  {{ objetoEdicao.status }}
-              </ion-select-option>
-          </ion-select>
-        </ion-item>
-
+     
     </ion-content>
     <ion-footer>
       <div class="ion-text-center" style="margin-bottom: 2%;position: absolute; bottom: 0; width: 100%;">
@@ -54,7 +38,7 @@ import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent,
   IonButton, IonFooter, IonButtons, IonInput , IonItem, IonLabel,
   IonSelect, IonSelectOption, IonText
 } from '@ionic/vue'; 
-import Evento from '../../model/Evento';
+import Organizador from '../../model/Organizador';
 
 export default {    
   
@@ -65,18 +49,12 @@ export default {
   IonButton, IonFooter,IonLabel,
   IonButtons, IonInput, IonItem,
   IonSelect, IonSelectOption, IonText,
-  Evento
+  Organizador
 },
   data() {
     return {
       seuModelo: '',
-      selectedOption: null,
-      options: [
-      { label: 'Aguardando', value: 'Aguardando' },
-      { label: 'Iniciado',   value: 'Iniciado' },
-      { label: 'Finalizado', value: 'Finalizado' },
-      // Adicione mais opções conforme necessário
-    ]
+      selectedOption: null
     };
   },
   methods: {

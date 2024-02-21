@@ -18,13 +18,13 @@
             <ion-avatar class="ion-justify-content-center ion-align-items-center">
               <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
             </ion-avatar>
-          </ion-row>  
+          </ion-row>   
           <ion-row class="ion-justify-content-center ion-align-items-center">   
             <ion-title class="ion-justify-content-center ion-align-items-center">Nome do Usuário</ion-title>
           </ion-row>
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
-            <ion-item v-if="p.labelMenu!=null" @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false"
+            <ion-item v-if="p.labelMenu!=null && p.isLoginId === isLoggedIn" @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false"
               class="hydrated" :class="{ selected: selectedIndex === i }">
               <!--<ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>-->
               <ion-label>{{ p.labelMenu }}</ion-label>
@@ -34,13 +34,14 @@
       </ion-content>
 
     </ion-menu>
-    <ion-router-outlet id="main-content"></ion-router-outlet>
+    <ion-router-outlet class="custom-router-outlet" id="main-content"></ion-router-outlet>
 
+    <LoginModal :showModal="showModal" @closed="hideLoginModal" />
 
   </ion-app>
 </template>
 
-<script setup>
+<script>
 import {
   IonApp,
   IonAvatar,
@@ -59,84 +60,147 @@ import {
   IonButtons,
   IonMenuButton
 } from '@ionic/vue';
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue';
+ // used for conditional rendering
+ import firebase from 'firebase/app'
+ import 'firebase/auth'
+ import { useRouter } from 'vue-router'
+ import LoginModal from './views/components/LoginModal.vue';
 
-const selectedIndex = ref(0);
-const appPages = [
-  {
-    title: 'Cadastro de Usuários',
-    labelMenu: 'Usuários',
-    url: '/folder/Usuarios',
-    //iosIcon: null,
-    //mdIcon: null,
-  },
-  {
-    title: 'Cadastro de Organizadores',
-    labelMenu: 'Organizadores',
-    url: '/folder/Organizadores',
-    //iosIcon: null,
-    //mdIcon: null,
-  },
-  {
-    title: 'Cadastro de Eventos',
-    labelMenu: 'Eventos',
-    url: '/folder/Eventos',
-    //iosIcon: paperPlaneOutline,
-    //mdIcon: paperPlaneSharp,
-  },
-  {
-    title: 'Cadastro de Categorias',
-    labelMenu: 'Categorias',
-    url: '/folder/Categorias',
-    // iosIcon: archiveOutline,
-    // mdIcon: archiveSharp,
-  },
-  {
-    title: 'Cadastro de Baterias',
-    labelMenu: 'Baterias',
-    url: '/folder/Baterias',
-    // iosIcon: warningOutline,
-    // mdIcon: warningSharp,
-  },
-  {
-    title: 'Cadastro de Filiação',
-    labelMenu: 'Filiações',
-    url: '/folder/Filiacoes',
-    //iosIcon: heartOutline,
-    //mdIcon: heartSharp,
-  },
-  {
-    title: 'Cadastro de Juizes',
-    labelMenu: 'Juizes',
-    url: '/folder/Juizes',
-    //iosIcon: heartOutline,
-    //mdIcon: heartSharp,
-  },
-  {
-    title: 'Cadastro de Atletas',
-    labelMenu: 'Atletas',
-    url: '/folder/Atletas',
-    // iosIcon: trashOutline,
-    // mdIcon: trashSharp,
-  },
-  {
-    title: 'Teste',
-    labelMenu: 'Teste',
-    url: '/folder/teste',
-    // iosIcon: warningOutline,
-    // mdIcon: warningSharp,
-  },
-];
+ export default {
+  components: { IonApp,
+  IonAvatar,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonMenu,
+  IonMenuToggle,
+  IonRouterOutlet,
+  IonCol,
+  IonRow,
+  IonTitle,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  LoginModal },
+  setup() {
+      const router = useRouter();
+      const isLoggedIn = ref(false);
+      const selectedIndex = ref(0);
+      const showModal = ref(false);
+
+      const showLoginModal = () => {
+        showModal.value = true;
+      };
+
+      const hideLoginModal = () => {
+        showModal.value = false;
+      };
 
 
-const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+      const appPages = [
+      {
+        title: 'Login de Usuário',
+        labelMenu: 'Login',
+        url: '/folder/login',
+        isLoginId: false
+        //iosIcon: null,
+        //mdIcon: null,
+      },
+      {
+        title: 'Criar login',
+        labelMenu: 'Criar login',
+        url: '/folder/registro',
+        isLoginId: false
+        //iosIcon: null,
+        //mdIcon: null,
+      },
+      {
+        title: 'Cadastro de Organizadores',
+        labelMenu: 'Organizadores',
+        url: '/folder/Organizadores',
+        isLoginId: true
+        //iosIcon: null,
+        //mdIcon: null,
+      },
+      {
+        title: 'Cadastro de Eventos',
+        labelMenu: 'Eventos',
+        url: '/folder/Eventos',
+        isLoginId: true
+        //iosIcon: paperPlaneOutline,
+        //mdIcon: paperPlaneSharp,
+      },
+      {
+        title: 'Cadastro de Categorias',
+        labelMenu: 'Categorias',
+        url: '/folder/Categorias',
+        isLoginId: true
+        // iosIcon: archiveOutline,
+        // mdIcon: archiveSharp,
+      },
+      {
+        title: 'Cadastro de Baterias',
+        labelMenu: 'Baterias',
+        url: '/folder/Baterias',
+        isLoginId: true
+        // iosIcon: warningOutline,
+        // mdIcon: warningSharp,
+      },
+      {
+        title: 'Cadastro de Filiação',
+        labelMenu: 'Filiações',
+        url: '/folder/Filiacoes',
+        isLoginId: true
+        //iosIcon: heartOutline,
+        //mdIcon: heartSharp,
+      },
+      {
+        title: 'Cadastro de Juizes',
+        labelMenu: 'Juizes',
+        url: '/folder/Juizes',
+        isLoginId: true
+        //iosIcon: heartOutline,
+        //mdIcon: heartSharp,
+      },
+      {
+        title: 'Cadastro de Atletas',
+        labelMenu: 'Atletas',
+        url: '/folder/Atletas',
+        isLoginId: true
+        // iosIcon: trashOutline,
+        // mdIcon: trashSharp,
+      },
+      {
+        title: 'Teste',
+        labelMenu: 'Teste',
+        url: '/folder/teste',
+        isLoginId: true
+        // iosIcon: warningOutline,
+        // mdIcon: warningSharp,
+      }];
 
-const path = window.location.pathname;
-if (path !== undefined) {
-  selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
+
+        // Check authentication state and update isLoginId accordingly
+      // runs after firebase is initialized
+
+      
+      
+        // Your other methods
+      const signOut = () => {
+          firebase.auth().signOut()
+          router.push('/')
+        }
+
+    const path = window.location.pathname;
+    if (path !== undefined) {
+      selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
+    }
+    return { showModal, showLoginModal, hideLoginModal };
+  }
 }
-
-
 </script>
 
 <style scoped>
@@ -258,5 +322,9 @@ ion-note {
 
 ion-item.selected {
   --color: var(--ion-color-primary);
+}
+
+.custom-router-outlet {
+  margin: 16px; /* Adjust the margin value as needed */
 }
 </style>

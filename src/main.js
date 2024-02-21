@@ -6,7 +6,7 @@ import Mask from 'ionic-vue-input-mask';
 import { IonicVue } from '@ionic/vue';
 
 import  FirebaseService  from '@/database/FirebaseService.js';
-
+FirebaseService.initializeApp();
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -27,7 +27,7 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-FirebaseService.initializeApp();
+
 
 
 const app = createApp(App);
@@ -38,5 +38,9 @@ const app = createApp(App);
 router.isReady().then(() => {
   app.mount('#app');
 });
+
+
+
+
 
 

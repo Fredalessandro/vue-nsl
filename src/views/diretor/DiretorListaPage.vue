@@ -1,9 +1,9 @@
-<!-- src/views/ListaOrganizadors.vue -->
+<!-- src/views/ListaDiretors.vue -->
 <template>
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Organizadores</ion-title>
+        <ion-title>Lista de Diretores de Prova</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -15,6 +15,7 @@
         <ion-row class="ion-align-items-start">
           <ion-col size=0.5>id</ion-col>
           <ion-col >Nome</ion-col>
+          <ion-col size=2>Telefone</ion-col>
           <ion-col >E-mail</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
@@ -24,6 +25,8 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.nome }}</ion-col>
+            <ion-col size=2 style="text-align: center;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.telefone }}</ion-col>  
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.email }}</ion-col>
             <ion-col size=0.8 style="text-align: center;"
@@ -44,7 +47,7 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroOrganizadorModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+    <CadastroDiretorModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
 </ion-page>
 </template>
 
@@ -56,18 +59,18 @@ import {
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
 import { add,document, create, trash } from 'ionicons/icons';
-import CadastroOrganizadorModal from '@/views/Organizador/CadastroOrganizadorModal.vue';
+import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
 import  FirebaseService  from '@/database/FirebaseService.js';
 import Sequencia from '@/model/Sequencia';
 import '../styles.css';
-import Organizador from '../../model/Organizador';
+import Diretor from '../../model/Diretor';
 
 export default {
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
     IonButtons, IonCheckbox,
-    CadastroOrganizadorModal
+    CadastroDiretorModal
   },
   data() {
     return {
@@ -79,8 +82,8 @@ export default {
       isCheckedAll: false,
       filteredItems: [],
       items: [],
-      objeto: new Organizador(null),
-      objetoEdicao: new Organizador(),
+      objeto: new Diretor(null),
+      objetoEdicao: new Diretor(),
       menuState: true,
       modalAberta: false,
       sequencia: Sequencia
@@ -99,7 +102,7 @@ export default {
       );
     },
     fetchItems() {
-      const itemsRef = FirebaseService.database.ref('Organizadores');
+      const itemsRef = FirebaseService.database.ref('Diretores');
       itemsRef.on('value', (snapshot) => {
         this.items = [];
         snapshot.forEach((childSnapshot) => {
@@ -114,7 +117,7 @@ export default {
     },
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Organizador(null);  
+        let dadosEdicao = new Diretor(null);  
         this.objetoEdicao = dadosEdicao;
       } 
       this.modalAberta = true; 
@@ -125,9 +128,10 @@ export default {
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.nome);
-      let dadosEdicao = new Organizador(
+      let dadosEdicao = new Diretor(
         objeto.id,
         objeto.nome,
+        objeto.telefone,
         objeto.email
       );
       this.objetoEdicao = dadosEdicao;
@@ -139,13 +143,13 @@ export default {
         // Gravar o documento no banco de dados local
 
         if (objeto.id != null) {
-          await FirebaseService.updateData('Organizadores/', objeto.id, objeto);
+          await FirebaseService.updateData('Diretores/', objeto.id, objeto);
         } else {
-          await FirebaseService.incrementarCodigo('organizador').then(value => {
+          await FirebaseService.incrementarCodigo('diretor').then(value => {
             objeto.id = value;
             console.log('Incremento', objeto.id);
 
-            FirebaseService.setData('Organizadores/' + value, objeto);
+            FirebaseService.setData('Diretores/' + value, objeto);
 
           });
         }
@@ -158,7 +162,7 @@ export default {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão da Organizador '+objeto.nome+' ?',
+          message: 'Exclusão da Diretor '+objeto.nome+' ?',
           cssClass : 'default-alert',
           buttons: [
             {
@@ -173,7 +177,7 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Organizadores/', objeto.id);
+                  FirebaseService.deleteData('Diretores/', objeto.id);
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

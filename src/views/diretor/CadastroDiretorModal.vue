@@ -4,7 +4,7 @@
   <ion-modal :is-open="isModalOpen" @ionModalDidDismiss="fecharModal" style="--height:80%; --width: 80%;">  
     <ion-header>
       <ion-toolbar>
-        <ion-title>Cadastro de Organizadors</ion-title>
+        <ion-title>Cadastro de Diretor de Prova</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="fecharModal">Fechar</ion-button>
         </ion-buttons>
@@ -19,7 +19,9 @@
         <ion-item>
           <ion-input style="margin-right: 5px; width: 400px;" :maxlength="50" label="Nome" v-model="objetoEdicao.nome" required></ion-input>
         </ion-item>
-       
+        <ion-item>
+          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="15"  label="Telefone" v-mask="'##-#####-####'" v-model="objetoEdicao.telefone" required></ion-input>
+        </ion-item>
         <ion-item>
           <ion-input style="margin-right: 5px; width: 400px;" :maxlength="250" label="E-mail" v-model="objetoEdicao.email" required></ion-input>
         </ion-item>
@@ -38,7 +40,7 @@ import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent,
   IonButton, IonFooter, IonButtons, IonInput , IonItem, IonLabel,
   IonSelect, IonSelectOption, IonText
 } from '@ionic/vue'; 
-import Organizador from '../../model/Organizador';
+import Diretor from '../../model/Diretor';
 
 export default {    
   
@@ -49,7 +51,7 @@ export default {
   IonButton, IonFooter,IonLabel,
   IonButtons, IonInput, IonItem,
   IonSelect, IonSelectOption, IonText,
-  Organizador
+  Diretor
 },
   data() {
     return {
@@ -71,4 +73,4 @@ export default {
   
 }; 
 
-</script>
+</script>../../model/Diretor

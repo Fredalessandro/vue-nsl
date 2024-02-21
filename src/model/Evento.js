@@ -5,6 +5,7 @@ export default class Atleta {
         this.local     = local;
         this.dataInicio= dataInicio;
         this.dataFinal = dataFinal;
+
         this.status    = status;
     }
 }

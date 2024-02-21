@@ -1,0 +1,19 @@
+{
+  "Sequencia": {
+    "atleta": {
+      "codigo": 0
+    },
+    "categoria": {
+      "codigo": 3
+    },
+    "diretor": {
+      "codigo": 0
+    },
+    "evento": {
+      "codigo": 1
+    },
+    "usuario": {
+      "codigo": 12
+    }
+  }
+}

@@ -6,5 +6,6 @@ export default class Categoria {
         this.idade        = idade;
         this.regra        = regra;
         this.atletas      = atletas;
+        
     }
 }

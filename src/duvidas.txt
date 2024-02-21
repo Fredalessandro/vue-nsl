@@ -1,0 +1,24 @@
+Criterios de notas na 
+
+Interferência
+
+com prioridade 100% na segunda maior nota
+sem prioridade 50%  na segunda maior nota
+    
+    Tipos Interferência 100%, qual no vai ser aplicado, Bloqueio 50% qual no vai ser aplicado quando não tem prioridade
+
+Equipe
+  
+  Nome
+  Entidade associada
+  Naturalidade
+  E-mail
+  Telefone
+  tipo Beach-Marshall, Head Judge, Judge,  Spotter 
+
+
+Organizador -> Diretor de prova
+
+
+Definir rank no final do evento por colocação
+Definir rank no final do evento por pontuação

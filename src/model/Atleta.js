@@ -1,8 +1,9 @@
 export default class Atleta {
-  constructor(id,nome,email,telefone,cpf,dataNascimento,cep,endereco,
-    numero,complemento,bairro,cidade,uf,tipo,rankEstadual,rankNacional) {
+  constructor(id,nome,apelidio,email,telefone,cpf,dataNascimento,cep,endereco,
+    numero,complemento,bairro,cidade,uf,tipo) {
     this.id = id;
     this.nome = nome;
+    this.apelidio = apelidio;
     this.email = email;
     this.telefone = telefone;
     this.cpf = cpf;
@@ -15,8 +16,6 @@ export default class Atleta {
     this.cidade = cidade;
     this.uf = uf;
     this.tipo = tipo;
-    this.rankEstadual=rankEstadual;
-    this.rankNacional=rankNacional;
   }
 }
   /*static clone(atleta) {

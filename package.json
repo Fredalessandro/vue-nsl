@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
     "test:e2e": "cypress run",
@@ -21,13 +21,15 @@
     "@ionic/vue": "^7.0.0",
     "@ionic/vue-router": "^7.0.0",
     "axios": "^1.6.5",
+    "chart.js": "^4.4.1",
     "cpf-check": "^3.0.0",
     "firebase": "^8.10.1",
     "i": "^0.3.7",
     "ionic-vue-input-mask": "^1.0.7",
     "ionicons": "^7.0.0",
-        "vue": "^3.3.0",
-    "vue-router": "^4.2.0"
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@capacitor/cli": "5.6.0",

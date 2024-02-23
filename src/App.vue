@@ -20,7 +20,7 @@
             </ion-avatar>
           </ion-row>  
           <ion-row class="ion-justify-content-center ion-align-items-center">   
-            <ion-title class="ion-justify-content-center ion-align-items-center">Nome do Usuário</ion-title>
+            <ion-title class="ion-justify-content-center ion-align-items-center">{{atributoCompartilhado}}</ion-title>
           </ion-row>
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
@@ -59,9 +59,9 @@ import {
   IonMenuButton
 } from '@ionic/vue';
 import { ref } from 'vue'
-import firebase from 'firebase/app';
 import { useRouter } from 'vue-router';
-
+import EventBus from '@/EventBus';
+ 
 const router = useRouter();
 const selectedIndex = ref(0);
 const appPages = [
@@ -122,19 +122,24 @@ const appPages = [
     // mdIcon: warningSharp,
   },
 ];
-
+  /*if (!this.getUser()) {
+    // If authentication is required but the user is not authenticated, redirect to login
+    router.replace('login');
+  } else {
+    // If authentication is not required but the user is authenticated, redirect to dashboard
+    router.replace('Home');
+  }*/
+/*
 firebase.auth().onAuthStateChanged((user) => {
   const isAuthenticated = !!user;
-  //const requiresAuth = router.currentRoute.value.meta.requiresAuth;
-
   if (!isAuthenticated) {
     // If authentication is required but the user is not authenticated, redirect to login
     router.replace('login');
   } else if (isAuthenticated) {
     // If authentication is not required but the user is authenticated, redirect to dashboard
-    router.replace('');
+    router.replace('Home');
   }
-});
+});*/
 
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
@@ -143,9 +148,16 @@ if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
 }
 
+let atributoCompartilhado = 'Valor inicial';
+
+const atualizarAtributo = (novoValor) => {
+      atributoCompartilhado = novoValor;
+}
+
+//EventBus.config.globalProperties.$on('atualizarAtributo', atualizarAtributo);
 
 
-
+this.$router.push('Login')
 </script>
 
 <style scoped>

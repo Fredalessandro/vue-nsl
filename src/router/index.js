@@ -5,8 +5,12 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 const routes = [
   {
     path: '/',
-    name: '',
-    redirect: '/folder/Inbox',
+    redirect: '/home'
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: () => import ('../views/Home.vue')
   },
   {
     path: '/folder/login',

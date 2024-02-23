@@ -9,7 +9,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-menu content-id="main-content" menu-id="side-menu">
+    <ion-menu v-if="store.state.atributoCompartilhado==='Novo Valor'" content-id="main-content" menu-id="side-menu">
 
       <ion-content>
         <ion-list id="inbox-list">
@@ -20,7 +20,7 @@
             </ion-avatar>
           </ion-row>  
           <ion-row class="ion-justify-content-center ion-align-items-center">   
-            <ion-title class="ion-justify-content-center ion-align-items-center">{{atributoCompartilhado}}</ion-title>
+            <ion-title class="ion-justify-content-center ion-align-items-center">{{ store.state.atributoCompartilhado }}</ion-title>
           </ion-row>
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
@@ -35,7 +35,7 @@
 
     </ion-menu>
     <ion-router-outlet id="main-content"></ion-router-outlet>
-
+    <div></div>
 
   </ion-app>
 </template>
@@ -60,7 +60,8 @@ import {
 } from '@ionic/vue';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
-import EventBus from '@/EventBus';
+import store from './store';
+
  
 const router = useRouter();
 const selectedIndex = ref(0);
@@ -142,22 +143,15 @@ firebase.auth().onAuthStateChanged((user) => {
 });*/
 
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
-
+//let atributoCompartilhado = store.state.atributoCompartilhado;
 const path = window.location.pathname;
 if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
 }
 
-let atributoCompartilhado = 'Valor inicial';
-
-const atualizarAtributo = (novoValor) => {
-      atributoCompartilhado = novoValor;
-}
 
 //EventBus.config.globalProperties.$on('atualizarAtributo', atualizarAtributo);
 
-
-this.$router.push('Login')
 </script>
 
 <style scoped>

@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import App from './App.vue'
 import router from './router';
 import Mask from 'ionic-vue-input-mask';
-import eventBus from '@/EventBus';
 
 import { IonicVue } from '@ionic/vue';
 
@@ -27,12 +26,12 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import EventBus from '@/EventBus';
+import store from './store';
 
 const app = createApp(App);
-app.config.globalProperties.$eventBus = EventBus; 
   app.use(IonicVue);
   app.use(Mask);
+  app.use(store);
   app.use(router);
   
 router.isReady().then(() => {

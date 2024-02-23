@@ -2,5 +2,5 @@
 
 import { createApp } from 'vue';
 
-const eventBus = createApp({});
-export default eventBus;
+const app = createApp({});
+export default app.config.globalProperties.$eventBus || app;

@@ -60,7 +60,8 @@ export default {
           email: this.email,
           password: this.password,
         });
-        eventBus.config.globalProperties.$emit('atualizarAtributo', 'novoValor');
+        //this.$store.commit('user', user);
+        this.$router.go('home');
         console.log('Signed in successfully:', user);
         // Navigate to another page or perform additional actions if needed
       } catch (error) {

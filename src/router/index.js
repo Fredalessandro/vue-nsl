@@ -13,37 +13,37 @@ const routes = [
     component: () => import ('../views/Home.vue')
   },
   {
-    path: '/folder/login',
+    path: '/login',
     name: 'Login',
     component: () => import ('../views/login/login.vue')
   },
   {
-    path: '/folder/registro',
+    path: '/registro',
     name: 'Registro',
     component: () => import ('../views/registro/registro.vue')
   },
   {
-    path: '/folder/diretor',
+    path: '/diretor',
     name: 'Diretor',
     component: () => import ('../views/diretor/DiretorListaPage.vue'),
   },
   {
-    path: '/folder/eventos',
+    path: '/eventos',
     name: 'Evento',
     component: () => import ('../views/evento/EventoListaPage.vue'),
   },
   {
-    path: '/folder/categorias',
+    path: '/categorias',
     name: 'Categoria',
     component: () => import ('../views/categoria/CategoriaListaPage.vue'),
   },
   {
-    path: '/folder/atletas',
+    path: '/atletas',
     name: 'Atleta',
     component: () => import ('../views/atleta/AtletaListaPage.vue'),
   },
   {
-    path: '/folder/baterias',
+    path: '/baterias',
     name: 'Bateria',
     component: () => import ('../views/bateria/Bateria.vue'),
   },

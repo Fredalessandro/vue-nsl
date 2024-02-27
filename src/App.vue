@@ -9,19 +9,15 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-menu v-if="store.state.atributoCompartilhado==='Novo Valor'" content-id="main-content" menu-id="side-menu">
+    <ion-menu v-if="store.getters.getUser" content-id="main-content" menu-id="side-menu">
 
       <ion-content>
         <ion-list id="inbox-list">
-          <ion-item class="ion-margin-bottom">
-           <ion-row class="ion-justify-content-center ion-align-items-center"> 
-            <ion-avatar class="ion-justify-content-center ion-align-items-center">
+          <ion-item class="ion-justify-content-center ion-align-items-center">
+            <ion-avatar>
               <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
             </ion-avatar>
-          </ion-row>  
-          <ion-row class="ion-justify-content-center ion-align-items-center">   
-            <ion-title class="ion-justify-content-center ion-align-items-center">{{ store.state.atributoCompartilhado }}</ion-title>
-          </ion-row>
+            <ion-label>{{ store.getters.getUser.displayName || store.getters.getUser.email }}</ion-label> 
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
             <ion-item v-if="p.labelMenu!=null" @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false"
@@ -123,13 +119,10 @@ const appPages = [
     // mdIcon: warningSharp,
   },
 ];
-  /*if (!this.getUser()) {
+  if (!store.getters.getUser) {
     // If authentication is required but the user is not authenticated, redirect to login
     router.replace('login');
-  } else {
-    // If authentication is not required but the user is authenticated, redirect to dashboard
-    router.replace('Home');
-  }*/
+  }
 /*
 firebase.auth().onAuthStateChanged((user) => {
   const isAuthenticated = !!user;

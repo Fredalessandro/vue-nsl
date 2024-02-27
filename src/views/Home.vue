@@ -9,7 +9,7 @@
     </ion-header>
 
     <ion-content class="ion-padding">
-      <ion-button @click="emitirEvento">Emitir Evento</ion-button>
+      
     </ion-content>
   </ion-page>
 </template>

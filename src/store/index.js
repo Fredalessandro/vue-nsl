@@ -1,7 +1,7 @@
 // src/store/index.js
 
 import { createStore } from 'vuex';
-import { auth } from '../firebase';
+import {firebase} from '../firebase.js';
 
 export default createStore({
   state: {
@@ -16,7 +16,7 @@ export default createStore({
     async signInWithEmailAndPassword({ commit }, { email, password }) {
       try {
         // Sign in with email and password
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
         // Set the user in session

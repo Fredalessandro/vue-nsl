@@ -5,9 +5,6 @@ import Mask from 'ionic-vue-input-mask';
 
 import { IonicVue } from '@ionic/vue';
 
-import  FirebaseService  from '@/database/FirebaseService.js';
-FirebaseService.initializeApp();
-
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
 

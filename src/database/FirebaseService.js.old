@@ -1,12 +1,9 @@
-import Sequencia from '@/model/Sequencia';
 import firebaseConfig from '../configuration/firebaseConfig';
-import firebase from 'firebase/app';
-import 'firebase/database';
+import firebase from 'firebase/compat/app';
+import { getDatabase, ref as dbRef, child, get } from 'firebase/database';
 
 class FirebaseService {
 
-  static database = firebase.database.Database;
-  
   constructor() {
     // Evita instâncias da classe
   }
@@ -14,11 +11,7 @@ class FirebaseService {
   static initializeApp() {
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
-      this.database = firebase.database();
-      
-    }
-    
-    
+    } 
   }
 
   static async incrementarCodigo(path) {
@@ -60,10 +53,24 @@ class FirebaseService {
   }
 
   static async getData(path) {
-    const snapshot = await this.database.ref(path).once('value');
-    return snapshot.toJSON();
-  }
+      // Create a reference to your database
+    const database = getDatabase();
+    const itemsRef = dbRef(database, path); // Adjust the path as needed
 
+    // Create a Vue ref to store the data
+    const items = ref([]);
+
+    // Listen for changes in the data
+    const unsubscribe = onValue(itemsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        items.value = Object.values(data);
+      } else {
+        items.value = [];
+      }
+    return items;
+  });
+  }
   static async setData(path, data) { 
     try {
       await this.database.ref(path).set(data);

@@ -13,16 +13,16 @@
       
       <ion-grid >
         <ion-row class="ion-align-items-start">
-          <ion-col size=0.5>id</ion-col>
+          <!--<ion-col size=0.5>id</ion-col>-->
           <ion-col >Nome</ion-col>
           <ion-col size=2>Telefone</ion-col>
           <ion-col >E-mail</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
-        <div v-for="(objeto, index) in filteredItems" :key="objeto.id" class="ion-align-items-start">
+        <div v-for="(objeto, index) in data" :key="objeto.id" class="ion-align-items-start">
           <ion-row>
-            <ion-col size=0.5 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>
+            <!--<ion-col size=0.5 style="text-align: center;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.nome }}</ion-col>
             <ion-col size=2 style="text-align: center;"
@@ -52,7 +52,7 @@
 </template>
 
 <script >
-import { alertController } from '@ionic/core'
+import { alertController } from '@ionic/core';
 import { ref,  onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -60,10 +60,11 @@ import {
 } from '@ionic/vue';
 import { add,document, create, trash } from 'ionicons/icons';
 import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
-import  FirebaseService  from '@/database/FirebaseService.js';
+import FirestoreService from '@/database/FirestoreService.js';
 import Sequencia from '@/model/Sequencia';
 import '../styles.css';
 import Diretor from '../../model/Diretor';
+import useFirestoreService from '@/database/FirestoreQueryService';
 
 export default {
   components: {
@@ -72,6 +73,17 @@ export default {
     IonButtons, IonCheckbox,
     CadastroDiretorModal
   },
+  setup() {
+    const { data, fetchCollection } = useFirestoreService('Diretores'); // Replace with your actual collection name
+
+    // Fetch the collection when the component is mounted
+    onMounted(() => {
+      fetchCollection();
+    });
+
+    return { data };
+  },
+
   data() {
     return {
       iconAdd: add,
@@ -81,7 +93,7 @@ export default {
       searchTerm: '',
       isCheckedAll: false,
       filteredItems: [],
-      items: [],
+      itens: [],
       objeto: new Diretor(null),
       objetoEdicao: new Diretor(),
       menuState: true,
@@ -93,28 +105,22 @@ export default {
     searchTerm: 'searchItems',
   },
   created() {
-    this.fetchItems();
+    this.filteredItems = this.data;
   },
   methods: {
     searchItems() {
-      this.filteredItems = this.items.filter((item) =>
-        item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      if (this.data) {
+        this.filteredItems = this.data.filter((item) =>
+          item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+      }
     },
-    fetchItems() {
-      const itemsRef = FirebaseService.database.ref('Diretores');
-      itemsRef.on('value', (snapshot) => {
-        this.items = [];
-        snapshot.forEach((childSnapshot) => {
-          const item = {
-            key: childSnapshot.key,
-            ...childSnapshot.val(),
-          };
-          this.items.push(item);
-        });
-        this.searchItems();
-      });
-    },
+    /*async fetchItems() {
+      const collectionName = 'Diretores'; // replace with your actual collection name
+      this.itens = [];
+      this.itens = await FirestoreService.getCollection(collectionName);
+      this.searchItems();
+    },*/
     abrirModal(novo) {
       if (novo) {
         let dadosEdicao = new Diretor(null);  
@@ -140,19 +146,15 @@ export default {
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        // Gravar o documento no banco de dados local
-
-        if (objeto.id != null) {
-          await FirebaseService.updateData('Diretores/', objeto.id, objeto);
-        } else {
-          await FirebaseService.incrementarCodigo('diretor').then(value => {
-            objeto.id = value;
-            console.log('Incremento', objeto.id);
-
-            FirebaseService.setData('Diretores/' + value, objeto);
-
-          });
-        }
+          const collectionName = 'Diretores';
+          if (objeto.id) {
+            await FirestoreService.set(collectionName,objeto.id,objeto);
+          } else {
+            await FirestoreService.add(collectionName, objeto);
+          }
+          fetchCollection();
+          //fetchData();
+        
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
       }
@@ -177,7 +179,8 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Diretores/', objeto.id);
+                  const collectionName = 'Diretores';
+                  FirestoreService.remove(collectionName,objeto.id);
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
@@ -188,7 +191,8 @@ export default {
         })
         .then(a => a.present())
     },
-  },
+  }
+  
 }
 
 </script>

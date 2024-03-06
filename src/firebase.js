@@ -1,9 +1,13 @@
 // src/firebase.js
-
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import firebaseConfig from './configuration/firebaseConfig';
-
-firebase.initializeApp(firebaseConfig);
-
-export const auth = firebase.auth();
+// firebase.js
+import firebaseConfig from '@/configuration/firebaseConfig';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+//import { initializeApp } from 'firebase/compat/app';
+//import { getDatabase, ref, set, remove, query, onValue } from 'firebase/database';
+//import  'firebase/compat/auth'
+//const firebaseApp = initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database;
+const auth = firebase.auth;
+export { firebase, database };

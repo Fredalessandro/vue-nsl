@@ -35,10 +35,8 @@ import { ref } from 'vue';
 import {
   IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
 } from '@ionic/vue';
-import firebase from 'firebase'
 import { useRouter } from 'vue-router' // import router
 import 'ionicons/icons';
-import eventBus from '@/EventBus';
 
 export default {
   components: {
@@ -61,7 +59,7 @@ export default {
           password: this.password,
         });
         //this.$store.commit('user', user);
-        this.$router.go('home');
+        this.router.replace('home');
         console.log('Signed in successfully:', user);
         // Navigate to another page or perform additional actions if needed
       } catch (error) {
@@ -71,7 +69,7 @@ export default {
 
     },
     async signInWithGoogle(){
-        try {
+       /**try {
             const provider = new firebase.auth.GoogleAuthProvider();
             const result = await firebase.auth().signInWithPopup(provider); // User is signed in.
             const user = result.user;
@@ -79,7 +77,7 @@ export default {
             console.log('Successfully signed in with Google:', user);
         } catch (error) {
             console.error(error.message);
-        }
+        }*/
     },
     register(){
         this.$router.push({ name: 'Registro' });

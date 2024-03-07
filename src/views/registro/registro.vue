@@ -6,11 +6,23 @@
                  <ion-title>Criar Usuário</ion-title>
              </ion-item>
              <ion-item class="custom-bordered-list">
+                 <ion-input   label="Nome" v-model="nome" type="text"
+                     required></ion-input>
+             </ion-item>
+             <ion-item class="custom-bordered-list">
+                 <ion-input   label="Telefone" v-model="telefone" v-mask="'##-#####-####'" 
+                     required></ion-input>
+             </ion-item>
+             <ion-item class="custom-bordered-list">
                  <ion-input   label="Email" v-model="email" type="email"
                      required></ion-input>
              </ion-item>
              <ion-item class="custom-bordered-list">
-                 <ion-input  label="Password" :maxlength="8" v-model="password" type="password"
+                 <ion-input  label="Senha" :maxlength="8" v-model="senha" type="password"
+                     required></ion-input>
+             </ion-item>
+             <ion-item class="custom-bordered-list">
+                 <ion-input  label="Confirme a senha" :maxlength="8" v-model="confirmeSenha" type="password"
                      required></ion-input>
              </ion-item>
              <!--<ion-item class="custom-bordered-bottom">
@@ -33,34 +45,48 @@
  import {
   IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
   } from '@ionic/vue';
-  import firebase from 'firebase'
+  import {firebase} from '../../firebase.js';
+  import FirestoreService from '@/database/FirestoreService.js';
   import { useRouter } from 'vue-router' // import router
   import 'ionicons/icons';
-
+  import Diretor from '../../model/Diretor';
 export default {
   components: {
-    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
+    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput,
+    Diretor
   },
   data() {
     return {
+    nome: '',
+    telefone: '',
     email: '',
-    password: '',
+    senha: '',
+    confirmeSenha: '',
     router: useRouter(), // get a reference to our vue router   
   }},
   methods: {
-    register(){
+   async register(){
       firebase
         .auth() // get the auth api
-        .createUserWithEmailAndPassword(this.email, this.password) // need .value because ref()
+        .createUserWithEmailAndPassword(this.email, this.senha) // need .value because ref()
         .then((data) => {
+          
           console.log('Successfully registered!');
-          this.router.push({ name: 'Home' }); // redirect to the feed
-          window.location.reload();
+          
+          
         })
         .catch(error => {
           console.log(error.code)
-          alert(error.message);
-        });
+        alert(error.message);
+      });
+      
+      const collectionName = 'Diretores';
+      const diretor = new Diretor(null,this.nome,this.telefone,this.email,null);
+      await FirestoreService.add(collectionName, diretor);
+
+      this.router.push({ name: 'Home' }); // redirect to the feed
+      window.location.reload();
+
     },
     cancel(){
         this.router.push({name:'Home'});
@@ -78,7 +104,7 @@ export default {
    justify-content: center;
    align-items: left;
    height: 100vh;
-   max-width: 300px; /* Ajuste conforme necessário */
+   max-width: 80%; /* Ajuste conforme necessário */
    width: 60vh;/* Adjust the button width as needed */
    margin: auto; /* Set the height to 100% of the viewport height */
  }

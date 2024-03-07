@@ -13,7 +13,7 @@
                 <ion-input  label="Password" :maxlength="8" v-model="password" type="password"
                     required></ion-input>
             </ion-item>
-            <ion-item class="no-bottom-border" style="align: center;">
+            <ion-item class="no-bottom-border" style="align">
                 <ion-button @click="signIn" class="custom-button">Entrar</ion-button>
             </ion-item>
             <!--<ion-item class="custom-bordered-bottom">
@@ -59,7 +59,8 @@ export default {
           password: this.password,
         });
         //this.$store.commit('user', user);
-        this.router.replace('home');
+        this.router.push({ name: 'Home' }); // redirect to the feed
+        window.location.reload();
         console.log('Signed in successfully:', user);
         // Navigate to another page or perform additional actions if needed
       } catch (error) {

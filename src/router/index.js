@@ -1,6 +1,6 @@
 
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-
+import EventoListaPage from '../views/evento/EventoListaPage.vue'
 
 const routes = [
   {

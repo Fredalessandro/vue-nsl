@@ -9,7 +9,7 @@
 
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchItems" ></ion-searchbar>
+      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="updateSearch" ></ion-searchbar>
       
       <ion-grid >
         <ion-row class="ion-align-items-start">
@@ -19,7 +19,7 @@
           <ion-col >E-mail</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
-        <div v-for="(objeto, index) in data" :key="objeto.id" class="ion-align-items-start">
+        <div v-for="(objeto, index) in filteredItems" :key="objeto.id" class="ion-align-items-start">
           <ion-row>
             <!--<ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
@@ -53,7 +53,6 @@
 
 <script >
 import { alertController } from '@ionic/core';
-import { ref,  onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
@@ -64,7 +63,7 @@ import FirestoreService from '@/database/FirestoreService.js';
 import Sequencia from '@/model/Sequencia';
 import '../styles.css';
 import Diretor from '../../model/Diretor';
-import useFirestoreService from '@/database/FirestoreQueryService';
+import { getFirestore, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
 export default {
   components: {
@@ -73,17 +72,6 @@ export default {
     IonButtons, IonCheckbox,
     CadastroDiretorModal
   },
-  setup() {
-    const { data, fetchCollection } = useFirestoreService('Diretores'); // Replace with your actual collection name
-
-    // Fetch the collection when the component is mounted
-    onMounted(() => {
-      fetchCollection();
-    });
-
-    return { data };
-  },
-
   data() {
     return {
       iconAdd: add,
@@ -91,36 +79,34 @@ export default {
       iconDelete: trash,
       iconEdit: create,
       searchTerm: '',
-      isCheckedAll: false,
-      filteredItems: [],
-      itens: [],
-      objeto: new Diretor(null),
+      items: [],
       objetoEdicao: new Diretor(),
-      menuState: true,
       modalAberta: false,
       sequencia: Sequencia
     };
   },
-   watch: {
-    searchTerm: 'searchItems',
+  mounted() {
+    const db = getFirestore();
+    const itemsCollection = collection(db, 'Diretores/'); // Replace with your Firestore collection name
+
+    const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
+
+    onSnapshot(q, (snapshot) => {
+      this.items = [];
+      snapshot.forEach((doc) => {
+        this.items.push({ id: doc.id, ...doc.data() });
+      });
+    });
   },
-  created() {
-    this.filteredItems = this.data;
-  },
-  methods: {
-    searchItems() {
-      if (this.data) {
-        this.filteredItems = this.data.filter((item) =>
-          item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
-        );
-      }
+  computed: {
+    filteredItems() {
+      return this.items.filter(item => item.nome.toLowerCase().includes(this.searchTerm.toLowerCase()));
     },
-    /*async fetchItems() {
-      const collectionName = 'Diretores'; // replace with your actual collection name
-      this.itens = [];
-      this.itens = await FirestoreService.getCollection(collectionName);
-      this.searchItems();
-    },*/
+  }, 
+  methods: {
+    updateSearch(event) {
+      this.searchTerm = event.detail.value;
+    },
     abrirModal(novo) {
       if (novo) {
         let dadosEdicao = new Diretor(null);  
@@ -152,9 +138,6 @@ export default {
           } else {
             await FirestoreService.add(collectionName, objeto);
           }
-          fetchCollection();
-          //fetchData();
-        
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
       }
@@ -191,8 +174,7 @@ export default {
         })
         .then(a => a.present())
     },
-  }
-  
+  }  
 }
 
 </script>

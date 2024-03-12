@@ -50,6 +50,7 @@
   import { useRouter } from 'vue-router' // import router
   import 'ionicons/icons';
   import Diretor from '../../model/Diretor';
+  import store from '../../store/index.js';
 export default {
   components: {
     IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput,
@@ -57,15 +58,16 @@ export default {
   },
   data() {
     return {
-    nome: '',
-    telefone: '',
-    email: '',
-    senha: '',
-    confirmeSenha: '',
+    nome: 'ALESSANDRO',
+    telefone: '81984147601',
+    email: 'fredalessandro@gmail.com',
+    senha: '31281704',
+    confirmeSenha: '31281704',
     router: useRouter(), // get a reference to our vue router   
   }},
   methods: {
    async register(){
+    try {
       firebase
         .auth() // get the auth api
         .createUserWithEmailAndPassword(this.email, this.senha) // need .value because ref()
@@ -73,20 +75,29 @@ export default {
           
           console.log('Successfully registered!');
           
-          
         })
         .catch(error => {
           console.log(error.code)
-        alert(error.message);
+          alert(error.message);
       });
-      
-      const collectionName = 'Diretores';
-      const diretor = new Diretor(null,this.nome,this.telefone,this.email,null);
-      await FirestoreService.add(collectionName, diretor);
 
-      this.router.push({ name: 'Home' }); // redirect to the feed
-      window.location.reload();
+        
+        const collectionName = 'Diretores';
 
+        const diretor = await FirestoreService.add(collectionName, new Diretor(null,this.nome,this.telefone,this.email,'OPERADOR',null));
+        
+        await this.$store.dispatch('setDiretorStorage', { diretor : diretor})
+        .then(()=>{
+          this.router.push('Login'); // redirect to the feed
+          window.location.reload();
+        }).catch(error => {
+          console.error('Error add data:', error);
+          alert(error.message);
+        });
+
+      } catch(error)  {
+        console.error('Error add data:', error);
+      };
     },
     cancel(){
         this.router.push({name:'Home'});

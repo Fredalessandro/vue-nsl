@@ -31,14 +31,14 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.email }}</ion-col>
             <ion-col size=0.8 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon v-if="isAdmin" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
               <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
             </ion-col>
           </ion-row>
         </div>
       </ion-grid>
     </ion-content>
-    <ion-footer class="ion-footer-fixed ion-padding" slot="end">
+    <ion-footer v-if="isAdmin" class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
           <ion-button class="round-button" @click="abrirModal(true)">
@@ -60,10 +60,10 @@ import {
 import { add,document, create, trash } from 'ionicons/icons';
 import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
-import Sequencia from '@/model/Sequencia';
 import '../styles.css';
 import Diretor from '../../model/Diretor';
 import { getFirestore, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+
 
 export default {
   components: {
@@ -80,20 +80,22 @@ export default {
       iconEdit: create,
       searchTerm: '',
       items: [],
+      collectionName: 'Diretores',
       objetoEdicao: new Diretor(),
       modalAberta: false,
-      sequencia: Sequencia
+      isAdmin: this.$store.getters.getDiretor.perfil === 'ADMIN',
     };
   },
   mounted() {
     const db = getFirestore();
-    const itemsCollection = collection(db, 'Diretores/'); // Replace with your Firestore collection name
+    const itemsCollection = collection(db, this.collectionName); // Replace with your Firestore collection name
 
     const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
 
     onSnapshot(q, (snapshot) => {
       this.items = [];
       snapshot.forEach((doc) => {
+        if (doc.id === this.$store.getters.getDiretor.id)
         this.items.push({ id: doc.id, ...doc.data() });
       });
     });
@@ -124,7 +126,8 @@ export default {
         objeto.id,
         objeto.nome,
         objeto.telefone,
-        objeto.email
+        objeto.email,
+       'OPERADOR'
       );
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -132,11 +135,10 @@ export default {
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-          const collectionName = 'Diretores';
           if (objeto.id) {
-            await FirestoreService.set(collectionName,objeto.id,objeto);
+            await FirestoreService.set(this.collectionName,objeto.id,objeto);
           } else {
-            await FirestoreService.add(collectionName, objeto);
+            await FirestoreService.add(this.collectionName, objeto);
           }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -147,7 +149,7 @@ export default {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão da Diretor '+objeto.nome+' ?',
+          message: 'Exclusão do Diretor '+objeto.nome+' ?',
           cssClass : 'default-alert',
           buttons: [
             {
@@ -162,8 +164,7 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  const collectionName = 'Diretores';
-                  FirestoreService.remove(collectionName,objeto.id);
+                  FirestoreService.remove(this.collectionName,objeto.id);
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
@@ -178,16 +179,3 @@ export default {
 }
 
 </script>
-<style scoped>
-.content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* You might need to adjust the height based on your layout */
-}
-
-.centered-items {
-  text-align: center;
-  /* Additional styling for the centered content */
-}
-</style>

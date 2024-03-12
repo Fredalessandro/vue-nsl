@@ -43,8 +43,8 @@ export default {
     IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
   },
   data() {
-    return {email: '',
-    password: '',
+    return {email: 'fredalessandro@gmail.com',
+    password: '31281704',
     router: useRouter(), // get a reference to our vue router
     googleLogo: ref('logo-google.svg')};    
   },
@@ -59,8 +59,8 @@ export default {
           password: this.password,
         });
         //this.$store.commit('user', user);
-        this.router.push({ name: 'Home' }); // redirect to the feed
-        window.location.reload();
+        this.$router.replace('/home'); // redirect to the feed
+        //window.location.reload();
         console.log('Signed in successfully:', user);
         // Navigate to another page or perform additional actions if needed
       } catch (error) {

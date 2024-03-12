@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, addDoc, setDoc, deleteDoc, collection, getDocs,  query, where } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, addDoc, updateDoc, increment, setDoc, deleteDoc, collection, getDocs,  query, where } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 const db = getFirestore();
@@ -53,61 +53,63 @@ const FirestoreService = {
   },
 
   async set(collection, documentId, data) {
-    const documentRef = doc(db, collection, documentId);
-    await setDoc(documentRef, {...data});
+    try {
+      const documentRef = doc(db, collection, documentId);
+      await setDoc(documentRef, {...data});
+    }  catch (error) {
+      console.error('Error set document:', error);
+    } 
+
   },
 
   async add(collectionName, data) {
     try {
       
-     const documentId = uuidv4();
-
-     /*const exists = await this.checkCollectionExistence(collectionName);
-     if (!exists) {
-        await this.createEmptyCollection(collectionName);
-     }*/
-    
-     const collectionRef = collection(db, collectionName);
+      const collectionRef = collection(db, collectionName);
       
-     const docment = await addDoc(collectionRef, { ...data });
+      const doc = await addDoc(collectionRef, { ...data });
      
-     data.id = docment.id;
-     const documentRefSet = doc(db, collectionName, docment.id);
-     await setDoc(documentRefSet, {...data});
-     
-     console.log('Document added successfully with ID:', documentId);
-      //fetchCollection(); // Optionally fetch the updated collection after adding a document
+      data.id = doc.id;
+
+      this.set(collectionName, doc.id, {...data});
+
+      console.log('Document added successfully with ID:', doc.id);
+      
+      return  data;
+
     } catch (error) {
       console.error('Error adding document:', error);
-    }
+    } 
+    return null;
   },
 
   async remove(collection, documentId) {
     const documentRef = doc(db, collection, documentId);
     await deleteDoc(documentRef);
   },
-  
   async executeQuery(path, atributo, operador, valor) {
     const collectionRef = collection(db, path); // Replace with your Firestore collection name
     const q = query(collectionRef, where(atributo, operador, valor)); // Replace with your query conditions
 
-    try {
-      const querySnapshot = await getDocs(q);
-      let queryResults = [];
-      queryResults = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        data: () => doc.data(),
-      }));
-      return queryResults?queryResults[0]:null;
-    } catch (error) {
-      // Handle error
-      console.error('Error executing query:', error.message);
+      // Replace with your field name and desired value
+      try {
+        const querySnapshot =  getDocs(q);
+
+        if (querySnapshot.size > 0) {
+          // Document with the specified filter condition found
+          const documentData = querySnapshot.docs[0].data();
+          console.log('Document data:', documentData);
+          return documentData;
+        } else {
+          // No document matching the filter condition found
+          console.log('No document found with the specified filter condition');
+          return null;
+        }
+      } catch (error) {
+        // Handle error
+        console.error('Error getting document with filter:', error.message);
+      }
     }
-    return null;
-  },
-  
-};
-
-
+}
 
 export default FirestoreService;

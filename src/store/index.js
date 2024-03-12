@@ -30,18 +30,23 @@ export default createStore({
         commit("setUser", user);
         localStorage.setItem("user", JSON.stringify(user));
 
-        const diretor = await FirestoreService.executeQuery(
-          "Diretores",
-          "email",
-          "==",
-          email
-        );
-        // Set the director in session
-        commit("setDiretor", diretor);
-        localStorage.setItem("diretor", JSON.stringify(diretor));
         return user;
       } catch (error) {
         console.error("Error signing in:", error.message);
+        throw error;
+      }
+    },
+    async setDiretorStorage({ commit }, { diretor }) {
+      try {
+        // Sign in with email and password
+
+        // Set the user in session
+        commit("setDiretor", diretor);
+        localStorage.setItem("diretor", JSON.stringify(diretor));
+
+        return diretor;
+      } catch (error) {
+        console.error("Error setDiretorStorage in:", error.message);
         throw error;
       }
     },
@@ -92,16 +97,17 @@ export default createStore({
       );
     },
     getDiretor: (state) => {
-      user = localStorage.getItem("user");
-      const diretor = FirestoreService.executeQuery(
-        "Diretores",
-        "email",
-        "==",
-        user.email
+      // Tente obter o usuário do estado da loja
+      const diretorFromStore = state.diretor;
+
+      // Se não estiver presente no estado da loja, tente obtê-lo do localStorage
+      const diretorFromLocalStorage = localStorage.getItem("diretor");
+
+      // Retorne o usuário do estado da loja ou do localStorage, convertendo de volta para o formato de objeto JSON
+      return (
+        diretorFromStore ||
+        (diretorFromLocalStorage ? JSON.parse(diretorFromLocalStorage) : null)
       );
-      // Retorne o diretor do estado da loja ou do localStorage, convertendo de volta para o formato de objeto JSON
-      console.log("Retorne o diretor " + diretor + " /n" + JSON.parse(diretor));
-      return diretor ? JSON.parse(diretor) : null;
-    },
-  },
+    }
+  }
 });

@@ -19,7 +19,7 @@
             </ion-avatar>
           </ion-item>  
           <ion-item class="ion-justify-content-center ion-align-items-center">
-            <ion-label>{{ store.getters.getUser.displayName || store.getters.getUser.email }}</ion-label> 
+            <ion-label>{{ store.getters.getDiretor.nome || store.getters.getDiretor.email }}</ion-label> 
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
             <!--@click="selectedIndex = i"-->
@@ -50,7 +50,6 @@ import {
   IonMenu,
   IonMenuToggle,
   IonRouterOutlet,
-  IonRow,
   IonTitle,
   IonHeader,
   IonToolbar,

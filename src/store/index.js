@@ -62,18 +62,19 @@ export default createStore({
       throw error;
     }
   },
-  signOut() {
-    const auth = firebase.auth();
-    signOut(auth)
-      .then(() => {
+  
+  async signOut({commit}) {
+
+    await firebase.auth()
+    .signOut()
+    .then(() => {
         // Sign-out successful
         console.log("User signed out");
         commit("setUser", null);
         localStorage.removeItem("user");
 
-        const diretor =
-          // Set the director in session
-          commit("setDiretor", user);
+        // Set the director in session
+        commit("setDiretor", null);
         localStorage.removeItem("diretor");
         // Redirect or perform any other action after sign-out
       })
@@ -81,7 +82,9 @@ export default createStore({
         // An error happened
         console.error("Error signing out:", error.message);
       });
+
   }},
+
   getters: {
     getUser: (state) => {
       // Tente obter o usuário do estado da loja
@@ -104,6 +107,7 @@ export default createStore({
       const diretorFromLocalStorage = localStorage.getItem("diretor");
 
       // Retorne o usuário do estado da loja ou do localStorage, convertendo de volta para o formato de objeto JSON
+      const diretorFromFirestore = FirestoreService.get('Diretores', diretorFromLocalStorage)
       return (
         diretorFromStore ||
         (diretorFromLocalStorage ? JSON.parse(diretorFromLocalStorage) : null)

@@ -1,5 +1,5 @@
 import { getFirestore, doc, getDoc, addDoc, updateDoc, increment, setDoc, deleteDoc, collection, getDocs,  query, where } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+
 
 const db = getFirestore();
 

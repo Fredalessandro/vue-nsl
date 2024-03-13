@@ -59,7 +59,7 @@ export default {
           password: this.password,
         });
         //this.$store.commit('user', user);
-        this.$router.replace('/home'); // redirect to the feed
+        this.$router.replace('/'); // redirect to the feed
         //window.location.reload();
         console.log('Signed in successfully:', user);
         // Navigate to another page or perform additional actions if needed

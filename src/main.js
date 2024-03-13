@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
-import App from './App.vue'
-import router from './router';
+import App from './App1.vue'
+import router from './router/index1.js';
 import Mask from 'ionic-vue-input-mask';
 
 import { IonicVue } from '@ionic/vue';
@@ -23,7 +23,7 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import store from './store';
+import store from './store/index.js';
 
 const app = createApp(App);
   app.use(IonicVue);

@@ -31,14 +31,14 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.email }}</ion-col>
             <ion-col size=0.8 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon v-if="isAdmin" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon v-if="documentData && documentData.perfil  === 'ADMIN'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
               <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
             </ion-col>
           </ion-row>
         </div>
       </ion-grid>
     </ion-content>
-    <ion-footer v-if="isAdmin" class="ion-footer-fixed ion-padding" slot="end">
+    <ion-footer v-if="documentData && documentData.perfil  === 'ADMIN'" class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
           <ion-button class="round-button" @click="abrirModal(true)">
@@ -47,7 +47,7 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroDiretorModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+    <CadastroDiretorModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" :isReadOnly="documentData && documentData.perfil  === 'ADMIN'" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
 </ion-page>
 </template>
 
@@ -57,13 +57,14 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
+import { ref, onMounted } from 'vue';
 import { add,document, create, trash } from 'ionicons/icons';
 import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
 import Diretor from '../../model/Diretor';
-import { getFirestore, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-
+import { getFirestore, doc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import {firebase} from '@/firebase.js';
 
 export default {
   components: {
@@ -83,27 +84,57 @@ export default {
       collectionName: 'Diretores',
       objetoEdicao: new Diretor(),
       modalAberta: false,
-      isAdmin: this.$store.getters.getDiretor.perfil === 'ADMIN',
+      documentData : null
     };
   },
   mounted() {
+    
     const db = getFirestore();
+
+    const documentRef = doc(db, this.collectionName, this.$store.getters.getDiretor.id); // Replace with your collection name and document ID
+
+    onSnapshot(documentRef, (snapshot) => {
+      try {
+        if (snapshot.exists()) {
+          this.documentData = snapshot.data();
+        } else {
+          this.documentData = null;
+        }
+      } catch (error) {
+        console.error('Error setting data:', error.message);
+        throw error;
+      }
+
+    });
+
+
     const itemsCollection = collection(db, this.collectionName); // Replace with your Firestore collection name
 
     const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
 
     onSnapshot(q, (snapshot) => {
+      
       this.items = [];
+      
       snapshot.forEach((doc) => {
-        if (doc.id === this.$store.getters.getDiretor.id)
-        this.items.push({ id: doc.id, ...doc.data() });
+
+        if (this.documentData.perfil==='ADMIN') {
+            this.items.push({ id: doc.id, ...doc.data() });
+        } else if (this.documentData.perfil!='ADMIN' && doc.id === this.$store.getters.getDiretor.id ) {
+            this.items.push({ id: doc.id, ...doc.data() });
+        }
+          
       });
+
     });
+ 
   },
   computed: {
     filteredItems() {
       return this.items.filter(item => item.nome.toLowerCase().includes(this.searchTerm.toLowerCase()));
-    },
+    }, 
+    
+
   }, 
   methods: {
     updateSearch(event) {
@@ -127,7 +158,7 @@ export default {
         objeto.nome,
         objeto.telefone,
         objeto.email,
-       'OPERADOR'
+        objeto.perfil
       );
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -135,13 +166,38 @@ export default {
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-          if (objeto.id) {
-            await FirestoreService.set(this.collectionName,objeto.id,objeto);
-          } else {
+        if (objeto.id) {
+          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+        } else {
+          objeto.perfil= 'OPERADOR';
+          await firebase
+            .auth() // get the auth api
+            .createUserWithEmailAndPassword(objeto.email, '011277') // need .value because ref()
+            .then((data) => {
+
+              console.log('Successfully registered!');
+
+            })
+            .catch(error => {
+              console.log(error.code)
+              alert(error.message);
+            });
+           
             await FirestoreService.add(this.collectionName, objeto);
-          }
+            await firebase
+            .auth().sendPasswordResetEmail(objeto.email)
+            .then((data) => {
+              // Password reset email sent successfully
+              console.log("Password reset email "+objeto.email+" sent successfully");
+            })
+            .catch((error) => {
+              // Handle errors
+              console.error("Error sending password reset email:", error);
+            });
+        }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
+        alert(error.message);
       }
 
     },
@@ -175,7 +231,26 @@ export default {
         })
         .then(a => a.present())
     },
-  }  
+    isAdmin() {
+
+      const db = getFirestore();
+      const itemsCollection = collection(db, this.collectionName); // Replace with your Firestore collection name
+
+      const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
+      let ret = false;
+      onSnapshot(q, (snapshot) => {
+        this.items = [];
+        snapshot.forEach((doc) => {
+          if (doc.id === this.$store.getters.getDiretor.id) {
+            const diretor = { ...doc.data() };
+            ret = (diretor.perfil === 'ADMIN');
+            return ret;
+          }
+        });
+      });
+
+    }
+  }
 }
 
 </script>

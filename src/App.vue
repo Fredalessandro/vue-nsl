@@ -17,12 +17,9 @@
             <ion-avatar>
               <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
             </ion-avatar>
-          </ion-item>  
-          <ion-item class="ion-justify-content-center ion-align-items-center">
-            <ion-label>{{ store.getters.getDiretor.nome || store.getters.getDiretor.email }}</ion-label> 
+            <ion-label>{{ store.getters.getUser.displayName || store.getters.getUser.email }}</ion-label> 
           </ion-item>
           <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
-            <!--@click="selectedIndex = i"-->
             <ion-item v-if="p.labelMenu!=null" @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false"
               class="hydrated" :class="{ selected: selectedIndex === i }">
               <!--<ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>-->
@@ -50,6 +47,7 @@ import {
   IonMenu,
   IonMenuToggle,
   IonRouterOutlet,
+  IonRow,
   IonTitle,
   IonHeader,
   IonToolbar,
@@ -112,8 +110,7 @@ const appPages = [
     url: '/Atletas',
     // iosIcon: trashOutline,
     // mdIcon: trashSharp,
-  },
-  
+  }
 ];
   if (!store.getters.getUser) {
     // If authentication is required but the user is not authenticated, redirect to login
@@ -131,14 +128,12 @@ firebase.auth().onAuthStateChanged((user) => {
   }
 });*/
 
-
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 //let atributoCompartilhado = store.state.atributoCompartilhado;
 const path = window.location.pathname;
 if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.url.toLowerCase() === path.toLowerCase());
 }
-
 
 
 //EventBus.config.globalProperties.$on('atualizarAtributo', atualizarAtributo);
@@ -266,3 +261,4 @@ ion-item.selected {
   --color: var(--ion-color-primary);
 }
 </style>
+./store/index.old./store/index.js.old

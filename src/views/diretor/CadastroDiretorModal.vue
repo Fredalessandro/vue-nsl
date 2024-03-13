@@ -23,7 +23,7 @@
           <ion-input style="margin-right: 5px; width: 250px;" :maxlength="15"  label="Telefone" v-mask="'##-#####-####'" v-model="objetoEdicao.telefone" required></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input style="margin-right: 5px; width: 400px;" :maxlength="250" label="E-mail" :readonly="isReadOnly" v-model="objetoEdicao.email" required></ion-input>
+          <ion-input style="margin-right: 5px; width: 400px;" :maxlength="250" label="E-mail" :readonly="!isReadOnly" v-model="objetoEdicao.email" required></ion-input>
         </ion-item>
      
     </ion-content>
@@ -44,7 +44,7 @@ import Diretor from '../../model/Diretor';
 
 export default {    
   
-  props: ['isModalOpen','objetoEdicao'],
+  props: ['isModalOpen','objetoEdicao','isReadOnly'],
   emits: ['fechar-modal', 'salvarEdicao'],
   components: {
   IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
@@ -56,8 +56,8 @@ export default {
   data() {
     return {
       seuModelo: '',
-      selectedOption: null,
-      isReadOnly: (this.$store.getters.getDiretor.perfil != 'ADMIN')
+      selectedOption: null
+
     };
   },
   methods: {

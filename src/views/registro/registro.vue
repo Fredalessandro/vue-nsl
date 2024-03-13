@@ -179,4 +179,4 @@ export default {
    max-width: 300px; /* Ajuste conforme necessário */
    width: 100%;
  }
- </style> 
+ </style> ../../store/index.old/index.js../../store/index.js.old/index.js

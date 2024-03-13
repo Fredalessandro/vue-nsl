@@ -1,0 +1,43 @@
+import { createRouter, createWebHistory } from '@ionic/vue-router';
+
+
+const routes = [
+      {
+        path: '/',
+        redirect: '/diretor',
+      },
+      {
+        path: '/diretor',
+        component: () => import('@/views/diretor/DiretorListaPage.vue'),
+      },
+      {
+        path: '/eventos',
+        component: () => import('@/views/evento/EventoListaPage.vue'),
+      },
+      {
+        path: '/categorias',
+        component: () => import('@/views/categoria/CategoriaListaPage.vue'),
+      },
+      {
+        path: '/baterias',
+        component: () => import('@/views/bateria/Bateria.vue'),
+      },
+      /*{
+        path: 'filiacoes',
+        component: () => import('@/views/Filiacoes.vue'),
+      },
+      {
+        path: 'juizes',
+        component: () => import('@/views/Juizes.vue'),
+      },
+      {
+        path: 'atletas',
+        component: () => import('@/views/Atletas.vue'),
+      },*/
+];
+
+const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes
+});
+export default router

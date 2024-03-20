@@ -54,14 +54,23 @@ export default {
       
       try {
         // Call the VueX action to sign in
-        const user = await this.$store.dispatch('signInWithEmailAndPassword', {
+        await this.$store.dispatch('signInWithEmailAndPassword', {
           email: this.email,
           password: this.password,
+        }).then((user) => {
+
+          // Colocar aqui a leitura dos atributos
+          
+          if (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil === 'ADMIN') {
+              this.$router.push({ path: '/diretor', replace: true });
+          } else {
+              this.$router.push({ path: '/evento', replace: true });
+          }
+          
+          console.log('Signed in successfully:', user);
         });
-        //this.$store.commit('user', user);
-        this.$router.replace('/'); // redirect to the feed
-        //window.location.reload();
-        console.log('Signed in successfully:', user);
+        
+        
         // Navigate to another page or perform additional actions if needed
       } catch (error) {
         console.error('Error signing in:', error.message);
@@ -81,7 +90,7 @@ export default {
         }*/
     },
     register(){
-        this.$router.push({ name: 'Registro' });
+        this.$router.replace({ name: 'Registro' });
     }
   }
 }

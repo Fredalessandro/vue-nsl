@@ -6,7 +6,7 @@
       
     <ion-header>
       <ion-toolbar>
-        <ion-title>Cadastro de Eventos</ion-title>
+        <ion-title>Cadastro de Evento</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="fecharModal">Fechar</ion-button>
         </ion-buttons>

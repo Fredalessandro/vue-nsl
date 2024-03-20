@@ -20,7 +20,7 @@
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems" :key="objeto.id" class="ion-align-items-start">
-          <ion-row>
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
             <!--<ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;"
@@ -57,7 +57,7 @@ import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,defineComponent } from 'vue';
 import { add,document, create, trash } from 'ionicons/icons';
 import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
@@ -65,8 +65,9 @@ import '../styles.css';
 import Diretor from '../../model/Diretor';
 import { getFirestore, doc, collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import {firebase} from '@/firebase.js';
+import store from '../../store';
 
-export default {
+export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
@@ -84,56 +85,43 @@ export default {
       collectionName: 'Diretores',
       objetoEdicao: new Diretor(),
       modalAberta: false,
-      documentData : null
+      documentData : null,
+      user: this.$store.getters.getUser,
+      objetoLinha: store.getters.objetoLinha,
+      store: store
     };
   },
-  mounted() {
+  setup() {
     
-    const db = getFirestore();
+      const collectionName = 'Diretores';
 
-    const documentRef = doc(db, this.collectionName, this.$store.getters.getDiretor.id); // Replace with your collection name and document ID
+      const db = getFirestore();
 
-    onSnapshot(documentRef, (snapshot) => {
-      try {
-        if (snapshot.exists()) {
-          this.documentData = snapshot.data();
-        } else {
-          this.documentData = null;
-        }
-      } catch (error) {
-        console.error('Error setting data:', error.message);
-        throw error;
-      }
+      const selectedItem = ref(null);
 
-    });
+      const selectRow = async (objeto) => {
+        selectedItem.value = objeto;
+        await store.dispatch('setObjetoLinha', { objetoLinha: objeto })
+              .then((value) => {
+               
+                console.log('setObjetoLinha', value);
+              }).catch(error => {
+                console.error('Error add data:', error);
+        });
+      };
 
+     return { selectedItem, selectRow };
 
-    const itemsCollection = collection(db, this.collectionName); // Replace with your Firestore collection name
-
-    const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
-
-    onSnapshot(q, (snapshot) => {
-      
-      this.items = [];
-      
-      snapshot.forEach((doc) => {
-
-        if (this.documentData.perfil==='ADMIN') {
-            this.items.push({ id: doc.id, ...doc.data() });
-        } else if (this.documentData.perfil!='ADMIN' && doc.id === this.$store.getters.getDiretor.id ) {
-            this.items.push({ id: doc.id, ...doc.data() });
-        }
-          
-      });
-
-    });
- 
+  },
+  mounted: function() {
+    //this.fetchItens();
   },
   computed: {
-    filteredItems() {
-      return this.items.filter(item => item.nome.toLowerCase().includes(this.searchTerm.toLowerCase()));
-    }, 
     
+    filteredItems() {
+      if (this.items.length === 0) this.fetchItens();
+      return this.items.filter(item => item.nome.toLowerCase().includes(this.searchTerm.toLowerCase()));
+    }
 
   }, 
   methods: {
@@ -195,6 +183,7 @@ export default {
               console.error("Error sending password reset email:", error);
             });
         }
+        this.fetchItens();
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
         alert(error.message);
@@ -249,8 +238,50 @@ export default {
         });
       });
 
+    },
+    async fetchItens(){
+
+      const db = getFirestore();
+      if (this.$store.getters.getDiretor) {
+        const documentRef = doc(db, this.collectionName, this.$store.getters.getDiretor.id); // Replace with your collection name and document ID
+
+        onSnapshot(documentRef, (snapshot) => {
+          try {
+            if (snapshot.exists()) {
+              this.documentData = snapshot.data();
+            } else {
+              this.documentData = null;
+            }
+          } catch (error) {
+            console.error('Error setting data:', error.message);
+            throw error;
+          }
+
+        });
+
+
+        const itemsCollection =  collection(db, this.collectionName); // Replace with your Firestore collection name
+
+        const q = query(itemsCollection, orderBy('nome')); // Add any additional query conditions
+
+        onSnapshot(q, (snapshot) => {
+
+          this.items = [];
+
+          snapshot.forEach((doc) => {
+
+            if (this.documentData.perfil === 'ADMIN') {
+              this.items.push({ id: doc.id, ...doc.data() });
+            } else if (this.documentData.perfil != 'ADMIN' && doc.id === store.getters.getDiretor.id) {
+              this.items.push({ id: doc.id, ...doc.data() });
+            }
+
+          });
+
+        });
+      }
     }
   }
-}
+});
 
 </script>

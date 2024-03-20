@@ -87,6 +87,7 @@ const FirestoreService = {
     const documentRef = doc(db, collection, documentId);
     await deleteDoc(documentRef);
   },
+
   async executeQuery(path, atributo, operador, valor) {
     const collectionRef = collection(db, path); // Replace with your Firestore collection name
     const q = query(collectionRef, where(atributo, operador, valor)); // Replace with your query conditions
@@ -109,7 +110,8 @@ const FirestoreService = {
         // Handle error
         console.error('Error getting document with filter:', error.message);
       }
-    }
+  },
+
 }
 
 export default FirestoreService;

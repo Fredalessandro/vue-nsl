@@ -3,7 +3,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Eventos</ion-title>
+        <ion-title>{{ objetoLinha?objetoLinha.nome:"" }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -79,14 +79,15 @@ export default {
     return {
       iconAdd: add,
       iconDocumet: document,
-      collectionName: 'Diretores/'+store.getters.getidDiretor+'/Eventos/',
+      collectionName: 'Diretores/'+store.getters.getObjetoLinha.id+'/Eventos/',
       iconDelete: trash,
       iconEdit: create,
       searchTerm: '',
       items: [],
       objetoEdicao: new Evento(),
       modalAberta: false,
-      isAdmin: this.$store.getters.getDiretor.perfil === 'ADMIN',
+      objetoLinha: store.getters.getObjetoLinha,
+      isAdmin: store.getters.getDiretor.perfil === 'ADMIN',
     };
   },
   mounted() {
@@ -138,14 +139,14 @@ export default {
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-          
-          if (objeto.id) {
-            await FirestoreService.set(this.collectionName,objeto.id,objeto);
-          } else {
-            await FirestoreService.add(this.collectionName, objeto);
-          }
+        if (objeto.id) {
+          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+        } else {
+          await FirestoreService.add(this.collectionName, objeto);
+        }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
+        alert(error.message);
       }
 
     },

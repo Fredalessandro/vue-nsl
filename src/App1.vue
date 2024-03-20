@@ -3,13 +3,34 @@
         <ion-tabs>
             <ion-router-outlet></ion-router-outlet>
             <ion-tab-bar @ionTabButtonClick="handleTabButtonClick" slot="top" class="left-aligned-tab-bar">
-                <ion-tab-button v-if="store.getters.getUser" ref="diretor" tab="diretor">
+                
+                <ion-tab-button v-if="(store.getters.getUser && store.getters.getDiretor.perfil === 'ADMIN')"  tab="diretor">
                     <ion-label>Diretor de Provas</ion-label>
                     <!--<ion-icon :icon="iconEllipse"></ion-icon>-->
                 </ion-tab-button>
 
-                <ion-tab-button v-if="store.getters.getUser"  tab="evento">
+                <ion-tab-button v-if="(store.getters.getUser)"   tab="evento">
                     <ion-label>Eventos</ion-label>
+                    <!--<ion-icon :icon="iconSquare"></ion-icon>-->
+                </ion-tab-button>
+
+                <ion-tab-button v-if="(store.getters.getUser)"   tab="categoria">
+                    <ion-label>Categorias</ion-label>
+                    <!--<ion-icon :icon="iconSquare"></ion-icon>-->
+                </ion-tab-button>
+                
+               <ion-tab-button ref="bateria"  tab="bateria">
+                    <ion-label>Baterias</ion-label>
+                    <!--<ion-icon :icon="iconSquare"></ion-icon>-->
+                </ion-tab-button>
+
+                <ion-tab-button ref="altleta"  tab="atleta">
+                    <ion-label>Atletas</ion-label>
+                    <!--<ion-icon :icon="iconSquare"></ion-icon>-->
+                </ion-tab-button>
+
+                <ion-tab-button ref="juizes"  tab="juizes">
+                    <ion-label>Filiações</ion-label>
                     <!--<ion-icon :icon="iconSquare"></ion-icon>-->
                 </ion-tab-button>
 
@@ -34,6 +55,7 @@
   import { ellipse,square } from 'ionicons/icons';
   import store from './store';
 
+
   export default defineComponent({
   components: {
     IonApp, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel,
@@ -43,7 +65,11 @@
     return {
         router:  useRouter(),
         iconEllipse: ellipse,
-        iconSquare: square
+        iconSquare: square,
+        store: store,
+        diretor: this.$store.getters.getDiretor,
+        user: this.$store.getters.getUser,
+        isObjetoLinha : this.$store.getters.getObjetoLina,
     }
   },
   methods: {
@@ -52,25 +78,25 @@
       console.log(`Tab button "${tabName.detail.tab}" clicked`);
       tabName.selected = true;
       // Example: Redirect to the clicked tab's route
-      this.router.push(`/${tabName.detail.tab}`);
-    },
-    async handleSignOut() {
-      try {
-        await auth.signOut(); // Sign out the user
-        router.push('/login'); // Redirect to the login page
-      } catch (error) {
-        console.error('Error signing out:', error);
+      if(this.user) {
+        this.$router.push({ path: `/${tabName.detail.tab}`, replace: true });
+      } else {
+        this.$router.push({ path: '/login',replace: true });
       }
+      
     },
+    isLogado(){
+        return this.user;
+    }
   },
   mounted(){
-    if (!store.getters.getUser) {
-    // If authentication is required but the user is not authenticated, redirect to login
-        router.replace('login');
-    }
+          if (!store.getters.getUser) {
+              // If authentication is required but the user is not authenticated, redirect to login
+              this.$router.replace('login');
+          }
+          
   }
-  
-});
+})
 </script>
 
 <style scoped>

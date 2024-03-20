@@ -17,10 +17,20 @@ const routes = [
   {
     path: '/diretor',
     component: Diretor,
+    beforeEnter: (to, from, next) => {
+      // Clear cache before entering the route
+      // You can add your cache-clearing logic here
+      next();
+    }
   },
   {
     path: '/evento',
     component: Evento,
+    beforeEnter: (to, from, next) => {
+      // Clear cache before entering the route
+      // You can add your cache-clearing logic here
+      next();
+    }
   },
   {
     path: '/logout',

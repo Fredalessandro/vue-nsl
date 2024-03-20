@@ -9,13 +9,13 @@
 </template>
   
 <script>
-import { IonButton } from '@ionic/vue';
-import { defineComponent } from 'vue'; // Import your Firebase authentication instance
+import { IonButton,IonLabel,IonPage,IonContent} from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import store from '../../store/index.js';
-export default defineComponent({
+import store from '../../store';
+
+export default {
     components: {
-        IonButton,
+        IonButton,IonLabel,IonPage,IonContent
     },
     data() {
         return {
@@ -25,23 +25,23 @@ export default defineComponent({
     },
     methods: {
         async handleSignOut() {
-            await this.$store.dispatch('signOut')
+            await this.$store.dispatch('signOut',{user:null,diretor:null})
                 .then(() => {
-                    this.router.push('/login'); // redirect to the feed
+                    this.$router.replace('/login'); // redirect to the feed
                 }).catch(error => {
                     console.error('Error add data:', error);
                     alert(error.message);
                 });
         },
-        async handleCancel() {
+        handleCancel() {
             try {
-                router.push('/'); // Redirect to the login page
+                router.push(''); // Redirect to the login page
             } catch (error) {
                 console.error('Error signing out:', error);
             }
-        },
-    },
-});
+        }
+    }
+}
 </script>
   
   <style scoped>

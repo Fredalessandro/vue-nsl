@@ -74,4 +74,4 @@ export default {
   
 }; 
 
-</script>../../model/Diretor
+</script>

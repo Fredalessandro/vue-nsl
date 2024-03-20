@@ -8,22 +8,29 @@ ion-col {
     height: 30px;
   }
   
-  .cor1 {
+  /*.cor1 {
     background-color: rgb(0, 175, 244);
     font-weight: normal;
-    /* Cor da linha par, ajuste conforme necessário */
+    /* Cor da linha par, ajuste conforme necessário 
     color: rgb(255, 255, 255);
-    /* Cor do texto na linha par, ajuste conforme necessário */
-  }
-  
+    /* Cor do texto na linha par, ajuste conforme necessário 
+  }*/
+
   .cor2 {
     background-color: #f9fcfba4;
     /* Cor da linha ímpar, ajuste conforme necessário */
     font-weight: normal;
     color: rgb(0, 0, 0);
-    /* Cor do texto na linha ímpar, ajuste conforme necessário */
+    /* Cor do texto na linha ímpar, ajuste conforme necessário*/ 
   }
   
+  .cor1 {
+    background-color: #f9fcfba4;
+    /* Cor da linha ímpar, ajuste conforme necessário */
+    font-weight: normal;
+    color: rgb(0, 0, 0);
+    /* Cor do texto na linha ímpar, ajuste conforme necessário*/ 
+  }
   
   
   .ion-footer-fixed {
@@ -63,4 +70,14 @@ ion-col {
     margin-right: 8px;
     margin-left: 8px;
     cursor: pointer;
+  }
+
+  .rowSelect {
+    border: 1px solid #ccc;
+   /* padding: 10px;*/
+    cursor: pointer;
+  }
+  .rowSelected {
+    background-color: #128cf7;
+    --color:#ffffff!important;
   }

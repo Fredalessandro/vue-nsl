@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App1.vue'
-import router from './router/index1.js';
+import router from '@/router/index.js';
 import Mask from 'ionic-vue-input-mask';
 
 import { IonicVue } from '@ionic/vue';
@@ -23,16 +23,22 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import store from './store/index.js';
+import store from '@/store';
+
+const globalObject = {
+  diretor: null,
+};
 
 const app = createApp(App);
+  app.provide('globalObject', globalObject);
   app.use(IonicVue);
   app.use(Mask);
   app.use(store);
   app.use(router);
-  
+
 router.isReady().then(() => {
   app.mount('#app');
+
 });
 
 

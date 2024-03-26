@@ -27,16 +27,17 @@
         </ion-item>
         
         <ion-item>       
-          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="Periodo de " type="date" v-model="objetoEdicao.dataInicio" required></ion-input>
-          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="A " type="date" v-model="objetoEdicao.dataFinal" required></ion-input>
+          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="Periodo de " type="date" :readonly="!isReadOnly" v-model="objetoEdicao.dataInicio" required></ion-input>
+          <ion-input style="margin-right: 5px; width: 250px;" :maxlength="10"  label="A " type="date" :readonly="!isReadOnly" v-model="objetoEdicao.dataFinal" required></ion-input>
         </ion-item>       
         
         <ion-item>
           <ion-label>Status</ion-label><br/>
           <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.status">
-              <ion-select-option v-for="option in options" :key="option.value" :value="option.value">
-                  {{ objetoEdicao.status }}
-              </ion-select-option>
+              <!--<ion-select-option v-for="option in options" :key="option.value" :value="option.value">
+              </ion-select-option>-->
+              <ion-select-option value="Aguardando">Aguardando</ion-select-option>
+              <ion-select-option value="Iniciado">Iniciado</ion-select-option>
           </ion-select>
         </ion-item>
 
@@ -58,7 +59,7 @@ import Evento from '../../model/Evento';
 
 export default {    
   
-  props: ['isModalOpen','objetoEdicao'],
+  props: ['isModalOpen','objetoEdicao','isReadOnly'],
   emits: ['fechar-modal', 'salvarEdicao'],
   components: {
   IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  

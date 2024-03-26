@@ -9,27 +9,27 @@
 
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchItems" ></ion-searchbar>
+      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>
       
       <ion-grid>
         <ion-row class="ion-align-items-start">
-          <ion-col size=0.5>id</ion-col>
+          <!--<ion-col size=0.5>id</ion-col>-->
           <ion-col>Descrição</ion-col>
           <ion-col size=3>Regra aplicada para idade</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
-        <div v-for="(categoria, index) in filteredItems" :key="categoria.id" class="ion-align-items-start">
-          <ion-row>
-            <ion-col size=0.5 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ categoria.id }}</ion-col>
+        <div v-for="(objeto, index) in filteredDocuments" :key="objeto.id" class="ion-align-items-start">
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+            <!--<ion-col size=0.5 style="text-align: center;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ categoria.descricao }}</ion-col>
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.descricao }}</ion-col>
             <ion-col size=3 style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{categoria.regra+' '+ categoria.idade+' anos' }}</ion-col>
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{objeto.regra+' '+ objeto.idade+' anos' }}</ion-col>
             <ion-col size=0.80 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon @click="presentAlertConfirm(categoria)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
-              <ion-icon @click="handleRowClick(categoria)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
+              <ion-icon @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
             </ion-col>
           </ion-row>
         </div>
@@ -44,25 +44,25 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroCategoriaModal  :is-modal-open="modalAberta" :categoriaEdicao="this.categoriaEdicao" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+    <CadastroCategoriaModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" :isReadOnly="isAdmin" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
 </ion-page>
 </template>
 
 <script >
 import { alertController } from '@ionic/core'
-import { ref,  onMounted } from 'vue';
+import { ref, defineComponent, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
 import { add,document, create, trash } from 'ionicons/icons';
-import CadastroCategoriaModal from '@/views/categoria/CadastrocategoriaModal.vue';
-import  FirebaseService  from '@/database/FirebaseService.js';
-import Sequencia from '@/model/Sequencia';
+import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue';
+import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
 import Categoria from '../../model/Categoria';
+import store from '@/store'; 
 
-export default {
+export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
@@ -75,99 +75,106 @@ export default {
       iconDocumet: document,
       iconDelete: trash,
       iconEdit: create,
+      collectionName: 'Categorias/',
+      store: store,
       searchTerm: '',
-      isCheckedAll: false,
-      filteredItems: [],
       items: [],
-      categoria: new Categoria(null),
-      categoriaEdicao: new Categoria(),
-      menuState: true,
+      objetoEdicao: new Categoria(),
       modalAberta: false,
-      sequencia: Sequencia
+      eventoSelecionado: this.$store.getters.getEventoSelecionado,
+      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
   },
-   watch: {
-    searchTerm: 'searchItems',
-  },
-  created() {
-    this.fetchItems();
+  setup() {
+    const eventoSelecionado = store.getters.getEventoSelecionado;
+    const collectionName =  'Categorias/';
+    const searchTerm = ref('');
+    const filteredDocuments = ref([]);
+    const searchDocuments = async () => {
+
+
+      try {
+
+        // Chame o serviço para buscar a coleção filtrada pelo termo de pesquisa
+        const searchResults = await FirestoreService.searchCollectionCategorias(collectionName, eventoSelecionado.id ,searchTerm.value.trim());
+        filteredDocuments.value = searchResults;
+
+      } catch (error) {
+        console.error('Erro ao buscar documentos:', error);
+      }
+      
+    };
+
+    const selectedItem = ref();
+
+    const selectRow = async (objeto) => {
+      selectedItem.value = objeto;
+      store.dispatch('setCategoriaSelecionado', { categoriaSelecionado: objeto });
+    };
+
+    // Carregue a lista ao iniciar a página
+    onMounted(async () => {
+      await searchDocuments();
+    });
+
+    return { searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, eventoSelecionado };
+
   },
   methods: {
-    searchItems() {
-      this.filteredItems = this.items.filter((item) =>
-        item.descricao.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    },
-    fetchItems() {
-      const itemsRef = FirebaseService.database.ref('Categorias');
-      itemsRef.on('value', (snapshot) => {
-        this.items = [];
-        snapshot.forEach((childSnapshot) => {
-          const item = {
-            key: childSnapshot.key,
-            ...childSnapshot.val(),
-          };
-          this.items.push(item);
-        });
-        this.searchItems();
-      });
+    updateSearch(event) {
+      this.searchTerm = event.detail.value;
     },
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Categoria(null);  
-        this.categoriaEdicao = dadosEdicao;
-      } 
-      this.modalAberta = true; 
+        let dadosEdicao = new Categoria(null);
+        dadosEdicao.idEvento = this.eventoSelecionado.id;
+        this.objetoEdicao = dadosEdicao;
+      }
+      this.modalAberta = true;
     },
     fecharModal() {
       this.modalAberta = false;
     },
-    handleRowClick(categoria) {
+    handleRowClick(objeto) {
       // Your click event handling logic goes here
-      console.log('Row clicked! ' + categoria.nome);
+      console.log('Row clicked! ' + objeto.evento);
       let dadosEdicao = new Categoria(
-        categoria.id,
-        categoria.descricao,
-        categoria.idade,
-        categoria.regra,
+        objeto.id,
+        objeto.descricao,
+        objeto.idade,
+        objeto.regra,
         null
       );
-      this.categoriaEdicao = dadosEdicao;
+      this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
     },
-    async handleSalvar(categoria) {
+    async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        // Gravar o documento no banco de dados local
-
-        if (categoria.id != null) {
-          await FirebaseService.updateData('Categorias/', categoria.id, categoria);
+        if (objeto.id) {
+          await FirestoreService.set(collectionName, objeto.id, objeto);
         } else {
-          await FirebaseService.incrementarCodigo('categoria').then(value => {
-            categoria.id = value;
-            console.log('Incremento', categoria.id);
-
-            FirebaseService.setData('Categorias/' + value, categoria);
-
-          });
+          objeto.idEvento = this.eventoSelecionado.id;
+          await FirestoreService.add(this.collectionName, objeto);
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
+        alert(error.message);
       }
 
     },
-    presentAlertConfirm(categoria) {
+    presentAlertConfirm(objeto) {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão da categoria '+categoria.descricao+' ?',
-          cssClass : 'default-alert',
+          message: 'Exclusão da Categoria ' + objeto.descricao + ' ?',
+          cssClass: 'default-alert',
           buttons: [
             {
               text: 'Não',
               role: 'cancel',
               handler: blah => {
-                console.log('Confirm Cancel:', categoria.nome)
+                console.log('Confirm Cancel:', objeto.descricao)
               },
             },
             {
@@ -175,19 +182,20 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Categorias/', categoria.id);
+                  const collectionName = 'Eventos';
+                  FirestoreService.remove(collectionName, objeto.id);
+                  this.searchDocuments();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
-                console.log('Confirm Okay', categoria.descricao)
+                console.log('Confirm Okay', objeto.evento)
               },
             },
           ],
         })
         .then(a => a.present())
     },
-  },
-}
-
+  }
+});
 </script>
 

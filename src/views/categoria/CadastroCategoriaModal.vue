@@ -14,24 +14,24 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-          <ion-item v-if="categoriaEdicao.id && categoriaEdicao.id!=0">
-            <ion-label>Código {{ categoriaEdicao.id }}</ion-label>
+          <ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
+            <ion-label>Código {{ objetoEdicao.id }}</ion-label>
           </ion-item>
   
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Descrição" v-model="categoriaEdicao.descricao" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Descrição" v-model="objetoEdicao.descricao" required></ion-input>
           </ion-item>
          
   
           <ion-item>  
-            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade" v-mask="'##'" v-model="categoriaEdicao.idade" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade" v-mask="'##'" v-model="objetoEdicao.idade" required></ion-input>
           </ion-item>
           
           <ion-item>
             <ion-label>Selecione a regra para idade</ion-label><br/>
-            <ion-select style="margin-right: 5px; width: 450px;" v-model="categoriaEdicao.regra">
+            <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.regra">
                 <ion-select-option v-for="option in options" :key="option.value" :value="option.value">
-                    {{ option.label+" "+categoriaEdicao.idade }}
+                    {{ option.label+" "+objetoEdicao.idade }}
                 </ion-select-option>
             </ion-select>
           </ion-item>
@@ -54,7 +54,7 @@
 
   export default {    
     
-    props: ['isModalOpen','categoriaEdicao'],
+    props: ['isModalOpen','objetoEdicao','isReadOnly'],
     emits: ['fechar-modal', 'salvarEdicao'],
     components: {
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
@@ -80,7 +80,7 @@
       },
       salvarEdicao() {
         // Valide os campos ou realize a lógica de salvamento
-        this.$emit('salvarEdicao', this.categoriaEdicao);
+        this.$emit('salvarEdicao', this.objetoEdicao);
         this.fecharModal();
       }
     }

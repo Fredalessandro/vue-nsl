@@ -32,15 +32,15 @@
   
 <script>
 import { ref } from 'vue';
-import {
-  IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
-} from '@ionic/vue';
+import { IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput } from '@ionic/vue';
 import { useRouter } from 'vue-router' // import router
 import 'ionicons/icons';
+import FirestoreService from '@/database/FirestoreService';
+import store from '@/store';
 
 export default {
   components: {
-    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput
+    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput, store
   },
   data() {
     return {email: 'fredalessandro@gmail.com',
@@ -49,28 +49,31 @@ export default {
     googleLogo: ref('logo-google.svg')};    
   },
   methods: {
-    
     async signIn() {
       
       try {
         // Call the VueX action to sign in
-        await this.$store.dispatch('signInWithEmailAndPassword', {
+      const user  =  await this.$store.dispatch('signInWithEmailAndPassword', {
           email: this.email,
           password: this.password,
-        }).then((user) => {
-
-          // Colocar aqui a leitura dos atributos
-          
-          if (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil === 'ADMIN') {
-              this.$router.push({ path: '/diretor', replace: true });
-          } else {
-              this.$router.push({ path: '/evento', replace: true });
-          }
-          
-          console.log('Signed in successfully:', user);
         });
         
-        
+      const data =  await FirestoreService.executeQuery('Diretores/', 'email', '==', user.email);
+      
+      console.log('Data :', data);
+      await this.$store.dispatch('setUser', { user : user});
+      await this.$store.dispatch('setDiretor', { diretor : data});
+      await this.$store.dispatch('setDiretorSelecionado', { diretorSelecionado : data});
+
+      
+      if (data.perfil=='ADMIN') {
+        this.$router.push({path:data.perfil=='ADMIN'?'diretor':'evento', replace: true });
+      } else {
+        const evento =  await FirestoreService.eventoAberto('Eventos/',diretor.id);
+        await this.$store.dispatch('setEventoSelecionado', { eventoSelecionado : evento});
+        this.$router.push({path:'categorias', replace: true });
+      }
+         
         // Navigate to another page or perform additional actions if needed
       } catch (error) {
         console.error('Error signing in:', error.message);
@@ -90,7 +93,7 @@ export default {
         }*/
     },
     register(){
-        this.$router.replace({ name: 'Registro' });
+        this.$router.push({ name: 'Registro' });
     }
   }
 }

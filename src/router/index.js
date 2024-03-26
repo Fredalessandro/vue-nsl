@@ -1,57 +1,41 @@
-
 import { createRouter, createWebHistory } from '@ionic/vue-router';
+
+import Diretor from '@/views/diretor/DiretorListaPage.vue';
+import Evento from '@/views/evento/EventoListaPage.vue';
+import Categoria from '@/views/categoria/CategoriaListaPage.vue';
+import Login from '@/views/login/login.vue';
+import Logout from '@/views/login/logout.vue';
 
 const routes = [
   {
     path: '/',
-    redirect: '/home'
-  },
-  {
-    path: '/home',
-    name: 'Home',
-    component: () => import ('../views/Home.vue')
+    redirect: '/login',
   },
   {
     path: '/login',
-    name: 'Login',
-    component: () => import ('../views/login/login.vue')
-  },
-  {
-    path: '/registro',
-    name: 'Registro',
-    component: () => import ('../views/registro/registro.vue')
+    component: Login,
   },
   {
     path: '/diretor',
-    name: 'Diretor',
-    component: () => import ('../views/diretor/DiretorListaPage.vue'),
+    component: Diretor,
   },
   {
-    path: '/eventos',
-    name: 'Evento',
-    component: () => import ('../views/evento/EventoListaPage.vue'),
+    path: '/evento',
+    component: Evento,
   },
   {
-    path: '/categorias',
-    name: 'Categoria',
-    component: () => import ('../views/categoria/CategoriaListaPage.vue'),
+    path: '/categoria',
+    component: Categoria,
   },
   {
-    path: '/atletas',
-    name: 'Atleta',
-    component: () => import ('../views/atleta/AtletaListaPage.vue'),
+    path: '/logout',
+    component: Logout,
   },
-  {
-    path: '/baterias',
-    name: 'Bateria',
-    component: () => import ('../views/bateria/Bateria.vue'),
-  },
-  
-
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 });
-export default router
+
+export default router;

@@ -86,15 +86,6 @@ export default {
 
         const diretor = await FirestoreService.add(collectionName, new Diretor(null,this.nome,this.telefone,this.email,'OPERADOR',null));
         
-        await this.$store.dispatch('setDiretorStorage', { diretor : diretor.id})
-        .then(()=>{
-          this.router.push('Login'); // redirect to the feed
-          window.location.reload();
-        }).catch(error => {
-          console.error('Error add data:', error);
-          alert(error.message);
-        });
-
       } catch(error)  {
         console.error('Error add data:', error);
       };

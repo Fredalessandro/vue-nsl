@@ -7,6 +7,7 @@ const store = createStore({
     diretor: {},
     diretorSelecionado: {},
     eventoSelecionado:{},
+    categoriaSelecionada:{},
     user: {} 
   },
   mutations: {
@@ -19,6 +20,9 @@ const store = createStore({
     setEventoSelecionado(state, obj) {
       state.eventoSelecionado = obj;
     },
+    setCategoriaSelecionada(state, obj){
+      state.categoriaSelecionada = obj;
+    },
     setUser(state, obj) {
         state.user = obj;  
     }    
@@ -27,6 +31,7 @@ const store = createStore({
     getDiretor: state => state.diretor,
     getDiretorSelecionado: state => state.diretorSelecionado,
     getEventoSelecionado: state => state.eventoSelecionado,
+    getCategoriaSelecionada: state => state.categoriaSelecionada,
     getUser: state => state.user
   },
   actions: {
@@ -38,6 +43,9 @@ const store = createStore({
     },
     setEventoSelecionado({ commit }, {eventoSelecionado}) {
       commit('setEventoSelecionado', eventoSelecionado);
+    },
+    setCategoriaSelecionada({ commit }, {categoriaSelecionada}) {
+      commit('setCategoriaSelecionada', categoriaSelecionada);
     },
     setUser({ commit }, {user}) {
       commit('setUser', user);

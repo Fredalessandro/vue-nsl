@@ -12,9 +12,9 @@
     </ion-header>
 
     <ion-content  class="ion-padding">
-        <ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
+        <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
           <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-        </ion-item>
+        </ion-item>-->
 
         <ion-item>
           <ion-input style="margin-right: 5px; width: 400px;" :maxlength="50" label="Nome" v-model="objetoEdicao.nome" required></ion-input>

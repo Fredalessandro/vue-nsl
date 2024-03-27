@@ -69,9 +69,9 @@ export default {
       if (data.perfil=='ADMIN') {
         this.$router.push({path:data.perfil=='ADMIN'?'diretor':'evento', replace: true });
       } else {
-        const evento =  await FirestoreService.eventoAberto('Eventos/',diretor.id);
+        const evento =  await FirestoreService.eventoAberto('Eventos/',data.id);
         await this.$store.dispatch('setEventoSelecionado', { eventoSelecionado : evento});
-        this.$router.push({path:'categorias', replace: true });
+        this.$router.push({path:'categoria', replace: true });
       }
          
         // Navigate to another page or perform additional actions if needed

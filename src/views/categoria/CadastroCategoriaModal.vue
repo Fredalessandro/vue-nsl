@@ -14,17 +14,20 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-          <ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
+          <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
             <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-          </ion-item>
+          </ion-item>-->
   
           <ion-item>
             <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Descrição" v-model="objetoEdicao.descricao" required></ion-input>
           </ion-item>
          
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
+          </ion-item>
   
           <ion-item>  
-            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade" v-mask="'##'" v-model="objetoEdicao.idade" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade"  v-model="objetoEdicao.idade" required></ion-input>
           </ion-item>
           
           <ion-item>
@@ -70,6 +73,8 @@
         options: [
         { label: 'Até', value: 'Até' },
         { label: 'A partir de', value: 'A partir de' },
+        { label: 'Open Amador', value: 'Open Amador' },
+        { label: 'Open Pro', value: 'Open Pro' },
         // Adicione mais opções conforme necessário
       ]
       };

@@ -14,9 +14,9 @@
     </ion-header>
 
     <ion-content  class="ion-padding">
-        <ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
+        <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
           <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-        </ion-item>
+        </ion-item>-->
 
         <ion-item>
           <ion-input style="margin-right: 5px; width: 350px;" :maxlength="40" label="Evento" v-model="objetoEdicao.evento" required></ion-input>
@@ -75,6 +75,7 @@ export default {
       options: [
       { label: 'Aguardando', value: 'Aguardando' },
       { label: 'Iniciado',   value: 'Iniciado' },
+      { label: 'Pausa',   value: 'Pausa' },
       { label: 'Finalizado', value: 'Finalizado' },
       // Adicione mais opções conforme necessário
     ]

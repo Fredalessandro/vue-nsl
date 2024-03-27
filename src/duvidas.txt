@@ -38,3 +38,12 @@ handleRowClick(objeto) {
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
     },
+
+    CATEGORIAS
+    6,8,10,12,14,16,18
+    OPEN AMADOR
+    OPEM PRO
+    MASTER 
+    GRAMASTER
+    KARRUNA
+    LEGEND

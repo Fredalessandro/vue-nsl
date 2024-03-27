@@ -13,9 +13,9 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-          <ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
+          <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
             <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-          </ion-item>
+          </ion-item>-->
   
           <ion-item>
             <ion-input style="margin-right: 5px; width: 250px;" :maxlength="14"  label="CPF" oninvalid="" v-mask="'###.###.###-##'" v-model="objetoEdicao.cpf" required></ion-input>

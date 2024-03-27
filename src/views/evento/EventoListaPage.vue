@@ -42,7 +42,7 @@
         </div>
       </ion-grid>
     </ion-content>
-    <ion-footer v-if="isAdmin" class="ion-footer-fixed ion-padding" slot="end">
+    <ion-footer v-if="isAdmin || (!isAdmin && filteredDocuments.size == 0)" class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
           <ion-button class="round-button" @click="abrirModal(true)">
@@ -70,6 +70,7 @@ import {
 } from '@ionic/vue';
 import store from '@/store';
 import { mapState } from 'vuex';
+import Categoria from '../../model/Categoria';
 
 export default defineComponent({
   components: {
@@ -82,14 +83,13 @@ export default defineComponent({
     return {
       iconAdd: add,
       iconDocumet: document,
-      collectionName: 'Eventos/',
+      collectionName: 'Eventos',
       store: store,
       iconDelete: trash,
       iconEdit: create,
       items: [],
       objetoEdicao: new Evento(),
       modalAberta: false,
-      diretorSelecionado: this.$store.getters.getDiretorSelecionado,
       isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
   },
@@ -123,6 +123,7 @@ export default defineComponent({
     };
 
     const selectedItem = ref();
+    let isCategorias = true;
 
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
@@ -134,7 +135,7 @@ export default defineComponent({
       await searchDocuments();
     });
 
-    return { searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, diretorSelecionado };
+    return { searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, diretorSelecionado, isCategorias };
 
   },
   methods: {
@@ -143,6 +144,27 @@ export default defineComponent({
     },
     abrirModal(novo) {
       if (novo) {
+        const lista = this.filteredDocuments;
+        const documentFound = lista.find(evento => evento.idDiretor === this.diretorSelecionado.id);
+
+        // Verificando se o documento foi encontrado
+        if (documentFound) {
+
+          return alertController
+            .create({
+              header: 'Confirma!',
+              message: 'Já existe evento cadastrado.',
+              cssClass: 'default-alert',
+              buttons: [
+                {
+                  text: 'Ok',
+                  role: 'cancel',
+                  handler: blah => {
+                    console.log('Confirm Cancel:', objeto.nome)
+                  },
+                }],
+            }).then(a => a.present())
+        }
         let dadosEdicao = new Evento(null);
         dadosEdicao.idDiretor = this.diretorSelecionado.id;
         dadosEdicao.status = 'Aguardando'
@@ -174,7 +196,13 @@ export default defineComponent({
           await FirestoreService.set(collectionName, objeto.id, objeto);
         } else {
           objeto.idDiretor = this.diretorSelecionado.id;
-          await FirestoreService.add(this.collectionName, objeto);
+          const data = await FirestoreService.add(this.collectionName, objeto);
+          let categorias = Categoria.categorias;
+          const collectionCategoria = 'Categorias';
+          categorias.forEach(element => {
+             element.idEvento = data.id;
+             FirestoreService.add(collectionCategoria, element);
+          });
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -183,6 +211,25 @@ export default defineComponent({
 
     },
     presentAlertConfirm(objeto) {
+
+      /*if (FirestoreService.checkCollectionExistence('Categorias', 'idEvento', '==', objeto.id)) {
+
+        return alertController
+          .create({
+            header: 'Confirma!',
+            message: 'Evento ' + objeto.evento + ' tem categorias relacionadas.',
+            cssClass: 'default-alert',
+            buttons: [
+              {
+                text: 'Ok',
+                role: 'cancel',
+                handler: blah => {
+                  console.log('Confirm Cancel:', objeto.nome)
+                },
+              }],
+          }).then(a => a.present())
+      }*/
+
       return alertController
         .create({
           header: 'Confirma!',

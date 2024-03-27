@@ -3,7 +3,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Categorias</ion-title>
+        <ion-title>{{ eventoSelecionado.evento }}, de {{ inicio }} a {{ final }}, local {{ eventoSelecionado.local }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -15,6 +15,7 @@
         <ion-row class="ion-align-items-start">
           <!--<ion-col size=0.5>id</ion-col>-->
           <ion-col>Descrição</ion-col>
+          <ion-col>Inscrição</ion-col>
           <ion-col size=3>Regra aplicada para idade</ion-col>
           <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
         </ion-row>
@@ -24,11 +25,13 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.descricao }}</ion-col>
+            <ion-col style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.valorInscricao }}</ion-col>           
             <ion-col size=3 style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{objeto.regra+' '+ objeto.idade+' anos' }}</ion-col>
             <ion-col size=0.80 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
               <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
             </ion-col>
           </ion-row>
@@ -50,7 +53,7 @@
 
 <script >
 import { alertController } from '@ionic/core'
-import { ref, defineComponent, onMounted } from 'vue';
+import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
    IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
@@ -60,7 +63,9 @@ import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue
 import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
 import Categoria from '../../model/Categoria';
+import { mapState } from 'vuex';
 import store from '@/store'; 
+import { format } from 'date-fns';
 
 export default defineComponent({
   components: {
@@ -75,15 +80,17 @@ export default defineComponent({
       iconDocumet: document,
       iconDelete: trash,
       iconEdit: create,
-      collectionName: 'Categorias/',
+      collectionName: 'Categorias',
       store: store,
       searchTerm: '',
       items: [],
       objetoEdicao: new Categoria(),
       modalAberta: false,
-      eventoSelecionado: this.$store.getters.getEventoSelecionado,
       isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
+  },
+  computed: {
+    ...mapState(['diretor', 'diretorSelecionado','eventoSelecionado', 'user'])
   },
   setup() {
     const eventoSelecionado = store.getters.getEventoSelecionado;
@@ -109,15 +116,22 @@ export default defineComponent({
 
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
-      store.dispatch('setCategoriaSelecionado', { categoriaSelecionado: objeto });
+      store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
     };
-
+    const inicio = computed(() => {
+      const date = new Date(eventoSelecionado.dataInicio);
+      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
+    });
+    const final = computed(() => {
+      const date = new Date(eventoSelecionado.dataFinal);
+      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
+    });
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
       await searchDocuments();
     });
 
-    return { searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, eventoSelecionado };
+    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, eventoSelecionado };
 
   },
   methods: {
@@ -137,24 +151,25 @@ export default defineComponent({
     },
     handleRowClick(objeto) {
       // Your click event handling logic goes here
-      console.log('Row clicked! ' + objeto.evento);
+      console.log('Row clicked! ' + objeto);
       let dadosEdicao = new Categoria(
         objeto.id,
         objeto.descricao,
         objeto.idade,
         objeto.regra,
-        null
+        objeto.valorInscricao
       );
       this.objetoEdicao = dadosEdicao;
+      this.objetoEdicao.idEvento = objeto.idEvento;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
+        objeto.idEvento = this.eventoSelecionado.id;
         if (objeto.id) {
-          await FirestoreService.set(collectionName, objeto.id, objeto);
+          await FirestoreService.set(this.collectionName, objeto.id, objeto);
         } else {
-          objeto.idEvento = this.eventoSelecionado.id;
           await FirestoreService.add(this.collectionName, objeto);
         }
       } catch (error) {
@@ -182,7 +197,7 @@ export default defineComponent({
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  const collectionName = 'Eventos';
+                  const collectionName = 'Categorias';
                   FirestoreService.remove(collectionName, objeto.id);
                   this.searchDocuments();
                 } catch (error) {

@@ -1,4 +1,4 @@
-import { getFirestore, doc, getDoc, addDoc,  onSnapshot, setDoc, deleteDoc, collection, getDocs,  query, where } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, addDoc,  onSnapshot, setDoc, deleteDoc, collection, getDocs,  query, where, orderBy } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import firebaseConfig from '@/configuration/firebaseConfig';
 initializeApp(firebaseConfig);
@@ -19,11 +19,10 @@ const FirestoreService = {
     }
   },
   
-  async checkCollectionExistence(collectionName) {
-
-    const collectionRef = collection(db, collectionName); // Replace with your desired collection name
-
+  async checkCollectionExistence(collectionName,field,operator,value) {
     try {
+    const collectionRef = collection(db, collectionName,where(field,operator,value));
+    
       const querySnapshot = await getDocs(collectionRef);
 
       if (querySnapshot.size > 0) {
@@ -39,6 +38,7 @@ const FirestoreService = {
       }
     } catch (error) {
       // Handle error
+      return false;
       console.error('Error checking collection existence:', error.message);
     }
   },
@@ -240,9 +240,10 @@ const FirestoreService = {
         console.error('Error getting document with filter:', error.message);
       }
   },
+  
   async searchCollectionCategorias(collectionName, idEvento, searchTerm) {
 
-    const q = query(collection(db, collectionName),where('idEvento', '==',idEvento));
+    const q = query(collection(db, collectionName),where('idEvento', '==',idEvento),orderBy('descricao', 'asc'));
 
     return new Promise((resolve, reject) => {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {

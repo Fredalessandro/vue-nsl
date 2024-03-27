@@ -9,7 +9,7 @@
                     <!--<ion-icon :icon="iconEllipse"></ion-icon>-->
                 </ion-tab-button>
 
-                <ion-tab-button v-if="user" tab="evento">
+                <ion-tab-button v-if="(diretor && diretor.perfil == 'ADMIN') && user" tab="evento">
                     <ion-label>Eventos</ion-label>
                     <!--<ion-icon :icon="iconSquare"></ion-icon>-->
                 </ion-tab-button>

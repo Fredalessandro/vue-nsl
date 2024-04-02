@@ -3,13 +3,23 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ diretorSelecionado.nome }} Eventos</ion-title>
+        <ion-buttons slot="start">
+          <ion-button class="round-button" defaultHref="/diretor">
+            <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>{{ diretorSelecionado.nome }} Evento</ion-title>
+        <ion-buttons v-if="isAdmin" slot="end">
+          <ion-button class="round-button" @click="handleSignOut">
+            <ion-icon :icon="iconExit" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>
+      <!--<ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>-->
 
       <ion-grid>
         <ion-row class="ion-align-items-start">
@@ -18,35 +28,51 @@
           <ion-col>Local</ion-col>
           <ion-col size=2>Periodo</ion-col>
           <ion-col size=2>Status</ion-col>
-          <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
+          <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
-        <div v-for="(objeto, index) in filteredDocuments" :key="objeto.id" class="ion-align-items-start">
+        <div v-for="(objeto, index) in items" :key="objeto.id" class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
             <!--<ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col size=4 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-          objeto.evento }}</ion-col>
+              objeto.evento }}</ion-col>
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-          objeto.local }}</ion-col>
+              objeto.local }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-          objeto.dataInicio + ' a ' + objeto.dataFinal }}</ion-col>
+              objeto.dataInicio + ' a ' + objeto.dataFinal }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-          objeto.status }}</ion-col>
-            <ion-col size=0.8 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon v-if="isAdmin" @click="presentAlertConfirm(objeto)" :icon="iconDelete"
-                style="color: rgb(249, 9, 9);" size="small"></ion-icon>
-              <ion-icon v-if="isAdmin" @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"
-                size="small"></ion-icon>
-            </ion-col>
+              objeto.status }}</ion-col>
+            <!--<ion-col size=0.80 style="text-align: center;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
+              <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
+              <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
+            </ion-col>-->
           </ion-row>
         </div>
       </ion-grid>
     </ion-content>
-    <ion-footer v-if="isAdmin || (!isAdmin && filteredDocuments.size == 0)" class="ion-footer-fixed ion-padding" slot="end">
+    <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
-          <ion-button class="round-button" @click="abrirModal(true)">
+          <ion-button class="round-button" @click="">
+            <ion-icon :icon="iconSurfer" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button class="round-button" @click="">
+            <ion-icon :icon="iconJulge" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button v-if="isAdmin && items.length >= 0" class="round-button"
+            @click="presentAlertConfirm(selectedItem)">
+            <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button v-if="isAdmin && items.length >= 0 || !isAdmin && items.length >= 0" class="round-button"
+            @click="handleRowClick(selectedItem)">
+            <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button v-if="isAdmin && items.length == 0" class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
+            <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -58,7 +84,7 @@
 
 <script>
 import { alertController } from '@ionic/core';
-import { add, document, create, trash } from 'ionicons/icons';
+import { people, add, document, create, trash, man,  arrowForward, arrowBack, exit } from 'ionicons/icons';
 import CadastroEventoModal from '@/views/evento/CadastroEventoModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
@@ -66,23 +92,30 @@ import Evento from '../../model/Evento';
 import { ref, defineComponent, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-  IonSearchbar, IonButton, IonIcon, IonFooter, IonButtons, IonCheckbox
+  IonSearchbar, IonButton, IonBackButton, IonIcon, IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
 import store from '@/store';
 import { mapState } from 'vuex';
 import Categoria from '../../model/Categoria';
+import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
+import { useRouter } from 'vue-router' 
 
 export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-    IonSearchbar, IonButton, IonIcon, IonFooter,
+    IonSearchbar, IonButton, IonBackButton, IonIcon, IonFooter,
     IonButtons, IonCheckbox,
-    CadastroEventoModal, store
+    CadastroEventoModal
   },
   data() {
     return {
+      iconJulge: people,
+      iconSurfer: man,
       iconAdd: add,
       iconDocumet: document,
+      iconRigth: arrowForward,
+      iconBack: arrowBack,
+      iconExit: exit,
       collectionName: 'Eventos',
       store: store,
       iconDelete: trash,
@@ -90,37 +123,20 @@ export default defineComponent({
       items: [],
       objetoEdicao: new Evento(),
       modalAberta: false,
-      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
+      
     };
   },
   computed: {
-    ...mapState(['diretor', 'diretorSelecionado', 'user'])
+    ...mapState(['diretor', 'diretorSelecionado', 'user']),
   },
   setup() {
+    const router= useRouter(); 
     const diretorSelecionado = store.getters.getDiretorSelecionado;
     const collectionName =  'Eventos/';
     const searchTerm = ref('');
-    const filteredDocuments = ref([]);
-    const searchDocuments = async () => {
+    const items = ref([]);
+    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
 
-
-      try {
-
-        // Chame o serviço para buscar a coleção filtrada pelo termo de pesquisa
-        if (store.getters.getDiretor.perfil == 'ADMIN') {
-           const searchResults = await FirestoreService.searchCollectionEventos(collectionName, diretorSelecionado.id ,searchTerm.value.trim());
-           filteredDocuments.value = searchResults;
-        } else {
-           const searchResults = await FirestoreService.searchCollectionEventosStatus(collectionName, diretorSelecionado.id, 'Aguardando', searchTerm.value.trim());
-           filteredDocuments.value = searchResults;
-        }
-
-
-      } catch (error) {
-        console.error('Erro ao buscar documentos:', error);
-      }
-      
-    };
 
     const selectedItem = ref();
     let isCategorias = true;
@@ -130,12 +146,38 @@ export default defineComponent({
       store.dispatch('setEventoSelecionado', { eventoSelecionado: objeto });
     };
 
+    const proximaPagina = async () => {
+      router.push({path:'categoria', replace: true });
+    }
+
+    const paginaAnterio = async () => {
+      router.push({path:'diretor', replace: true });
+    }
+
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      await searchDocuments();
+      //await searchDocuments();
+      const db = getFirestore();
+      const q = query(collection(db, collectionName),where('idDiretor', '==',diretorSelecionado.id),where('status', '!=', status));
+      
+      // Observando alterações na coleção
+      onSnapshot(q, (snapshot) => {
+        items.value = [];
+        snapshot.forEach((doc) => {
+          const item = {
+            key: doc.id,
+            ...doc.data(),
+          };
+          //items.value.push({ id: doc.id, data: doc.data() });
+          store.dispatch('setEventoSelecionado', { eventoSelecionado: item });
+          selectedItem.value = item;
+          items.value.push(item);
+        });
+      });
+
     });
 
-    return { searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, diretorSelecionado, isCategorias };
+    return {isAdmin, searchTerm,  selectedItem, selectRow, proximaPagina, diretorSelecionado, isCategorias,items };
 
   },
   methods: {
@@ -144,7 +186,7 @@ export default defineComponent({
     },
     abrirModal(novo) {
       if (novo) {
-        const lista = this.filteredDocuments;
+        const lista = this.items;
         const documentFound = lista.find(evento => evento.idDiretor === this.diretorSelecionado.id);
 
         // Verificando se o documento foi encontrado
@@ -165,7 +207,7 @@ export default defineComponent({
                 }],
             }).then(a => a.present())
         }
-        let dadosEdicao = new Evento(null);
+        let dadosEdicao = new Evento();
         dadosEdicao.idDiretor = this.diretorSelecionado.id;
         dadosEdicao.status = 'Aguardando'
         this.objetoEdicao = dadosEdicao;
@@ -179,12 +221,13 @@ export default defineComponent({
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.evento);
       let dadosEdicao = new Evento(
+        objeto.idDiretor,
         objeto.id,
         objeto.evento,
         objeto.local,
         objeto.dataInicio,
         objeto.dataFinal,
-        'Aguardando'
+        objeto.status
       );
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -193,7 +236,7 @@ export default defineComponent({
       // Lógica para salvar o usuário
       try {
         if (objeto.id) {
-          await FirestoreService.set(collectionName, objeto.id, objeto);
+          await FirestoreService.set(this.collectionName, objeto.id, objeto);
         } else {
           objeto.idDiretor = this.diretorSelecionado.id;
           const data = await FirestoreService.add(this.collectionName, objeto);
@@ -261,6 +304,15 @@ export default defineComponent({
         })
         .then(a => a.present())
     },
+    async handleSignOut() {
+            await this.$store.dispatch('signOut',{user:null,diretor:null})
+                .then(() => {
+                    this.$router.replace('/login'); // redirect to the feed
+                }).catch(error => {
+                    console.error('Error add data:', error);
+                    alert(error.message);
+                });
+        },
   }
 });
 

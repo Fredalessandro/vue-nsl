@@ -1,6 +1,6 @@
-export default class Atleta {
-    constructor(id, evento, local, dataInicio, dataFinal, valorInscricao, status){
-        this.idDiretor = null;
+export default class Evento {
+    constructor(idDiretor='',id='', evento='', local='', dataInicio=null, dataFinal=null, status){
+        this.idDiretor = idDiretor;
         this.id        = id;
         this.evento    = evento;
         this.local     = local;

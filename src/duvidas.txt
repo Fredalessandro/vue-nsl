@@ -17,6 +17,9 @@ Equipe
   tipo Beach-Marshall, Head Judge, Judge,  Spotter 
 
 
+  
+
+
 Organizador -> Diretor de prova
 
 
@@ -47,3 +50,21 @@ handleRowClick(objeto) {
     GRAMASTER
     KARRUNA
     LEGEND
+
+
+'LEONADO MATEUS',
+'MIGUEL GOMES',
+'HEITOR GOMES',
+'GABRIEL MEDEIROS',
+'GABRIEL CIPRIANO',   AL
+'SHAR BOY',
+'DAVI BRASIL',
+'GABRIEL BRASIL',
+'JONAS GABRIEL',
+'NICOLAS CLAUDINO',
+'NICOLAS MIGUEL',
+'ALESSANDRO FELLIX',  AL
+'PAULIINHO EDC',
+'NICOLAS DAVIEL',     AL
+'CAUÃ LUCIO XAVIER',  AL
+'IURY ROCHA',

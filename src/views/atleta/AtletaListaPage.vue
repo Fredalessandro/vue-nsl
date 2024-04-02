@@ -3,13 +3,16 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Lista de Atletas</ion-title>
-      </ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/evento" />
+      </ion-buttons>
+      <ion-title>Atletas</ion-title>
+    </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchItems" ></ion-searchbar>
+      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>
       
       <ion-grid>
         <ion-row class="ion-align-items-start">
@@ -53,6 +56,12 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
+          <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
+            <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button class="round-button" @click="handleRowClick(selectedItem)">
+            <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
+          </ion-button>
           <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
@@ -67,22 +76,25 @@
 
 <script >
 import { alertController } from '@ionic/core'
+import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-   IonSearchbar, IonButton, IonIcon, IonFooter, IonButtons, IonCheckbox, IonRippleEffect, IonCard
+   IonSearchbar, IonButton, IonBackButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
 import { add,document, create, trash } from 'ionicons/icons';
 import CadastroAtletaModal from '@/views/atleta/CadastroAtletaModal.vue';
-import FirebaseService  from '@/database/FirebaseService.js';
-import Sequencia from '@/model/Sequencia';
-import Atleta from '../../model/Atleta';
+import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
+import Atleta from '../../model/Atleta';
+import { mapState } from 'vuex';
+import store from '@/store'; 
+import { format } from 'date-fns';
 
-export default {
+export default defineComponent({
   components: {
-    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
+    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
-    IonButtons, IonCheckbox, IonRippleEffect, IonCard,
+    IonButtons, IonCheckbox, IonBackButton,
     CadastroAtletaModal
   },
   data() {
@@ -91,93 +103,101 @@ export default {
       iconDocumet: document,
       iconDelete: trash,
       iconEdit: create,
+      collectionName: 'Categorias',
+      store: store,
       searchTerm: '',
-      isCheckedAll: false,
-      filteredItems: [],
       items: [],
-      objeto: new Atleta(null),
-      objetoEdicao: new Atleta(),
-      menuState: true,
+      objetoEdicao: new Categoria(),
       modalAberta: false,
-      sequencia: Sequencia
+      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
   },
-   watch: {
-    searchTerm: 'searchItems',
+  computed: {
+    ...mapState(['diretor', 'diretorSelecionado','eventoSelecionado', 'user'])
   },
-  created() {
-    this.fetchItems();
+  setup() {
+    const eventoSelecionado = store.getters.getEventoSelecionado;
+    const collectionName =  'Categorias/';
+    const searchTerm = ref('');
+    const filteredDocuments = ref([]);
+    const searchDocuments = async () => {
+
+
+      try {
+
+        // Chame o serviço para buscar a coleção filtrada pelo termo de pesquisa
+        const searchResults = await FirestoreService.searchCollectionCategorias(collectionName, eventoSelecionado.id ,searchTerm.value.trim());
+        filteredDocuments.value = searchResults;
+
+      } catch (error) {
+        console.error('Erro ao buscar documentos:', error);
+      }
+      
+    };
+
+    const selectedItem = ref();
+
+    const selectRow = async (objeto) => {
+      selectedItem.value = objeto;
+      store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
+    };
+    const inicio = computed(() => {
+      const date = new Date(eventoSelecionado.dataInicio);
+      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
+    });
+    const final = computed(() => {
+      const date = new Date(eventoSelecionado.dataFinal);
+      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
+    });
+    // Carregue a lista ao iniciar a página
+    onMounted(async () => {
+      await searchDocuments();
+    });
+
+    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, eventoSelecionado };
+
   },
   methods: {
-    searchItems() {
-      this.filteredItems = this.items.filter((item) =>
-        item.nome.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    },
-    fetchItems() {
-      const itemsRef = FirebaseService.database.ref('Atletas');
-      itemsRef.on('value', (snapshot) => {
-        this.items = [];
-        snapshot.forEach((childSnapshot) => {
-          const item = {
-            key: childSnapshot.key,
-            ...childSnapshot.val(),
-          };
-          this.items.push(item);
-        });
-        this.searchItems();
-      });
+    updateSearch(event) {
+      this.searchTerm = event.detail.value;
     },
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Atleta(null);  
+        let dadosEdicao = new Categoria(null);
+        dadosEdicao.idEvento = this.eventoSelecionado.id;
         this.objetoEdicao = dadosEdicao;
-      } 
-      this.modalAberta = true; 
+      }
+      this.modalAberta = true;
     },
     fecharModal() {
       this.modalAberta = false;
     },
     handleRowClick(objeto) {
       // Your click event handling logic goes here
-      console.log('Row clicked! ' + objeto.nome);
-      let dadosEdicao = new objeto(
+      console.log('Row clicked! ' + objeto);
+      let dadosEdicao = new Categoria(
         objeto.id,
-        objeto.nome,
-        objeto.email,
-        objeto.telefone,
-        objeto.cpf,
-        objeto.dataNascimento,
-        objeto.cep,
-        objeto.endereco,
-        objeto.numero,
-        objeto.complemento,
-        objeto.bairro,
-        objeto.cidade,
-        objeto.uf,
-        objeto.tipo
+        objeto.descricao,
+        objeto.idade,
+        objeto.regra,
+        objeto.valorInscricao
       );
       this.objetoEdicao = dadosEdicao;
+      this.objetoEdicao.idEvento = objeto.idEvento;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        // Gravar o documento no banco de dados local
-
-        if (objeto.id != null) {
-          await FirebaseService.updateData('Atletas/', objeto.id, objeto);
+        objeto.idEvento = this.eventoSelecionado.id;
+        if (objeto.id) {
+          await FirestoreService.set(this.collectionName, objeto.id, objeto);
         } else {
-          await FirebaseService.incrementarCodigo('atleta').then(value => {
-            objeto.id = value;
-            console.log('Incremento', objeto.id);
-
-            FirebaseService.setData('Atletas/' + value, objeto);
-
-          });
+          await FirestoreService.add(this.collectionName, objeto);
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
+        alert(error.message);
       }
 
     },
@@ -185,14 +205,14 @@ export default {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão do usuário '+objeto.nome+' ?',
-          cssClass : 'default-alert',
+          message: 'Exclusão da Categoria ' + objeto.descricao + ' ?',
+          cssClass: 'default-alert',
           buttons: [
             {
               text: 'Não',
               role: 'cancel',
               handler: blah => {
-                console.log('Confirm Cancel:', objeto.nome)
+                console.log('Confirm Cancel:', objeto.descricao)
               },
             },
             {
@@ -200,19 +220,21 @@ export default {
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirebaseService.deleteData('Atletas/', objeto.id);
+                  const collectionName = 'Categorias';
+                  FirestoreService.remove(collectionName, objeto.id);
+                  this.searchDocuments();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
-                console.log('Confirm Okay', objeto.nome)
+                console.log('Confirm Okay', objeto.evento)
               },
             },
           ],
         })
         .then(a => a.present())
     },
-  },
-}
+  }
+});
 
 </script>
 

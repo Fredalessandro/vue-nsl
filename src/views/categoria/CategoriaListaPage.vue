@@ -3,10 +3,14 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ eventoSelecionado.evento }}, de {{ inicio }} a {{ final }}, local {{ eventoSelecionado.local }}</ion-title>
-      </ion-toolbar>
+        <ion-buttons slot="start">
+        <ion-button class="round-button" @click="paginaAnterio">
+          <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>Categorias {{ eventoSelecionado.evento }} local {{ eventoSelecionado.local }}</ion-title>
+    </ion-toolbar>
     </ion-header>
-
     <ion-content class="ion-padding">
 
       <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>
@@ -15,9 +19,9 @@
         <ion-row class="ion-align-items-start">
           <!--<ion-col size=0.5>id</ion-col>-->
           <ion-col>Descrição</ion-col>
-          <ion-col>Inscrição</ion-col>
-          <ion-col size=3>Regra aplicada para idade</ion-col>
-          <ion-col size=0.80 style="text-align: center;">Ação</ion-col>
+          <ion-col>Valor Inscrição</ion-col>
+          <ion-col size=3>Regra de idade</ion-col>
+          <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
         <div v-for="(objeto, index) in filteredDocuments" :key="objeto.id" class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
@@ -29,11 +33,11 @@
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.valorInscricao }}</ion-col>           
             <ion-col size=3 style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{objeto.regra+' '+ objeto.idade+' anos' }}</ion-col>
-            <ion-col size=0.80 style="text-align: center;"
+            <!--<ion-col size=0.80 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
               <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
               <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
-            </ion-col>
+            </ion-col>-->
           </ion-row>
         </div>
       </ion-grid>
@@ -41,8 +45,17 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
+          <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
+            <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button class="round-button" @click="handleRowClick(selectedItem)">
+            <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
+          </ion-button>
           <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+          <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
+            <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -56,9 +69,9 @@ import { alertController } from '@ionic/core'
 import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-   IonSearchbar, IonButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
+   IonSearchbar, IonButton, IonBackButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
-import { add,document, create, trash } from 'ionicons/icons';
+import { add,document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
 import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
@@ -66,12 +79,13 @@ import Categoria from '../../model/Categoria';
 import { mapState } from 'vuex';
 import store from '@/store'; 
 import { format } from 'date-fns';
+import { useRouter } from 'vue-router' 
 
 export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
     IonSearchbar, IonButton, IonIcon, IonFooter,
-    IonButtons, IonCheckbox,
+    IonButtons, IonCheckbox, IonBackButton,
     CadastroCategoriaModal
   },
   data() {
@@ -80,6 +94,8 @@ export default defineComponent({
       iconDocumet: document,
       iconDelete: trash,
       iconEdit: create,
+      iconRigth: arrowForward,
+      iconBack: arrowBack,
       collectionName: 'Categorias',
       store: store,
       searchTerm: '',
@@ -93,6 +109,7 @@ export default defineComponent({
     ...mapState(['diretor', 'diretorSelecionado','eventoSelecionado', 'user'])
   },
   setup() {
+    const router= useRouter(); 
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const collectionName =  'Categorias/';
     const searchTerm = ref('');
@@ -118,6 +135,9 @@ export default defineComponent({
       selectedItem.value = objeto;
       store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
     };
+    const paginaAnterio = async () => {
+      router.push({path:'evento', replace: true });
+    }
     const inicio = computed(() => {
       const date = new Date(eventoSelecionado.dataInicio);
       return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
@@ -131,7 +151,7 @@ export default defineComponent({
       await searchDocuments();
     });
 
-    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, selectRow, eventoSelecionado };
+    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, paginaAnterio, selectRow, eventoSelecionado };
 
   },
   methods: {

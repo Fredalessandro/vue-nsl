@@ -4,51 +4,56 @@ import firebase from 'firebase/compat/app';
 
 const store = createStore({
   state: {
-    diretor: {},
-    diretorSelecionado: {},
-    eventoSelecionado:{},
-    categoriaSelecionada:{},
-    user: {} 
+    diretor: localStorage.getItem('diretor'),
+    diretorSelecionado: localStorage.getItem('diretorSelecionado'),
+    eventoSelecionado: localStorage.getItem('eventoSelecionado'),
+    categoriaSelecionada: localStorage.getItem('categoriaSelecionada'),
+    user: localStorage.getItem('user'), 
   },
   mutations: {
     setDiretor(state, obj) {
         state.diretor = obj;
+        localStorage.setItem('diretor', state.diretor); 
     },
     setDiretorSelecionado(state, obj) {
       state.diretorSelecionado = obj;
+      localStorage.setItem('diretorSelecionado', state.diretorSelecionado); 
     },
     setEventoSelecionado(state, obj) {
       state.eventoSelecionado = obj;
+      localStorage.setItem('eventoSelecionado', state.eventoSelecionado); 
     },
     setCategoriaSelecionada(state, obj){
       state.categoriaSelecionada = obj;
+      localStorage.setItem('categoriaSelecionada', state.categoriaSelecionada); 
     },
     setUser(state, obj) {
         state.user = obj;  
+        localStorage.setItem('user',state.user); 
     }    
   },
   getters: {
-    getDiretor: state => state.diretor,
-    getDiretorSelecionado: state => state.diretorSelecionado,
-    getEventoSelecionado: state => state.eventoSelecionado,
-    getCategoriaSelecionada: state => state.categoriaSelecionada,
-    getUser: state => state.user
+    getDiretor : state => JSON.parse(state.diretor),
+    getDiretorSelecionado: state => JSON.parse(state.diretorSelecionado),
+    getEventoSelecionado: state => JSON.parse(state.eventoSelecionado),
+    getCategoriaSelecionada: state => JSON.parse(state.categoriaSelecionada),
+    getUser: state => JSON.parse(state.user)
   },
   actions: {
     setDiretor({ commit }, {diretor}) {
-      commit('setDiretor', diretor);
+      commit('setDiretor', JSON.stringify(diretor));
     },
     setDiretorSelecionado({ commit }, {diretorSelecionado}) {
-      commit('setDiretorSelecionado', diretorSelecionado);
+      commit('setDiretorSelecionado', JSON.stringify(diretorSelecionado));
     },
     setEventoSelecionado({ commit }, {eventoSelecionado}) {
-      commit('setEventoSelecionado', eventoSelecionado);
+      commit('setEventoSelecionado', JSON.stringify(eventoSelecionado));
     },
     setCategoriaSelecionada({ commit }, {categoriaSelecionada}) {
-      commit('setCategoriaSelecionada', categoriaSelecionada);
+      commit('setCategoriaSelecionada', JSON.stringify(categoriaSelecionada));
     },
     setUser({ commit }, {user}) {
-      commit('setUser', user);
+      commit('setUser', JSON.stringify(user));
     },
     async signInWithEmailAndPassword({ commit }, { email, password }) {
       try {
@@ -88,10 +93,25 @@ const store = createStore({
         .auth()
         .signOut()
         .then(() => {
+          
           // Sign-out successful
           console.log("User signed out");
+          
           commit("setUser", null);
           localStorage.removeItem("user");
+
+          commit("setDiretor", null);
+          localStorage.removeItem("diretor");
+         
+          commit("setDiretorSelecionado", null);
+          localStorage.removeItem("diretorSelecionado");    
+
+          commit("setEventoSelecionado", null);
+          localStorage.removeItem("eventoSelecionado");
+   
+          commit("setCategoriaSelecionada", null);
+          localStorage.removeItem("categoriaSelecionada");       
+
         })
         .catch((error) => {
           // An error happened

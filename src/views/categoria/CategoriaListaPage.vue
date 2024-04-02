@@ -4,17 +4,19 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-        <ion-button class="round-button" @click="paginaAnterio">
-          <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-title>Categorias {{ eventoSelecionado.evento }} local {{ eventoSelecionado.local }}</ion-title>
-    </ion-toolbar>
+          <ion-button class="round-button" @click="paginaAnterio">
+            <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Categorias {{ eventoSelecionado.evento }} local {{ eventoSelecionado.local }}</ion-title>
+      </ion-toolbar>
+      <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
+        @ionInput="filterItems"></ion-searchbar>
     </ion-header>
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="searchDocuments"></ion-searchbar>
-      
+
+
       <ion-grid>
         <ion-row class="ion-align-items-start">
           <!--<ion-col size=0.5>id</ion-col>-->
@@ -23,16 +25,18 @@
           <ion-col size=3>Regra de idade</ion-col>
           <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
-        <div v-for="(objeto, index) in filteredDocuments" :key="objeto.id" class="ion-align-items-start">
+        <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.id"
+          class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
             <!--<ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
-            <ion-col style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.descricao }}</ion-col>
-            <ion-col style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.valorInscricao }}</ion-col>           
+            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.descricao }}</ion-col>
+            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.valorInscricao }}</ion-col>
             <ion-col size=3 style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{objeto.regra+' '+ objeto.idade+' anos' }}</ion-col>
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.idade==0?"Sem regra":objeto.regra + ' ' +  objeto.idade + ' anos')
+              }}</ion-col>
             <!--<ion-col size=0.80 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
               <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
@@ -44,48 +48,61 @@
     </ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
-        <ion-buttons  slot="end" >
+        <ion-buttons slot="end">
+          <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
             <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Excluir</ion-label>
+          </div>
+          <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="handleRowClick(selectedItem)">
             <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Editar</ion-label>
+          </div>
+          <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Inserir</ion-label>
+        </div>
+        <div class="label-container">
           <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
             <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Baterias</ion-label>
+        </div>  
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    <CadastroCategoriaModal  :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" :isReadOnly="isAdmin" @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
-</ion-page>
+    <CadastroCategoriaModal :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" :isReadOnly="isAdmin"
+      @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+  </ion-page>
 </template>
 
-<script >
+<script>
 import { alertController } from '@ionic/core'
 import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-   IonSearchbar, IonButton, IonBackButton, IonIcon,  IonFooter, IonButtons, IonCheckbox
+  IonSearchbar, IonButton, IonLabel, IonIcon, IonFooter, IonButtons, IonCheckbox
 } from '@ionic/vue';
-import { add,document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
+import { add, document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
 import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue';
 import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
 import Categoria from '../../model/Categoria';
-import { mapState } from 'vuex';
-import store from '@/store'; 
+import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
+import store from '@/store';
 import { format } from 'date-fns';
-import { useRouter } from 'vue-router' 
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
-    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, 
+    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
     IonSearchbar, IonButton, IonIcon, IonFooter,
-    IonButtons, IonCheckbox, IonBackButton,
+    IonButtons, IonLabel,
     CadastroCategoriaModal
   },
   data() {
@@ -105,11 +122,8 @@ export default defineComponent({
       isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
   },
-  computed: {
-    ...mapState(['diretor', 'diretorSelecionado','eventoSelecionado', 'user'])
-  },
   setup() {
-    const router= useRouter(); 
+    /*const router= useRouter(); 
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const collectionName =  'Categorias/';
     const searchTerm = ref('');
@@ -151,13 +165,70 @@ export default defineComponent({
       await searchDocuments();
     });
 
-    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, paginaAnterio, selectRow, eventoSelecionado };
+    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, paginaAnterio, selectRow, eventoSelecionado };*/
+
+    const router = useRouter();
+    const eventoSelecionado = store.getters.getEventoSelecionado;
+    const collectionName = 'Categorias';
+    const searchTerm = ref('');
+    const items = ref([]);
+    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
+
+
+    const selectedItem = ref();
+    let isCategorias = true;
+
+    const selectRow = async (objeto) => {
+      selectedItem.value = objeto;
+      store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
+    };
+
+    const proximaPagina = async () => {
+      router.push({ path: 'baterias', replace: true });
+    }
+
+    const paginaAnterio = async () => {
+      router.push({ path: 'evento', replace: true });
+    }
+
+    // Carregue a lista ao iniciar a página
+    onMounted(async () => {
+      //await searchDocuments();
+      const db = getFirestore();
+      const q = query(collection(db, collectionName),orderBy('descricao'), where('idEvento', '==', eventoSelecionado.id));
+
+      // Observando alterações na coleção
+      onSnapshot(q, (snapshot) => {
+        items.value = [];
+        snapshot.forEach((doc) => {
+          const item = {
+            key: doc.id,
+            ...doc.data(),
+          };
+          if (!selectedItem.value) {
+            store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: item });
+            selectedItem.value = item;
+          }
+          items.value.push(item);
+        });
+      });
+
+    });
+    
+    const filteredItems = computed(() => {
+      const term = searchTerm.value.toLowerCase();
+      // Filter items based on whether they include the search term
+      return items?items.value.filter(item => item.descricao.toLowerCase().includes(term)):[];
+    });
+
+    const filterItems = event => {
+      searchTerm.value = event.target.value;
+    };
+
+    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, isCategorias, items };
 
   },
   methods: {
-    updateSearch(event) {
-      this.searchTerm = event.detail.value;
-    },
     abrirModal(novo) {
       if (novo) {
         let dadosEdicao = new Categoria(null);
@@ -233,4 +304,3 @@ export default defineComponent({
   }
 });
 </script>
-

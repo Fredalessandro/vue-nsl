@@ -9,11 +9,13 @@
           <ion-icon :icon="iconExit" style="color: white;" size="large"></ion-icon>
         </ion-button>
       </ion-buttons>
+      <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm" @ionInput="filterItems"></ion-searchbar>
     </ion-toolbar>
+    
   </ion-header>
     <ion-content class="ion-padding">
 
-      <ion-searchbar placeholder="Pesquisar" v-model="searchTerm" @ionInput="filterItems"></ion-searchbar>
+
       <ion-grid>
         <ion-row class="ion-align-items-start">
           <!--<ion-col size=0.5>id</ion-col>-->
@@ -44,18 +46,30 @@
     <ion-footer v-if="isAdmin" class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons  slot="end" >
+          <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
             <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Excluir</ion-label>
+        </div>
+        <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="handleRowClick(selectedItem)">
             <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Editar</ion-label>
+        </div>
+        <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Inserir</ion-label>
+        </div>
+        <div class="label-container">
           <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
             <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Evento</ion-label>
+        </div>  
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
@@ -68,7 +82,7 @@
 import { alertController } from '@ionic/core';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-  IonSearchbar, IonButton, IonBackButton, IonIcon, IonFooter, IonButtons, IonCheckbox
+  IonSearchbar, IonButton, IonBackButton, IonIcon, IonFooter, IonButtons, IonLabel
 } from '@ionic/vue';
 import { ref, defineComponent, onMounted, computed } from 'vue';
 import { add, document, create, trash, arrowForward, arrowBack, exit } from 'ionicons/icons';
@@ -85,7 +99,7 @@ export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
     IonSearchbar, IonButton, IonIcon, IonFooter,
-    IonButtons,IonBackButton, IonCheckbox,
+    IonButtons,IonBackButton, IonLabel,
     CadastroDiretorModal
   },
   data() {
@@ -153,9 +167,9 @@ export default defineComponent({
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
       // Filter items based on whether they include the search term
-      return items.value.filter(item => item.nome.toLowerCase().includes(term) ||
+      return items?items.value.filter(item => item.nome.toLowerCase().includes(term) ||
         item.telefone.toLowerCase().includes(term) ||
-        item.email.toLowerCase().includes(term));
+        item.email.toLowerCase().includes(term)):[];
     });
 
     const filterItems = event => {

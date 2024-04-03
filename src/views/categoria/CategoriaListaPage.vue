@@ -67,8 +67,8 @@
           </ion-button>
           <ion-label class="bottom-label">Inserir</ion-label>
         </div>
-        <div class="label-container">
-          <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
+        <div  v-if="selectedItem" class="label-container">
+          <ion-button class="round-button" @click="proximaPagina">
             <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
           <ion-label class="bottom-label">Baterias</ion-label>
@@ -123,50 +123,7 @@ export default defineComponent({
     };
   },
   setup() {
-    /*const router= useRouter(); 
-    const eventoSelecionado = store.getters.getEventoSelecionado;
-    const collectionName =  'Categorias/';
-    const searchTerm = ref('');
-    const filteredDocuments = ref([]);
-    const searchDocuments = async () => {
-
-
-      try {
-
-        // Chame o serviço para buscar a coleção filtrada pelo termo de pesquisa
-        const searchResults = await FirestoreService.searchCollectionCategorias(collectionName, eventoSelecionado.id ,searchTerm.value.trim());
-        filteredDocuments.value = searchResults;
-
-      } catch (error) {
-        console.error('Erro ao buscar documentos:', error);
-      }
-      
-    };
-
-    const selectedItem = ref();
-
-    const selectRow = async (objeto) => {
-      selectedItem.value = objeto;
-      store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
-    };
-    const paginaAnterio = async () => {
-      router.push({path:'evento', replace: true });
-    }
-    const inicio = computed(() => {
-      const date = new Date(eventoSelecionado.dataInicio);
-      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
-    });
-    const final = computed(() => {
-      const date = new Date(eventoSelecionado.dataFinal);
-      return date.toLocaleDateString('pt-BR'); // Altere para o seu local se necessário
-    });
-    // Carregue a lista ao iniciar a página
-    onMounted(async () => {
-      await searchDocuments();
-    });
-
-    return { inicio, final, searchTerm, filteredDocuments, searchDocuments, selectedItem, paginaAnterio, selectRow, eventoSelecionado };*/
-
+    
     const router = useRouter();
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const collectionName = 'Categorias';

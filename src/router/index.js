@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Diretor from '@/views/diretor/DiretorListaPage.vue';
 import Evento from '@/views/evento/EventoListaPage.vue';
 import Categoria from '@/views/categoria/CategoriaListaPage.vue';
+import Juiz from '@/views/juiz/JuizListaPage.vue'
+import Atleta from '@/views/atleta/AtletaListaPage.vue'
 import Login from '@/views/login/login.vue';
 import Logout from '@/views/login/logout.vue';
 
@@ -26,6 +28,14 @@ const routes = [
   {
     path: '/categoria',
     component: Categoria,
+  },
+  {
+    path: '/juiz',
+    component: Juiz,
+  },
+  {
+    path: '/atleta',
+    component: Atleta,
   },
   {
     path: '/logout',

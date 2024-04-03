@@ -30,7 +30,7 @@
           <ion-col size=2>Status</ion-col>
           <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
-        <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.id"
+        <div v-for="(objeto, index) in items" :key="objeto.id"
           class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
             <!--<ion-col size=0.5 style="text-align: center;"
@@ -56,39 +56,39 @@
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
           <div class="label-container" style="margin-right: 30px;">
-            <ion-button class="round-button" @click="">
+            <ion-button class="round-button" @click="paginaJuizes">
               <ion-icon :icon="iconJulge" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Juízes</ion-label>
           </div>
           <div class="label-container" style="margin-right: 30px;">
-            <ion-button class="round-button" @click="">
+            <ion-button class="round-button" @click="paginaAtleta">
               <ion-icon :icon="iconSurfer" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Atletas</ion-label>
           </div>
-          <div v-if="isAdmin && items.length >= 0" class="label-container" style="margin-right: 30px;">
+          <div v-if="isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button  class="round-button"
               @click="presentAlertConfirm(selectedItem)">
               <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Excluir</ion-label>
           </div>
-          <div v-if="isAdmin && items.length >= 0 || !isAdmin && items.length >= 0" class="label-container" style="margin-right: 30px;">
+          <div  class="label-container" style="margin-right: 30px;">
             <ion-button  class="round-button"
               @click="handleRowClick(selectedItem)">
               <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Editar</ion-label>
           </div>
-          <div v-if="isAdmin && items.length == 0" class="label-container" style="margin-right: 30px;">
+          <div v-if="isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button  class="round-button" @click="abrirModal(true)">
               <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Inserir</ion-label>
           </div>
           <div class="label-container">
-            <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
+            <ion-button class="round-button" @click="proximaPagina">
               <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Categorias</ion-label>
@@ -109,6 +109,8 @@ import FirestoreService from '@/database/FirestoreService.js';
 import '../styles.css';
 import Evento from '../../model/Evento';
 import Categoria from '../../model/Categoria';
+import Juiz from '../../model/Juiz';
+import Atleta from '../../model/Atleta';
 import { ref, defineComponent, onMounted, computed } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -158,12 +160,18 @@ export default defineComponent({
 
 
     const selectedItem = ref();
-    let isCategorias = true;
 
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
       store.dispatch('setEventoSelecionado', { eventoSelecionado: objeto });
     };
+
+    const paginaJuizes = async () => {
+      router.push({ path: 'juiz', replace: true });
+    }
+    const paginaAtleta = async () => {
+      router.push({ path: 'atleta', replace: true });
+    }
 
     const proximaPagina = async () => {
       router.push({ path: 'categoria', replace: true });
@@ -197,21 +205,22 @@ export default defineComponent({
             ...doc.data(),
           };
           //items.value.push({ id: doc.id, data: doc.data() });
-          store.dispatch('setEventoSelecionado', { eventoSelecionado: item });
-          selectedItem.value = item;
+          if (!selectedItem.value) {
+            store.dispatch('setEventoSelecionado', { eventoSelecionado: item });
+            selectedItem.value = item;
+          }
           items.value.push(item);
         });
       });
 
     });
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, diretorSelecionado, isCategorias, inicio, final, items };
+    return { isAdmin, searchTerm, selectedItem, 
+      selectRow, proximaPagina, paginaAnterio, paginaJuizes, paginaAtleta,
+      diretorSelecionado, inicio, final, items };
 
   },
   methods: {
-    updateSearch(event) {
-      this.searchTerm = event.detail.value;
-    },
     abrirModal(novo) {
       if (novo) {
         const lista = this.items;
@@ -266,14 +275,38 @@ export default defineComponent({
         if (objeto.id) {
           await FirestoreService.set(this.collectionName, objeto.id, objeto);
         } else {
+          
           objeto.idDiretor = this.diretorSelecionado.id;
           const data = await FirestoreService.add(this.collectionName, objeto);
+          
           let categorias = Categoria.categorias;
+          
           const collectionCategoria = 'Categorias';
+          
           categorias.forEach(element => {
             element.idEvento = data.id;
             FirestoreService.add(collectionCategoria, element);
           });
+
+          let juizes = Juiz.juizes;
+          
+          const collectionJuiz = 'Juizes';
+          
+          juizes.forEach(element => {
+            element.idEvento = data.id;
+            FirestoreService.add(collectionJuiz, element);
+          });
+
+          let atletas = Atleta.atletas;
+          
+          const collectionAtleta = 'Atletas';
+          
+          atletas.forEach(element => {
+            FirestoreService.add(collectionAtleta, element);
+          });
+
+
+
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -321,7 +354,7 @@ export default defineComponent({
                   // Gravar o documento no banco de dados local
                   const collectionName = '/Eventos';
                   FirestoreService.remove(collectionName, objeto.id);
-                  this.searchDocuments();
+                  store.dispatch('setEventoSelecionado', { eventoSelecionado: null });
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

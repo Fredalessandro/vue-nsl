@@ -6,7 +6,7 @@
         
       <ion-header>
         <ion-toolbar>
-          <ion-title>Cadastro de Categorias</ion-title>
+          <ion-title>Cadastro de Juízes</ion-title>
           <ion-buttons slot="end">
             <ion-button @click="fecharModal">Fechar</ion-button>
           </ion-buttons>
@@ -19,25 +19,28 @@
           </ion-item>-->
   
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Descrição" v-model="objetoEdicao.descricao" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="50" label="Nome" v-model="objetoEdicao.nome" required></ion-input>
           </ion-item>
          
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="20" label="Login"  v-model="objetoEdicao.login" required></ion-input>
           </ion-item>
   
           <ion-item>  
-            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade"  v-model="objetoEdicao.idade" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="6"  label="Senha"  v-model="objetoEdicao.senha" required></ion-input>
           </ion-item>
-          
+          <ion-item>  
+            <ion-checkbox v-model="objetoEdicao.ativo" @ionChange="handleChange">Ativo</ion-checkbox>
+          </ion-item>  
           <ion-item>
-            <ion-label>Selecione a regra para idade</ion-label><br/>
-            <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.regra">
+            <ion-label>Selecione tipo juiz</ion-label><br/>
+            <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.tipo">
                 <ion-select-option v-for="option in options" :key="option.value" :value="option.value">
-                    {{ option.label+(objetoEdicao.idade==0?"":" "+objetoEdicao.idade) }}
+                    {{ option.label }}
                 </ion-select-option>
             </ion-select>
           </ion-item>
+
 
       </ion-content>
       <ion-footer>
@@ -51,9 +54,9 @@
   <script >
   import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, 
     IonButton, IonFooter, IonButtons, IonInput , IonItem, IonLabel,
-    IonSelect, IonSelectOption, IonText
+    IonSelect, IonSelectOption, IonText, IonCheckbox
 } from '@ionic/vue'; 
-  import Categoria from '../../model/Categoria';
+  import Juiz from '../../model/Juiz';
 
   export default {    
     
@@ -63,18 +66,16 @@
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
     IonButton, IonFooter,IonLabel,
     IonButtons, IonInput, IonItem,
-    IonSelect, IonSelectOption, IonText,
-    Categoria
+    IonSelect, IonSelectOption, IonText, IonCheckbox,
+    Juiz
   },
     data() {
       return {
         seuModelo: '',
         selectedOption: null,
         options: [
-        { label: 'Até', value: 'Até' },
-        { label: 'A partir de', value: 'A partir de' },
-        { label: 'Open Amador', value: 'Open Amador' },
-        { label: 'Open Pro', value: 'Open Pro' },
+        { label: 'Juiz Principal', value: 'Juiz Principal' },
+        { label: 'Juiz', value: 'Juiz' }
         // Adicione mais opções conforme necessário
       ]
       };
@@ -87,7 +88,12 @@
         // Valide os campos ou realize a lógica de salvamento
         this.$emit('salvarEdicao', this.objetoEdicao);
         this.fecharModal();
+      },
+      handleChange(event){
+      // This function will be called whenever the checkbox state changes
+        this.objetoEdicao.ativo = event.detail.checked;
       }
+
     }
   
     

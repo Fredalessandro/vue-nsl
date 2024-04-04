@@ -120,7 +120,7 @@ import store from '@/store';
 import { mapState } from 'vuex';
 import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import { useRouter } from 'vue-router'
-
+import { BateriaService } from '@/service/BateriaService.js';
 export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -280,12 +280,15 @@ export default defineComponent({
           const data = await FirestoreService.add(this.collectionName, objeto);
           
           let categorias = Categoria.categorias;
-          
+          let atletas = Atleta.atletas;
           const collectionCategoria = 'Categorias';
           
           categorias.forEach(element => {
             element.idEvento = data.id;
-            FirestoreService.add(collectionCategoria, element);
+            BateriaService.geraBaterias(element,element.qtdAtletasBateria,element.qtdAtletas).then((cat =>{
+              FirestoreService.add(collectionCategoria, cat);
+            }))
+            
           });
 
           let juizes = Juiz.juizes;
@@ -297,7 +300,7 @@ export default defineComponent({
             FirestoreService.add(collectionJuiz, element);
           });
 
-          let atletas = Atleta.atletas;
+
           
           const collectionAtleta = 'Atletas';
           

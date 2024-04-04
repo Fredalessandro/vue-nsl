@@ -13,9 +13,13 @@
                 <ion-input  label="Password" :maxlength="8" v-model="password" type="password"
                     required></ion-input>
             </ion-item>
+            <ion-item class="custom-bordered-list">  
+                <ion-checkbox v-model="offline" @ionChange="handleChange">offline</ion-checkbox>
+            </ion-item>  
             <ion-item class="no-bottom-border" style="align">
                 <ion-button @click="signIn" class="custom-button">Entrar</ion-button>
             </ion-item>
+
             <!--<ion-item class="custom-bordered-bottom">
                 <ion-button @click="signInWithGoogle" class="custom-button">
                     <ion-icon :icon="googleLogo" class="google-logo"></ion-icon>
@@ -32,7 +36,7 @@
   
 <script>
 import { ref } from 'vue';
-import { IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput } from '@ionic/vue';
+import { IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput,IonCheckbox } from '@ionic/vue';
 import { useRouter } from 'vue-router' // import router
 import 'ionicons/icons';
 import FirestoreService from '@/database/FirestoreService';
@@ -40,24 +44,30 @@ import store from '@/store';
 
 export default {
   components: {
-    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput, store
+    IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput, IonCheckbox, store
   },
   data() {
     return {email: 'fredalessandro@gmail.com',
     password: '31281704',
-    router: useRouter(), // get a reference to our vue router
+    router: useRouter(),
+    offline: false, // get a reference to our vue router
     googleLogo: ref('logo-google.svg')};    
   },
   methods: {
+    handleChange(event){
+      // This function will be called whenever the checkbox state changes
+        this.offline = event.detail.checked;
+      },
     async signIn() {
       
       try {
-        // Call the VueX action to sign in
-      const user  =  await this.$store.dispatch('signInWithEmailAndPassword', {
-          email: this.email,
-          password: this.password,
+      const user = this.offline? await FirestoreService.executeQuery('UserLocal', 'email', '==', this.email):
+        await this.$store.dispatch('signInWithEmailAndPassword', {
+            email: this.email,
+            password: this.password,
         });
-        
+      
+
       const data =  await FirestoreService.executeQuery('Diretores/', 'email', '==', user.email);
       
       console.log('Data :', data);
@@ -67,7 +77,7 @@ export default {
 
       
       /*if (data.perfil=='ADMIN') {*/
-        this.$router.push({path:data.perfil=='ADMIN'?'diretor':'evento', replace: true });
+        this.router.push({path:data.perfil=='ADMIN'?'diretor':'evento', replace: true });
       /*} else {
         const evento =  await FirestoreService.eventoAberto('Eventos/',data.id);
         await this.$store.dispatch('setEventoSelecionado', { eventoSelecionado : evento});
@@ -93,7 +103,7 @@ export default {
         }*/
     },
     register(){
-        this.$router.push({ name: 'Registro' });
+        this.router.push({ path: 'registro', replace: true });
     }
   }
 }

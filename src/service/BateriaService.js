@@ -1,10 +1,11 @@
+import Bateria from "../model/Bateria.js";
 export class BateriaService {
     
     static async geraBaterias(categoria,qtdAtletasBateria,atletas) {
         
         try {
             
-            let tamanho = (altetas!=null)?atletas.size:32;
+            let tamanho = atletas;
             let i = tamanho;
             let round = 0;
             let x = qtdAtletasBateria;
@@ -39,7 +40,7 @@ export class BateriaService {
               x = 2;
             }
             
-            categoria.baterias = qtdAtletasBateria;
+            categoria.baterias = dadosBaterias;
            
             return categoria;
 

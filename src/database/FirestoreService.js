@@ -1,9 +1,11 @@
-import { getFirestore, doc, getDoc, addDoc,  onSnapshot, setDoc, deleteDoc, collection, getDocs,  query, where, orderBy } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, doc, getDoc, addDoc,  onSnapshot, setDoc, deleteDoc, collection, getDocs,  query, where, orderBy } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import firebaseConfig from '@/configuration/firebaseConfig';
 initializeApp(firebaseConfig);
 
 const db = getFirestore();
+
+connectFirestoreEmulator(db, 'localhost', 8080);
 
 const FirestoreService = {
   

@@ -68,7 +68,7 @@ export default {
   methods: {
    async register(){
     try {
-      firebase
+      /*firebase
         .auth() // get the auth api
         .createUserWithEmailAndPassword(this.email, this.senha) // need .value because ref()
         .then((data) => {
@@ -79,19 +79,24 @@ export default {
         .catch(error => {
           console.log(error.code)
           alert(error.message);
-      });
+      });*/
 
-        
         const collectionName = 'Diretores';
 
         const diretor = await FirestoreService.add(collectionName, new Diretor(null,this.nome,this.telefone,this.email,'OPERADOR',null));
         
+        const collectionUser = 'UserLocal';
+
+        const user = await FirestoreService.add(collectionUser,{email:this.email, passoword:this.senha} );
+        
+        this.router.push({path:'/', replace: true });
+
       } catch(error)  {
         console.error('Error add data:', error);
       };
     },
     cancel(){
-        this.router.push({name:'Home'});
+        this.router.push({path:'/', replace: true });
         window.location.reload();
     }
    }

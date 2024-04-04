@@ -1,0 +1,47 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Categorias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idEvento",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "descricao",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Eventos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idDiretor",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Juizes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "idEvento",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nome",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

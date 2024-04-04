@@ -64,8 +64,8 @@
           </ion-button>
           <ion-label class="bottom-label">Inserir</ion-label>
         </div>
-        <div class="label-container">
-          <ion-button v-if="selectedItem" class="round-button" @click="proximaPagina">
+        <div v-if="selectedItem" class="label-container">
+          <ion-button  class="round-button" @click="proximaPagina">
             <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
           </ion-button>
           <ion-label class="bottom-label">Evento</ion-label>
@@ -114,7 +114,8 @@ export default defineComponent({
       searchTerm: '',
       store: store,
       diretor: this.$store.getters.getDiretor,
-      collectionName: 'Diretores/',
+      collectionName: 'Diretores',
+      collectionUser: 'UserLocal',
       objetoEdicao: new Diretor(),
       modalAberta: false
     };
@@ -225,6 +226,7 @@ export default defineComponent({
             });
 
           await FirestoreService.add(this.collectionName, objeto);
+          await FirestoreService.add(this.collectionUser, {email:objeto.email,password:'011277'});
           await firebase
             .auth().sendPasswordResetEmail(objeto.email)
             .then((data) => {

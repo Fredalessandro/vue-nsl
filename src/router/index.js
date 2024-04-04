@@ -7,7 +7,7 @@ import Juiz from '@/views/juiz/JuizListaPage.vue'
 import Atleta from '@/views/atleta/AtletaListaPage.vue'
 import Login from '@/views/login/login.vue';
 import Logout from '@/views/login/logout.vue';
-
+import Registro from '@/views/registro/registro.vue';
 const routes = [
   {
     path: '/',
@@ -36,6 +36,10 @@ const routes = [
   {
     path: '/atleta',
     component: Atleta,
+  },
+  {
+    path: '/registro',
+    component: Registro,
   },
   {
     path: '/logout',

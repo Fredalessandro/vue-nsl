@@ -97,6 +97,8 @@ import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'fir
 import store from '@/store';
 import { format } from 'date-fns';
 import { useRouter } from 'vue-router'
+import { BateriaService } from '@/service/BateriaService.js';
+import Constantes from '../../Constantes';
 
 export default defineComponent({
   components: {
@@ -113,7 +115,6 @@ export default defineComponent({
       iconEdit: create,
       iconRigth: arrowForward,
       iconBack: arrowBack,
-      collectionName: 'Categorias',
       store: store,
       searchTerm: '',
       items: [],
@@ -126,7 +127,6 @@ export default defineComponent({
     
     const router = useRouter();
     const eventoSelecionado = store.getters.getEventoSelecionado;
-    const collectionName = 'Categorias';
     const searchTerm = ref('');
     const items = ref([]);
     const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
@@ -152,7 +152,7 @@ export default defineComponent({
     onMounted(async () => {
       //await searchDocuments();
       const db = getFirestore();
-      const q = query(collection(db, collectionName),orderBy('descricao'), where('idEvento', '==', eventoSelecionado.id));
+      const q = query(collection(db, Constantes.colecaoCategorias),orderBy('descricao'), where('idEvento', '==', eventoSelecionado.id));
 
       // Observando alterações na coleção
       onSnapshot(q, (snapshot) => {
@@ -216,9 +216,10 @@ export default defineComponent({
       try {
         objeto.idEvento = this.eventoSelecionado.id;
         if (objeto.id) {
-          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+          await FirestoreService.set(Constantes.colecaoCategorias, objeto.id, objeto);
         } else {
-          await FirestoreService.add(this.collectionName, objeto);
+          const baterias = BateriaService.gerarBaterias(objeto.qtdAtletas,objeto.qtdAtletasBateria);
+          await FirestoreService.addCategoria(Constantes.colecaoCategorias, objeto);
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -245,9 +246,8 @@ export default defineComponent({
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  const collectionName = 'Categorias';
-                  FirestoreService.remove(collectionName, objeto.id);
-                  this.searchDocuments();
+                  FirestoreService.remove(Constantes.colecaoCategorias, objeto.id);
+                  FirestoreService.removeAll(Constantes.colecaoBaterias,'idCategoria','==',objeto.id)
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

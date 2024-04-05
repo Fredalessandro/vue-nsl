@@ -51,6 +51,7 @@
   import 'ionicons/icons';
   import Diretor from '../../model/Diretor';
   import store from '../../store/index.js';
+import Constantes from '../../Constantes';
 export default {
   components: {
     IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput,
@@ -81,13 +82,9 @@ export default {
           alert(error.message);
       });*/
 
-        const collectionName = 'Diretores';
-
-        const diretor = await FirestoreService.add(collectionName, new Diretor(null,this.nome,this.telefone,this.email,'OPERADOR',null));
+        const diretor = await FirestoreService.add(Constantes.colecaoDiretores, new Diretor(null,this.nome,this.telefone,this.email,'OPERADOR',null));
         
-        const collectionUser = 'UserLocal';
-
-        const user = await FirestoreService.add(collectionUser,{email:this.email, passoword:this.senha} );
+        const user = await FirestoreService.add(Constantes.colecaoUserLocal,{email:this.email, passoword:this.senha} );
         
         this.router.push({path:'/', replace: true });
 

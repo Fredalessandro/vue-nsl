@@ -41,6 +41,7 @@ import { useRouter } from 'vue-router' // import router
 import 'ionicons/icons';
 import FirestoreService from '@/database/FirestoreService';
 import store from '@/store';
+import Constantes from '../../Constantes';
 
 export default {
   components: {
@@ -61,7 +62,7 @@ export default {
     async signIn() {
       
       try {
-      const user = this.offline? await FirestoreService.executeQuery('UserLocal', 'email', '==', this.email):
+      const user = this.offline? await FirestoreService.executeQuery(Constantes.colecaoUserLocal, 'email', '==', this.email):
         await this.$store.dispatch('signInWithEmailAndPassword', {
             email: this.email,
             password: this.password,

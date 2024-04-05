@@ -2,7 +2,9 @@
 export default class Bateria {
     // Define properties of your model     
 
-    constructor(id,descricao,round,  atletas = [], notas = [], status,avanca){
+    constructor(idEvento,idCategoria,id,descricao,round,  atletas = [], notas = [], status,avanca){
+        this.idEvento = idEvento;
+        this.idCategoria = idCategoria;
         this.id = id;
         this.descricao = descricao;
         this.round     = round;

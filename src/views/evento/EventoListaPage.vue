@@ -121,6 +121,7 @@ import { mapState } from 'vuex';
 import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import { useRouter } from 'vue-router'
 import { BateriaService } from '@/service/BateriaService.js';
+import Constantes from '../../Constantes';
 export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -137,7 +138,6 @@ export default defineComponent({
       iconRigth: arrowForward,
       iconBack: arrowBack,
       iconExit: exit,
-      collectionName: 'Eventos',
       store: store,
       iconDelete: trash,
       iconEdit: create,
@@ -153,7 +153,6 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const diretorSelecionado = store.getters.getDiretorSelecionado;
-    const collectionName = 'Eventos/';
     const searchTerm = ref('');
     const items = ref([]);
     const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
@@ -194,7 +193,7 @@ export default defineComponent({
     onMounted(async () => {
       //await searchDocuments();
       const db = getFirestore();
-      const q = query(collection(db, collectionName), where('idDiretor', '==', diretorSelecionado.id), where('status', '!=', status));
+      const q = query(collection(db, Constantes.colecaoEventos), where('idDiretor', '==', diretorSelecionado.id), where('status', '!=', status));
 
       // Observando alterações na coleção
       onSnapshot(q, (snapshot) => {
@@ -273,42 +272,33 @@ export default defineComponent({
       // Lógica para salvar o usuário
       try {
         if (objeto.id) {
-          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+          await FirestoreService.set(Constantes.colecaoEventos, objeto.id, objeto);
         } else {
           
           objeto.idDiretor = this.diretorSelecionado.id;
-          const data = await FirestoreService.add(this.collectionName, objeto);
+          const data = await FirestoreService.add(Constantes.colecaoEventos, objeto);
           
           let categorias = Categoria.categorias;
-          let atletas = Atleta.atletas;
-          const collectionCategoria = 'Categorias';
           
           categorias.forEach(element => {
             element.idEvento = data.id;
-            BateriaService.geraBaterias(element,element.qtdAtletasBateria,element.qtdAtletas).then((cat =>{
-              FirestoreService.add(collectionCategoria, cat);
-            }))
-            
+            const baterias = BateriaService.gerarBaterias(element.qtdAtletasBateria,element.qtdAtletas);
+            FirestoreService.addCategoria(Constantes.colecaoCategorias, element, baterias);
           });
 
           let juizes = Juiz.juizes;
           
-          const collectionJuiz = 'Juizes';
-          
           juizes.forEach(element => {
             element.idEvento = data.id;
-            FirestoreService.add(collectionJuiz, element);
+            FirestoreService.add(Constantes.colecaoJuizes, element);
           });
 
-
-          
-          const collectionAtleta = 'Atletas';
+         let atletas = Atleta.atletas;
           
           atletas.forEach(element => {
-            FirestoreService.add(collectionAtleta, element);
+            element.idEvento = data.id;
+            FirestoreService.add(Constantes.atletas, element);
           });
-
-
 
         }
       } catch (error) {
@@ -319,7 +309,7 @@ export default defineComponent({
     },
     presentAlertConfirm(objeto) {
 
-      /*if (FirestoreService.checkCollectionExistence('Categorias', 'idEvento', '==', objeto.id)) {
+      /*if (FirestoreService.checkCollectionExistence(CategorConstantes.colecaoCategorias, 'idEvento', '==', objeto.id)) {
 
         return alertController
           .create({
@@ -355,9 +345,12 @@ export default defineComponent({
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  const collectionName = '/Eventos';
-                  FirestoreService.remove(collectionName, objeto.id);
+
+                  FirestoreService.remove(Constantes.colecaoEventos, objeto.id);
                   store.dispatch('setEventoSelecionado', { eventoSelecionado: null });
+                  
+                  FirestoreService.removeAll(Constantes.colecaoBaterias,'idEvento','==',objeto.id)
+
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

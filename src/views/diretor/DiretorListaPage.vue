@@ -94,6 +94,7 @@ import { useRouter } from 'vue-router'
 import { firebase } from '@/firebase.js';
 import store from '@/store';
 import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
+import Constantes from '../../Constantes';
 
 export default defineComponent({
   components: {
@@ -114,8 +115,8 @@ export default defineComponent({
       searchTerm: '',
       store: store,
       diretor: this.$store.getters.getDiretor,
-      collectionName: 'Diretores',
-      collectionUser: 'UserLocal',
+      collectionName: Constantes.colecaoDiretores,
+      collectionUser: Constantes.colecaoUserLocal,
       objetoEdicao: new Diretor(),
       modalAberta: false
     };
@@ -144,7 +145,8 @@ export default defineComponent({
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
       const db = getFirestore();
-      const q = query(collection(db, collectionName),where('perfil', '!=', 'ADMIN'));
+      const q = isAdmin?query(collection(db, collectionName),where('perfil', '!=', 'ADMIN')):
+      query(collection(db, collectionName),where('perfil', '!=', 'ADMIN'),where('id', '==', store.getters.getDiretor.id));
       
       // Observando alterações na coleção
       onSnapshot(q, (snapshot) => {

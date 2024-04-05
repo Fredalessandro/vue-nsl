@@ -1,52 +1,35 @@
 import Bateria from "../model/Bateria.js";
 export class BateriaService {
-    
-    static async geraBaterias(categoria,qtdAtletasBateria,atletas) {
-        
-        try {
-            
-            let tamanho = atletas;
-            let i = tamanho;
-            let round = 0;
-            let x = qtdAtletasBateria;
-            let dadosBaterias = [];
-            let id = 0;
-            
-            while (i >= 2) {
-              
-                let baterias = [];
-        
-              round++;
-        
-              i = tamanho / x;
-        
-              console.log("Quantidade baterias " + round + " " + i);
-        
-              for (let index = 0; index < i; index++) {
-                let strRound = round + "º Round";
-                if (i==4) {
-                  strRound = "Quartas de Final";
-                } else if (i=2) {
-                  strRound = "SemiFinal";
-                } else if (i=1) {
-                  strRound = "Final";
-                }
-                baterias.push(
-                  new Bateria(id++,index + 1 + "ª bateria do ",strRound,null,null,"Aguardando")
-                );
-              }
-              dadosBaterias.push(baterias);
-              tamanho = i;
-              x = 2;
-            }
-            
-            categoria.baterias = dadosBaterias;
-           
-            return categoria;
 
-         } catch (error) {
-           console.error('Erro ao gerar baterias', error);
-           throw error;
-         }
+
+  static gerarBaterias(atletas, atletasPorBateria) {
+    
+    const baterias = [];
+    let totalBaterias = Math.ceil(atletas / atletasPorBateria);
+    let strRound = 1;
+    let id = 0;
+    while (totalBaterias>=1) {
+      console.log("Quantidade baterias " + totalBaterias);
+      for (let i = 0; i < totalBaterias; i++) {
+        baterias.push(
+          new Bateria(null,null,
+            ++id,
+            i + 1 + "ª bateria do ",
+            "" + strRound,
+            null,
+            null,
+            "Aguardando"
+          )
+        );
+      }
+      if (totalBaterias==1){
+        break;
+      }
+      totalBaterias = Math.ceil((atletas/++strRound) / atletasPorBateria);
     }
+    
+    // Distribui os atletas em baterias
+    return JSON.stringify(baterias);
+
+  }  
 }

@@ -1,6 +1,7 @@
+  // Função para deserializar um objeto com campos simples de volta para um objeto Bateri
 export default class Categoria {
     // Define properties of your model     
-    constructor(id='', descricao='', idade=0, regra='',valorInscricao=0, qtdAtletasBateria=4,qtdAtletas=16){
+    constructor(id='', descricao='', idade=0, regra='',valorInscricao=0, qtdAtletasBateria=4,qtdAtletas=16,baterias = []){
         this.idEvento     = null;
         this.id           = id;
         this.descricao    = descricao;
@@ -8,9 +9,9 @@ export default class Categoria {
         this.regra        = regra;
         this.valorInscricao = valorInscricao;
         this.qtdAtletasBateria = qtdAtletasBateria;
-        this.qtdAtletas = atletas;
-        this.baterias   = [];
+        this.qtdAtletas = qtdAtletas;
     }
+
 
     static categorias = [
         new Categoria(null,'Até 6',6,'Até',50,4,16),

@@ -1,6 +1,7 @@
 export default class Atleta {
-  constructor(id,nome,apelidio,email,telefone,cpf,dataNascimento,cep,endereco,
+  constructor(idEvento,id,nome,apelidio,email,telefone,cpf,dataNascimento,cep,endereco,
     numero,complemento,bairro,cidade,uf,rankNordestino,rankEstadual) {
+    this.idEvento = this.idEvento;
     this.id = id;
     this.nome = nome;
     this.apelidio = apelidio;
@@ -19,22 +20,22 @@ export default class Atleta {
     this.rankEstadual=rankEstadual;
   }
   static atletas = [
-    new Atleta(null,'LEONADO MATEUS','LEONADO MATEUS',      'LEONADOMATEUS@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',101,200),
-    new Atleta(null,'MIGUEL GOMES','MIGUEL GOMES',          'MIGUELGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',10,200), 
-    new Atleta(null,'HEITOR GOMES','HEITOR GOMES',          'HEITORGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',159,211), 
-    new Atleta(null,'GABRIEL MEDEIROS','GABRIEL MEDEIROS',  'GABRIELMEDEIROS@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',102,200), 
-    new Atleta(null,'GABRIEL CIPRIANO','GABRIEL CIPRIANO',  'GABRIELCIPRIANO@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',103,120),
-    new Atleta(null,'SHAR BOY','SHAR BOY',                  'SHARBOY@nsl.com.br'          ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',104,201), 
-    new Atleta(null,'DAVI BRASIL','DAVI BRASIL',            'DAVIBRASIL@nsl.com.br'       ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',98,300), 
-    new Atleta(null,'GABRIEL BRASIL','GABRIEL BRASIL',      'GABRIELBRASIL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',25,250),  
-    new Atleta(null,'JONAS GABRIEL','JONAS GABRIEL',        'JONASGABRIEL@nsl.com.br'     ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',122,200),
-    new Atleta(null,'NICOLAS CLAUDINO','NICOLAS CLAUDINO',  'NICOLASCLAUDINO@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',131,99), 
-    new Atleta(null,'NICOLAS MIGUEL','NICOLAS MIGUEL',      'NICOLASMIGUEL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',102,111), 
-    new Atleta(null,'ALESSANDRO FELLIX','ALESSANDRO FELLIX','ALESSANDROFELLIX@nsl.com.br' ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',103,98), 
-    new Atleta(null,'PAULIINHO EDC','PAULIINHO EDC',        'PAULIINHEDC@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',111,99),
-    new Atleta(null,'NICOLAS DANIEL','NICOLAS DANIEL',      'NICOLASDANIEL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',121,80), 
-    new Atleta(null,'CAUÃ LUCIO XAVIER','CAUÃ LUCIO XAVIER','CAUALUCIOXAVIER@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',131,0), 
-    new Atleta(null,'IURY ROCHA','IURY ROCHA',              'IURYROCHA@nsl.com.br'        ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',100,0),  
+    new Atleta(null,null,'LEONADO MATEUS','LEONADO MATEUS',      'LEONADOMATEUS@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',101,200),
+    new Atleta(null,null,'MIGUEL GOMES','MIGUEL GOMES',          'MIGUELGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',10,200), 
+    new Atleta(null,null,'HEITOR GOMES','HEITOR GOMES',          'HEITORGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',159,211), 
+    new Atleta(null,null,'GABRIEL MEDEIROS','GABRIEL MEDEIROS',  'GABRIELMEDEIROS@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',102,200), 
+    new Atleta(null,null,'GABRIEL CIPRIANO','GABRIEL CIPRIANO',  'GABRIELCIPRIANO@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',103,120),
+    new Atleta(null,null,'SHAR BOY','SHAR BOY',                  'SHARBOY@nsl.com.br'          ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',104,201), 
+    new Atleta(null,null,'DAVI BRASIL','DAVI BRASIL',            'DAVIBRASIL@nsl.com.br'       ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',98,300), 
+    new Atleta(null,null,'GABRIEL BRASIL','GABRIEL BRASIL',      'GABRIELBRASIL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',25,250),  
+    new Atleta(null,null,'JONAS GABRIEL','JONAS GABRIEL',        'JONASGABRIEL@nsl.com.br'     ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',122,200),
+    new Atleta(null,null,'NICOLAS CLAUDINO','NICOLAS CLAUDINO',  'NICOLASCLAUDINO@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',131,99), 
+    new Atleta(null,null,'NICOLAS MIGUEL','NICOLAS MIGUEL',      'NICOLASMIGUEL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',102,111), 
+    new Atleta(null,null,'ALESSANDRO FELLIX','ALESSANDRO FELLIX','ALESSANDROFELLIX@nsl.com.br' ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',103,98), 
+    new Atleta(null,null,'PAULIINHO EDC','PAULIINHO EDC',        'PAULIINHEDC@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',111,99),
+    new Atleta(null,null,'NICOLAS DANIEL','NICOLAS DANIEL',      'NICOLASDANIEL@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',121,80), 
+    new Atleta(null,null,'CAUÃ LUCIO XAVIER','CAUÃ LUCIO XAVIER','CAUALUCIOXAVIER@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','MACEIO','AL',131,0), 
+    new Atleta(null,null,'IURY ROCHA','IURY ROCHA',              'IURYROCHA@nsl.com.br'        ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',100,0),  
   ] 
 }
   /*static clone(atleta) {

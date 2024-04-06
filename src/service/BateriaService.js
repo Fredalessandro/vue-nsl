@@ -2,18 +2,18 @@ import Bateria from "../model/Bateria.js";
 export class BateriaService {
 
 
-  static gerarBaterias(atletas, atletasPorBateria) {
+  static gerarBaterias(atletasPorBateria, atletas) {
     
     const baterias = [];
     let totalBaterias = Math.ceil(atletas / atletasPorBateria);
     let strRound = 1;
-    let id = 0;
+    let id = 1;
     while (totalBaterias>=1) {
       console.log("Quantidade baterias " + totalBaterias);
       for (let i = 0; i < totalBaterias; i++) {
         baterias.push(
           new Bateria(null,null,
-            ++id,
+            id,
             i + 1 + "ª bateria do ",
             "" + strRound,
             null,
@@ -21,11 +21,16 @@ export class BateriaService {
             "Aguardando"
           )
         );
+        ++id;
       }
-      if (totalBaterias==1){
-        break;
+
+      if (totalBaterias!=1){
+        strRound++
+        totalBaterias = Math.ceil((atletas/strRound) / atletasPorBateria);
+      } else {
+        totalBaterias = 0;
       }
-      totalBaterias = Math.ceil((atletas/++strRound) / atletasPorBateria);
+
     }
     
     // Distribui os atletas em baterias

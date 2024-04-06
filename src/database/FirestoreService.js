@@ -66,7 +66,42 @@ const FirestoreService = {
       console.error("Error set document:", error);
     }
   },
+  async addCategoria(collectionName, data, baterias) {
+    try {
+      const collectionRef = collection(db, collectionName);
 
+      const doc = await addDoc(collectionRef, { ...data });
+
+      data.id = doc.id;
+
+      this.set(collectionName, doc.id, { ...data });
+
+      if (baterias) {
+        
+        const listaBaterias = JSON.parse(baterias);
+        
+        listaBaterias.forEach((bateria) => {
+
+          bateria.idEvento    = data.idEvento;
+          
+          bateria.idCategoria = data.id;
+
+          const collectionRefBateria = collection(db, Constantes.colecaoBaterias);
+
+          const docBateria = addDoc(collectionRefBateria, { ...bateria });
+
+        });
+
+      }
+
+      console.log("Document added successfully with ID:", doc.id);
+
+      return data;
+    } catch (error) {
+      console.error("Error adding document:", error);
+    }
+    return null;
+  },
   async add(collectionName, data) {
     try {
       const collectionRef = collection(db, collectionName);
@@ -85,27 +120,6 @@ const FirestoreService = {
     }
     return null;
   },
-
-  async addCategoria(collectionName, data, baterias) {
-    try {
-      const categoria = await add(collectionName, data);
-      if (baterias) {
-
-        baterias.array.forEach((bateria) => {
-          bateria.idEvento    = categoria.idEvento;
-          bateria.idCategoria = categoria.id;
-          this.add(Constantes.colecaoBaterias, bateria);
-        });
-      }
-      console.log("Document added successfully with ID:", doc.id);
-
-      return data;
-    } catch (error) {
-      console.error("Error adding document:", error);
-    }
-    return null;
-  },
-
   async remove(collection, documentId) {
     try {
       const documentRef = doc(db, collection, documentId);

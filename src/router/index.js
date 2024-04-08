@@ -8,6 +8,7 @@ import Atleta from '@/views/atleta/AtletaListaPage.vue'
 import Login from '@/views/login/login.vue';
 import Logout from '@/views/login/logout.vue';
 import Registro from '@/views/registro/registro.vue';
+import Bateria from '../views/bateria/BateriaLiastaPage.vue';
 const routes = [
   {
     path: '/',
@@ -28,6 +29,10 @@ const routes = [
   {
     path: '/categoria',
     component: Categoria,
+  },
+  {
+    path: '/bateria',
+    component: Bateria,
   },
   {
     path: '/juiz',

@@ -141,7 +141,7 @@ export default defineComponent({
     };
 
     const proximaPagina = async () => {
-      router.push({ path: 'baterias', replace: true });
+      router.push({ path: 'bateria', replace: true });
     }
 
     const paginaAnterio = async () => {
@@ -258,6 +258,7 @@ export default defineComponent({
         })
         .then(a => a.present())
     },
+    
   }
 });
 </script>

@@ -2,7 +2,7 @@
   <ion-page>
     <ion-content class="ion-padding">
         <ion-row class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
-          <div v-for="(baterias, index) in this.dadosBaterias" class="ion-align-items-start">
+          <div v-for="(baterias, index) in dadosBaterias" class="ion-align-items-start">
             <ion-col size="6">
               <ion-grid class="ion-padding">
                 <ion-row v-for="bateria in baterias" class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
@@ -40,6 +40,7 @@ import {
 
 export default {
   name: "Organograma",
+  props: ['dadosBaterias'],
   components: {
     IonPage,
     IonHeader,
@@ -51,12 +52,7 @@ export default {
     IonCol,
     IonCard,
     IonCardContent
-  },
-  setup() {
-    const dados = ref([]);
-    dados.valeu = dadosBaterias;
-    return { dadosBaterias };
-  },
+  }
 };
 </script>
 

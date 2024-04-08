@@ -8,6 +8,7 @@ const store = createStore({
     diretorSelecionado: localStorage.getItem("diretorSelecionado"),
     eventoSelecionado: localStorage.getItem("eventoSelecionado"),
     categoriaSelecionada: localStorage.getItem("categoriaSelecionada"),
+    bateriaSelecionada: localStorage.getItem("bateriaSelecionada"),
     juizSelecionado: localStorage.getItem("juizSelecionado"),
     atletaSelecionado: localStorage.getItem("atletaSelecionado"),
     user: localStorage.getItem("user"),
@@ -28,6 +29,10 @@ const store = createStore({
     setCategoriaSelecionada(state, obj) {
       state.categoriaSelecionada = obj;
       localStorage.setItem("categoriaSelecionada", state.categoriaSelecionada);
+    },
+    setBateriaSelecionada(state, obj) {
+      state.bateriaSelecionada = obj;
+      localStorage.setItem("bateriaSelecionada", state.bateriaSelecionada);
     },
     setJuizSelecionado(state, obj) {
       state.juizSelecionado = obj;
@@ -63,6 +68,9 @@ const store = createStore({
     },
     setCategoriaSelecionada({ commit }, { categoriaSelecionada }) {
       commit("setCategoriaSelecionada", JSON.stringify(categoriaSelecionada));
+    },
+    setCategoriaSelecionada({ commit }, { bateriaSelecionada }) {
+      commit("setBateriaSelecionada", JSON.stringify(bateriaSelecionada));
     },
     setJuizSelecionado({ commit }, { juizSelecionado }) {
       commit("setJuizSelecionado", JSON.stringify(juizSelecionado));
@@ -127,6 +135,9 @@ const store = createStore({
 
             commit("setCategoriaSelecionada", null);
             localStorage.removeItem("categoriaSelecionada");
+
+            commit("setBateriaSelecionada", null);
+            localStorage.removeItem("bateriaSelecionada");
 
             commit("setJuizSelecionado", null);
             localStorage.removeItem("juizSelecionado");

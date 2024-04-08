@@ -7,21 +7,24 @@ export class BateriaService {
     const baterias = [];
     let totalBaterias = Math.ceil(atletas / atletasPorBateria);
     let strRound = 1;
-    let id = 1;
+    let sequencia = 1;
     while (totalBaterias>=1) {
       console.log("Quantidade baterias " + totalBaterias);
       for (let i = 0; i < totalBaterias; i++) {
         baterias.push(
-          new Bateria(null,null,
-            id,
+          new Bateria(null,
+            null,
+            null,
+            sequencia,
             i + 1 + "ª bateria do ",
-            "" + strRound,
+            strRound+" Round",
             null,
             null,
-            "Aguardando"
+            "Aguardando",
+            null
           )
         );
-        ++id;
+        ++sequencia;
       }
 
       if (totalBaterias!=1){
@@ -34,7 +37,7 @@ export class BateriaService {
     }
     
     // Distribui os atletas em baterias
-    return JSON.stringify(baterias);
+    return baterias;
 
   }  
 }

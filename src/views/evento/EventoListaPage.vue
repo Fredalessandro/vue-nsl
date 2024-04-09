@@ -297,7 +297,7 @@ export default defineComponent({
           
           atletas.forEach(element => {
             element.idEvento = data.id;
-            FirestoreService.add(Constantes.atletas, element);
+            FirestoreService.add(Constantes.colecaoAtletas, element);
           });
 
         }
@@ -349,7 +349,17 @@ export default defineComponent({
                   FirestoreService.remove(Constantes.colecaoEventos, objeto.id);
                   store.dispatch('setEventoSelecionado', { eventoSelecionado: null });
                   
+                  FirestoreService.removeAll(Constantes.colecaoCategorias,'idEvento','==',objeto.id)
+                  store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: null });
+
                   FirestoreService.removeAll(Constantes.colecaoBaterias,'idEvento','==',objeto.id)
+                  store.dispatch('setBateriaSelecionada', { bateriaSelecionada: null });
+
+                  FirestoreService.removeAll(Constantes.colecaoJuizes,'idEvento','==',objeto.id)
+                  store.dispatch('setJuizSelecionado', { juizSelecionada: null });
+
+                  FirestoreService.removeAll(Constantes.colecaoAtletas,'idEvento','==',objeto.id)
+                  store.dispatch('setAtletaSelcionado', { atletaSelcionado: null });
 
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);

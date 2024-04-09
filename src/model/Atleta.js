@@ -1,6 +1,6 @@
 export default class Atleta {
   constructor(idEvento,id,nome,apelidio,email,telefone,cpf,dataNascimento,cep,endereco,
-    numero,complemento,bairro,cidade,uf,rankNordestino,rankEstadual) {
+    numero,complemento,bairro,cidade,uf,rankNordestino,rankEstadual,idadeAno=0) {
     this.idEvento = this.idEvento;
     this.id = id;
     this.nome = nome;
@@ -18,9 +18,32 @@ export default class Atleta {
     this.uf = uf;
     this.rankNordestino=rankNordestino;
     this.rankEstadual=rankEstadual;
+    this.idadeAno = idadeAno;
+  };
+  
+  static calcularIdade(dtNasc) {
+    const dataAtual = new Date();
+    const anoAtual = dataAtual.getFullYear();
+    const mesAtual = dataAtual.getMonth() + 1;
+    const diaAtual = dataAtual.getDate();
+    
+    const dataNascimento = new Date(dtNasc);
+    const anoNascimento = dataNascimento.getFullYear();
+    const mesNascimento = dataNascimento.getMonth() + 1;
+    const diaNascimento = dataNascimento.getDate();
+  
+    let idade = anoAtual - anoNascimento;
+    
+    // Verifica se ainda não fez aniversário este ano
+    if (mesAtual < mesNascimento || (mesAtual === mesNascimento && diaAtual < diaNascimento)) {
+      idade--;
+    }
+    console.log('Idade '+idade);
+    return idade;
   }
+
   static atletas = [
-    new Atleta(null,null,'LEONADO MATEUS','LEONADO MATEUS',      'LEONADOMATEUS@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',101,200),
+    new Atleta(null,null,'LEONADO MATEUS','LEONADO MATEUS',      'LEONADOMATEUS@nsl.com.br'    ,'81988888888','621.374.924-11','10/03/2010','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',101,200),
     new Atleta(null,null,'MIGUEL GOMES','MIGUEL GOMES',          'MIGUELGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',10,200), 
     new Atleta(null,null,'HEITOR GOMES','HEITOR GOMES',          'HEITORGOMES@nsl.com.br'      ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',159,211), 
     new Atleta(null,null,'GABRIEL MEDEIROS','GABRIEL MEDEIROS',  'GABRIELMEDEIROS@nsl.com.br'  ,'81988888888','621.374.924-11','10/03/2014','50900-120','RUA DO SURF','10','','VIBER','RECIFE','PE',102,200), 

@@ -78,7 +78,7 @@ const FirestoreService = {
 
       if (baterias) {
         
-        const listaBaterias = JSON.parse(baterias);
+        const listaBaterias = baterias;
         
         listaBaterias.forEach((bateria) => {
 
@@ -129,27 +129,20 @@ const FirestoreService = {
       console.error("Error remove document :", error.message);
     }
   },
-  async removeAll(collection,atributo,operador,valor) {
-    const collectionRef = collection(db, collection); // Replace with your Firestore collection name
-    const q = query(collectionRef, where(atributo, operador, valor));
-    // Executar a consulta
-    q.get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          // Para cada documento retornado pela consulta, remova-o
-          doc.ref
-            .delete()
-            .then(() => {
-              console.log("Documento removido com sucesso!");
-            })
-            .catch((error) => {
-              console.error("Erro ao remover documento:", error);
-            });
+  async removeAll(collectionNome,atributo,operador,valor) {
+    try {
+      const q = query(collection(db, collectionNome), where(atributo, operador, valor));
+      // Consulta os documentos
+      const querySnapshot = await getDocs(q);
+
+      // Itera sobre os documentos encontrados e os remove
+      querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+          console.log('Documento removido com sucesso:', doc.id);
         });
-      })
-      .catch((error) => {
-        console.error("Erro ao executar consulta:", error);
-      });
+      } catch (error) {
+          console.error('Erro ao remover documentos:', error);
+      }
   },
   async executeQuery(path, atributo, operador, valor) {
     const collectionRef = collection(db, path); // Replace with your Firestore collection name

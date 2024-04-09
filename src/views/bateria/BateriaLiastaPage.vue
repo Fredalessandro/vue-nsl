@@ -7,14 +7,32 @@
             <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Evento {{ eventoSelecionado.evento }} Categoria {{ categoriaSelecionada.descricao }} </ion-title>
+        <ion-title>Baterias :  Evento {{ eventoSelecionado.evento }} Categoria {{ categoriaSelecionada.descricao }} </ion-title>
       </ion-toolbar>
       <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
         @ionInput="filterItems"></ion-searchbar>
     </ion-header>
     <ion-content class="ion-padding">
-        <Organograma :dadosBaterias="dadosBaterias"/>
-    </ion-content>
+
+<ion-grid>
+  <ion-row class="ion-align-items-start">
+    <ion-col>Round</ion-col>
+    <ion-col>Descricao</ion-col>
+    <ion-col>Status</ion-col>
+  </ion-row>
+  <div v-for="(objeto, index) in items" :key="objeto.id"
+    class="ion-align-items-start">
+    <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+      objeto.round }}</ion-col>
+      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+      objeto.descricao }}</ion-col>
+      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+      objeto.status }}</ion-col>
+    </ion-row>
+  </div>
+</ion-grid>
+</ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
@@ -58,8 +76,8 @@
   import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
   import { add, document, create, trash, arrowForward, arrowBack, refreshCircle } from 'ionicons/icons';
   import {IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonSearchbar, IonButton, IonLabel, IonIcon, IonFooter, IonButtons, IonCard, IonCardContent} from '@ionic/vue';
-import FirestoreService from '../../database/FirestoreService';
-import { BateriaService } from '../../service/BateriaService';
+  import FirestoreService from '../../database/FirestoreService';
+  import { BateriaService } from '../../service/BateriaService';
 
   export default defineComponent({
     name: 'BateriaOrganograma',
@@ -90,12 +108,11 @@ import { BateriaService } from '../../service/BateriaService';
     const searchTerm = ref('');
     const items = ref([]);
     const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
-    const dadosBaterias = ref([]);
+    const dadosBaterias = {};
 
     const selectedItem = ref();
 
-    watch(dadosBaterias);
-
+    
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
      // store.dispatch('setBateriaSelecionada', { categoriaSelecionada: objeto });
@@ -118,7 +135,7 @@ import { BateriaService } from '../../service/BateriaService';
       // Observando alterações na coleção
       onSnapshot(q, (snapshot) => {
         items.value = [];
-        dadosBaterias.value =[];
+        dadosBaterias.value ={};
         snapshot.forEach((doc) => {
           const item = {
             key: doc.id,
@@ -136,13 +153,11 @@ import { BateriaService } from '../../service/BateriaService';
             } else {
               dadosBaterias[item.round] = [item];
             }
-
+            
         });
         
       });
       
-      
-
     });
     
     const filteredItems = computed(() => {
@@ -155,7 +170,7 @@ import { BateriaService } from '../../service/BateriaService';
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, categoriaSelecionada, dadosBaterias };
+    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, categoriaSelecionada, dadosBaterias, items};
 
   },
   methods:{

@@ -1,30 +1,34 @@
 <template>
   <ion-page>
-    <ion-content class="ion-padding">
-        <ion-row class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
-          <div v-for="(baterias, index) in dadosBaterias" class="ion-align-items-start">
-            <ion-col size="6">
-              <ion-grid class="ion-padding">
-                <ion-row v-for="bateria in baterias" class="ion-align-items-center ion-justify-content-center" style="height: 100%;">
-                  <ion-col>
-                    <ion-card>
-                      <ion-card-content>
-                        <ion-title>{{bateria.descricao}}</ion-title>
-                      </ion-card-content>
-                    </ion-card>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-            </ion-col>
-          </div>
-        </ion-row>
-     
+    <ion-content class="container">
+   
+        <div v-for="(baterias, index) in dadosBaterias" :key="index" >
+          <ion-grid>
+            <ion-row v-for="bateria in baterias" style="height: auto;" class="item">
+              <ion-col  style="width: 40vw; height: auto; align-items: center;"> <!-- Define o tamanho e o offset para centralizar -->
+                <ion-card>
+                  <ion-card-header>
+                      <ion-card-title>{{bateria.round + " " + bateria.descricao }}</ion-card-title>
+                  </ion-card-header>
+                  <ion-card-content>
+                        <ion-label>Item</ion-label>
+                        <ion-label>Item</ion-label>
+                        <ion-label>Item</ion-label>
+                        <ion-label>Item</ion-label>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+      </div>
+
     </ion-content>
   </ion-page>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { defineComponent } from "vue";
 import {
   IonPage,
   IonHeader,
@@ -35,12 +39,24 @@ import {
   IonRow,
   IonCol,
   IonCard,
-  IonCardContent
+  IonCardContent,
+  IonLabel,
+  IonCardHeader, 
+  IonCardSubtitle, 
+  IonCardTitle,
+  IonList,
+  IonItem,
+  IonThumbnail
 } from "@ionic/vue";
 
-export default {
+export default defineComponent( {
   name: "Organograma",
-  props: ['dadosBaterias'],
+  props: {
+    dadosBaterias: {
+      type: Array, // Especifica que dadosBaterias deve ser um array
+      required: true // Opcional: indica que a propriedade é obrigatória
+    }
+  },  
   components: {
     IonPage,
     IonHeader,
@@ -51,18 +67,40 @@ export default {
     IonRow,
     IonCol,
     IonCard,
-    IonCardContent
+    IonCardContent,
+    IonLabel,
+    IonCardHeader, 
+    IonCardSubtitle, 
+    IonCardTitle,
+    IonList,
+    IonItem,
+    IonThumbnail
+  },
+  setup(props) {
+    // Agora você pode acessar dadosBaterias dentro de setup()
+    console.log(props.dadosBaterias);
+
+    // Se você precisar usar dadosBaterias em algum lugar além do setup, retorne-o do setup()
+    return {
+      dadosBaterias: props.dadosBaterias
+    };
   }
-};
+})
 </script>
 
 <style scoped>
-.chart-container {
+.item {
+  padding: 1vw; /* Define o padding proporcionalmente ao tamanho da tela */
+  text-align: right;
+  
+}
+
+.container {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: space-around;
-  align-items: center;
-  height: 100vh;
+  align-items: right;
+  height: auto;
 }
 
 .node {

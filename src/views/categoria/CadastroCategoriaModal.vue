@@ -14,10 +14,7 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-          <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
-            <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-          </ion-item>-->
-  
+
           <ion-item>
             <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Descrição" v-model="objetoEdicao.descricao" required></ion-input>
           </ion-item>
@@ -25,7 +22,15 @@
           <ion-item>
             <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
           </ion-item>
-  
+          
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Inscrição"  v-model="objetoEdicao.qtdAtletasBateria" required></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Inscrição"  v-model="objetoEdicao.qtdAtletas" required></ion-input>
+          </ion-item>
+
           <ion-item>  
             <ion-input style="margin-right: 5px; width: 450px;" :maxlength="2"  label="Idade"  v-model="objetoEdicao.idade" required></ion-input>
           </ion-item>

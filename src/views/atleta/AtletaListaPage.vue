@@ -20,8 +20,9 @@
           <ion-col>Nome</ion-col>
           <ion-col >e-mail</ion-col>
           <ion-col >Telefone</ion-col>
+          <ion-col >Dt. Nascimento</ion-col>
           <ion-col >CPF</ion-col>
-          <ion-col >Endereço</ion-col>
+          <ion-col >Cidade - Estado</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.key"
           class="ion-align-items-start">
@@ -34,10 +35,13 @@
               <ion-col  style="text-align: center;"
                 :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.telefone }}</ion-col>
-              <ion-col  style="text-align: left;"
+            <ion-col  style="text-align: center;"
+                :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.dataNascimento+" => "+objeto.idadeAno+" anos " }}</ion-col>
+              <ion-col  style="text-align: center;"
                 :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.cpf }}</ion-col>
               <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-                {{ objeto.endereco + " - " + objeto.numero + ", " + objeto.bairro + ", " + objeto.cidade + ", " +
+                {{ objeto.cidade + " - " +
                 objeto.uf
                 }}</ion-col>
             </ion-row>
@@ -156,6 +160,7 @@ export default defineComponent({
             store.dispatch('setAtletaSelecionado', { atletaSelecionado: item });
             selectedItem.value = item;
           }
+          item.idadeAno = Atleta.calcularIdade(item.dataNascimento);
           items.value.push(item);
         });
       });

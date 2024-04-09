@@ -69,7 +69,7 @@ const store = createStore({
     setCategoriaSelecionada({ commit }, { categoriaSelecionada }) {
       commit("setCategoriaSelecionada", JSON.stringify(categoriaSelecionada));
     },
-    setCategoriaSelecionada({ commit }, { bateriaSelecionada }) {
+    setBateriaSelecionada({ commit }, { bateriaSelecionada }) {
       commit("setBateriaSelecionada", JSON.stringify(bateriaSelecionada));
     },
     setJuizSelecionado({ commit }, { juizSelecionado }) {

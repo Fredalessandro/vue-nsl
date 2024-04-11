@@ -14,24 +14,29 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-          <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
-            <ion-label>Código {{ objetoEdicao.id }}</ion-label>
-          </ion-item>-->
-  
-          <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="50" label="Nome" v-model="objetoEdicao.nome" required></ion-input>
-          </ion-item>
-         
-          <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="20" label="Login"  v-model="objetoEdicao.login" required></ion-input>
-          </ion-item>
-  
-          <ion-item>  
-            <ion-input style="margin-right: 5px; width: 450px;" :maxlength="6"  label="Senha"  v-model="objetoEdicao.senha" required></ion-input>
-          </ion-item>
-          <ion-item>  
+        <ion-list class="custom-content">
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Nome" v-model="objetoEdicao.nome" type="text" required></ion-input>
+        </ion-item>
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Login" v-model="objetoEdicao.login" type="text" required></ion-input>
+        </ion-item>
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Email" v-model="objetoEdicao.email" type="email" required></ion-input>
+        </ion-item>
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Telefone" v-model="objetoEdicao.telefone" v-mask="'##-#####-####'" required></ion-input>
+        </ion-item>
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Senha" :maxlength="6" v-model="objetoEdicao.senha" type="text" required></ion-input>
+        </ion-item>
+        <ion-item class="custom-bordered-list">
+          <ion-input label="Confirme a senha" :maxlength="6" v-model="objetoEdicao.confirmeSenha" type="text"
+            required></ion-input>
+        </ion-item>
+        <ion-item>  
             <ion-checkbox v-model="objetoEdicao.ativo" @ionChange="handleChange">Ativo</ion-checkbox>
-          </ion-item>  
+        </ion-item>  
           <ion-item>
             <ion-label>Selecione tipo juiz</ion-label><br/>
             <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.tipo">
@@ -40,7 +45,7 @@
                 </ion-select-option>
             </ion-select>
           </ion-item>
-
+        </ion-list>
 
       </ion-content>
       <ion-footer>
@@ -74,8 +79,8 @@
         seuModelo: '',
         selectedOption: null,
         options: [
-        { label: 'Juiz Principal', value: 'Juiz Principal' },
-        { label: 'Juiz', value: 'Juiz' }
+        { label: 'JUIZ PRINCIPAL', value: 'JUIZ PRINCIPAL' },
+        { label: 'JUIZ', value: 'JUIZ' }
         // Adicione mais opções conforme necessário
       ]
       };

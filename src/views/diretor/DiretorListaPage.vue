@@ -2,74 +2,74 @@
 <template>
   <ion-page>
     <ion-header>
-    <ion-toolbar>
-      <ion-title>Lista de Diretores de Prova</ion-title>
-      <ion-buttons slot="end">
-        <ion-button class="round-button" @click="handleSignOut">
-          <ion-icon :icon="iconExit" style="color: white;" size="large"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm" @ionInput="filterItems"></ion-searchbar>
-    </ion-toolbar>
-    
-  </ion-header>
+      <ion-toolbar>
+        <ion-title>Lista de Diretores de Prova</ion-title>
+        <ion-buttons slot="end">
+          <ion-button class="round-button" @click="handleSignOut">
+            <ion-icon :icon="iconExit" style="color: white;" size="large"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
+          @ionInput="filterItems"></ion-searchbar>
+      </ion-toolbar>
+
+    </ion-header>
     <ion-content class="ion-padding">
 
-
       <ion-grid>
-        <ion-row class="ion-align-items-start">
-          <!--<ion-col size=0.5>id</ion-col>-->
+        <ion-row >
           <ion-col>Nome</ion-col>
-          <ion-col size=2>Telefone</ion-col>
+          <ion-col style="width: 2px;">Login</ion-col>
           <ion-col>E-mail</ion-col>
-           <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
+          <ion-col>Telefone</ion-col>
+          <ion-col>Senha</ion-col>
+          <ion-col>Ativo</ion-col>
         </ion-row>
-        <div v-for="(objeto, index) in filteredItems?filteredItems:items" :key="objeto.id" class="ion-align-items-start">
+        <div v-for="(objeto, index) in items" :key="objeto._id">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
-            <!--<ion-col size=0.5 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-        objeto.nome }}</ion-col>
-            <ion-col size=2 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-        objeto.telefone }}</ion-col>
+            objeto.nome }}</ion-col>
+            <ion-col   style="width: 2px; text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.login }}</ion-col>
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-        objeto.email }}</ion-col>
-            <!--<ion-col size=0.80 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
-              <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
-            </ion-col>-->
+            objeto.email }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.telefone }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+              objeto.senha }}</ion-col>
+            <ion-col  style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.ativo?'Sim':'Não' }}</ion-col>    
           </ion-row>
         </div>
       </ion-grid>
     </ion-content>
     <ion-footer v-if="isAdmin" class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
-        <ion-buttons  slot="end" >
+        <ion-buttons slot="end">
           <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
-            <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Excluir</ion-label>
-        </div>
-        <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="handleRowClick(selectedItem)">
-            <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Editar</ion-label>
-        </div>
-        <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="abrirModal(true)">
-            <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Inserir</ion-label>
-        </div>
-        <div v-if="selectedItem" class="label-container">
-          <ion-button  class="round-button" @click="proximaPagina">
-            <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Evento</ion-label>
-        </div>  
+            <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
+              <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Excluir</ion-label>
+          </div>
+          <div class="label-container" style="margin-right: 30px;">
+            <ion-button class="round-button" @click="handleRowClick(selectedItem)">
+              <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Editar</ion-label>
+          </div>
+          <div class="label-container" style="margin-right: 30px;">
+            <ion-button class="round-button" @click="abrirModal(true)">
+              <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Inserir</ion-label>
+          </div>
+          <div v-if="selectedItem" class="label-container">
+            <ion-button class="round-button" @click="proximaPagina">
+              <ion-icon :icon="iconRigth" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Evento</ion-label>
+          </div>
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import '../styles.css';
 import { alertController } from '@ionic/core';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -87,14 +88,9 @@ import {
 import { ref, defineComponent, onMounted, computed } from 'vue';
 import { add, document, create, trash, arrowForward, arrowBack, exit } from 'ionicons/icons';
 import CadastroDiretorModal from '@/views/diretor/CadastroDiretorModal.vue';
-import FirestoreService from '@/database/FirestoreService.js';
-import '../styles.css';
-import Diretor from '../../model/Diretor';
 import { useRouter } from 'vue-router'
-import { firebase } from '@/firebase.js';
 import store from '@/store';
-import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
-import Constantes from '../../Constantes';
+import UsuarioService from '../../service/UsuarioService';
 
 export default defineComponent({
   components: {
@@ -114,22 +110,17 @@ export default defineComponent({
       iconExit: exit,
       searchTerm: '',
       store: store,
-      diretor: this.$store.getters.getDiretor,
-      collectionName: Constantes.colecaoDiretores,
-      collectionUser: Constantes.colecaoUserLocal,
-      objetoEdicao: new Diretor(),
+      items:[],
+      objetoEdicao: {},
       modalAberta: false
     };
   },
   setup() {
 
     const router= useRouter(); 
-    const diretorSelecionado = store.getters.getDiretorSelecionado;
-    const collectionName =  'Diretores/';
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
-
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
     const selectedItem = ref();
 
@@ -144,49 +135,47 @@ export default defineComponent({
 
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      const db = getFirestore();
-      const q = isAdmin?query(collection(db, collectionName),where('perfil', '!=', 'ADMIN')):
-      query(collection(db, collectionName),where('perfil', '!=', 'ADMIN'),where('id', '==', store.getters.getDiretor.id));
-      
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          if (!selectedItem.value) {
-            selectedItem.value = item;
-            store.dispatch('setDiretorSelecionado', { diretorSelecionado: item });
-          }  
-          items.value.push(item);
-        });
-      });
 
+      buscaRegistros();
 
     });
+
+    const buscaRegistros = async () => {
+        items.value = [];
+        items.value = await UsuarioService.getUsuariosByAttribute('tipo=DIRETOR');
+    }  
 
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
       // Filter items based on whether they include the search term
-      return items?items.value.filter(item => item.nome.toLowerCase().includes(term) ||
+      return items.value?items.value.filter(item => item.nome.toLowerCase().includes(term) ||
         item.telefone.toLowerCase().includes(term) ||
         item.email.toLowerCase().includes(term)):[];
+    
     });
+
+    
 
     const filterItems = event => {
       searchTerm.value = event.target.value;
     };
 
-    return {isAdmin, searchTerm,  selectedItem, selectRow, proximaPagina, diretorSelecionado, items, filteredItems, filterItems };
+    return {isAdmin, searchTerm,  selectedItem, items, selectRow, proximaPagina, filterItems };
 
   },
 
   methods: {
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Diretor(null);
+        let dadosEdicao = {
+          nome: '',
+          login: '',
+          email: '',
+          telefone: '',
+          tipo: 'DIRETOR',
+          senha:'',
+          ativo:true
+        }
         this.objetoEdicao = dadosEdicao;
       }
       this.modalAberta = true;
@@ -197,50 +186,42 @@ export default defineComponent({
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.nome);
-      let dadosEdicao = new Diretor(
-        objeto.id,
-        objeto.nome,
-        objeto.telefone,
-        objeto.email,
-        objeto.perfil
-      );
+      let dadosEdicao = {
+        _id: objeto._id,
+        nome:objeto.nome,
+        login:objeto.login,
+        telefone:objeto.telefone,
+        email:objeto.email,
+        tipo:objeto.tipo,
+        senha:objeto.senha,
+        ativo:objeto.ativo
+      }
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        if (objeto.id) {
-          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+        if (objeto._id) {
+          const usuario = await UsuarioService.atualizarUsuario(objeto._id, objeto)
+          
         } else {
-          objeto.perfil = 'OPERADOR';
-          await firebase
-            .auth() // get the auth api
-            .createUserWithEmailAndPassword(objeto.email, '011277') // need .value because ref()
-            .then((data) => {
+          
+          objeto.tipo = 'DIRETOR';
+          const usuario = await UsuarioService.createUsuario({
+            nome: objeto.nome,
+            login: objeto.login,
+            email: objeto.email,
+            telefone: objeto.telefone,
+            tipo: objeto.tipo,
+            senha: objeto.senha,
+            ativo: objeto.ativo
+          });
 
-              console.log('Successfully registered!');
-
-            })
-            .catch(error => {
-              console.log(error.code)
-              alert(error.message);
-            });
-
-          await FirestoreService.add(this.collectionName, objeto);
-          await FirestoreService.add(this.collectionUser, {email:objeto.email,password:'011277'});
-          await firebase
-            .auth().sendPasswordResetEmail(objeto.email)
-            .then((data) => {
-              // Password reset email sent successfully
-              console.log("Password reset email " + objeto.email + " sent successfully");
-            })
-            .catch((error) => {
-              // Handle errors
-              console.error("Error sending password reset email:", error);
-            });
         }
-        this.fetchItens();
+
+        buscaRegistros;
+
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
         alert(error.message);
@@ -263,10 +244,11 @@ export default defineComponent({
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirestoreService.remove(this.collectionName, objeto.id);
+                 await UsuarioService.removeUsuario(objeto._id);
+                  buscaRegistros();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

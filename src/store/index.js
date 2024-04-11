@@ -11,7 +11,7 @@ const store = createStore({
     bateriaSelecionada: localStorage.getItem("bateriaSelecionada"),
     juizSelecionado: localStorage.getItem("juizSelecionado"),
     atletaSelecionado: localStorage.getItem("atletaSelecionado"),
-    user: localStorage.getItem("user"),
+    usuario: localStorage.getItem("usuario"),
   },
   mutations: {
     setDiretor(state, obj) {
@@ -42,9 +42,9 @@ const store = createStore({
       state.atletaSelecionado = obj;
       localStorage.setItem("atletaSelecionado", state.atletaSelecionado);
     },
-    setUser(state, obj) {
-      state.user = obj;
-      localStorage.setItem("user", state.user);
+    setUsuario(state, obj) {
+      state.usuario = obj;
+      localStorage.setItem("usuario", state.usuario);
     },
   },
   getters: {
@@ -54,7 +54,7 @@ const store = createStore({
     getCategoriaSelecionada: (state) => JSON.parse(state.categoriaSelecionada),
     getJuizSelecionado: (state) => JSON.parse(state.juizSelecionado),
     getAtletaSelecionado: (state) => JSON.parse(state.atletaSelecionado),
-    getUser: (state) => JSON.parse(state.user),
+    getUsuario: (state) => JSON.parse(state.usuario),
   },
   actions: {
     setDiretor({ commit }, { diretor }) {
@@ -78,22 +78,22 @@ const store = createStore({
     setAtletaSelecionado({ commit }, { atletaSelecionado }) {
       commit("setAtletaSelecionado", JSON.stringify(atletaSelecionado));
     },
-    setUser({ commit }, { user }) {
-      commit("setUser", JSON.stringify(user));
+    setUsuario({ commit }, { usuario }) {
+      commit("setUsuario", JSON.stringify(usuario));
     },
     async signInWithEmailAndPassword({ commit }, { email, password }) {
       try {
         // Sign in with email and password
-        const userCredential = await firebase
+        const usuarioCredential = await firebase
           .auth()
           .signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        const usuario = usuarioCredential.user;
 
-        // Set the user in session
-        commit("setUser", user);
-        localStorage.setItem("user", JSON.stringify(user));
+        // Set the Usuario in session
+        commit("setUsuario", usuario);
+        localStorage.setItem("usuario", JSON.stringify(usuario));
 
-        return user;
+        return usuario;
       } catch (error) {
         console.error("Error signing in:", error.message);
         throw error;
@@ -102,17 +102,17 @@ const store = createStore({
 
     async createUserWithEmailAndPassword({ commit }, { email, password }) {
       try {
-        const userCredential = await firebase
+        const UsuarioCredential = await firebase
           .auth() // get the auth api
           .createUserWithEmailAndPassword(this.email, this.senha); // need .value because ref()
-        const user = userCredential.user;
-        return user;
+        const Usuario = UsuarioCredential.Usuario;
+        return Usuario;
       } catch (error) {
         console.error("Error signing in:", error.message);
         throw error;
       }
     },
-    async signOut({ commit }, { user, diretor }) {
+    async signOut({ commit }, { Usuario, diretor }) {
       try {
         await firebase
           .auth()
@@ -121,8 +121,8 @@ const store = createStore({
             // Sign-out successful
             console.log("User signed out");
 
-            commit("setUser", null);
-            localStorage.removeItem("user");
+            commit("setUsuario", null);
+            localStorage.removeItem("usuario");
 
             commit("setDiretor", null);
             localStorage.removeItem("diretor");

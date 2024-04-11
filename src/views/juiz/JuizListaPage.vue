@@ -18,28 +18,31 @@
 
 
       <ion-grid>
-        <ion-row class="ion-align-items-start">
-          <!--<ion-col size=0.5>id</ion-col>-->
-          <ion-col>Juiz</ion-col>
-          <ion-col>Login</ion-col>
+        <ion-row >
+          <ion-col>Nome</ion-col>
+          <ion-col style="width: 2px;">Login</ion-col>
+          <ion-col>E-mail</ion-col>
+          <ion-col>Telefone</ion-col>
           <ion-col>Senha</ion-col>
           <ion-col>Tipo</ion-col>
           <ion-col>Ativo</ion-col>
-          <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
-        <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.id"
-          class="ion-align-items-start">
+        <div v-for="(objeto, index) in items" :key="objeto._id">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.nome }}</ion-col>
-            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col   style="width: 2px; text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.login }}</ion-col>
+            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.email }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.telefone }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+              objeto.tipo }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+              objeto.senha }}</ion-col>
             <ion-col  style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.senha }}</ion-col>
-            <ion-col  style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.tipo }}</ion-col>
-            <ion-col  style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.ativo?'Sim':'Não' }}</ion-col>  
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.ativo?'Sim':'Não' }}</ion-col>    
           </ion-row>
         </div>
       </ion-grid>

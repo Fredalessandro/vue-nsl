@@ -33,8 +33,6 @@
         <div v-for="(objeto, index) in items" :key="objeto.id"
           class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
-            <!--<ion-col size=0.5 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col size=4 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.evento }}</ion-col>
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
@@ -43,11 +41,6 @@
             objeto.dataInicio + ' a ' + objeto.dataFinal }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.status }}</ion-col>
-            <!--<ion-col size=0.80 style="text-align: center;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
-              <ion-icon v-if="eventoSelecionado.status == 'Aguardando'" @click="presentAlertConfirm(objeto)" :icon="iconDelete" style="color: rgb(249, 9, 9);" size="small"></ion-icon>
-              <ion-icon @click="handleRowClick(objeto)" :icon="iconEdit" style="color: rgrgb(10, 9, 9);"  size="small"></ion-icon>
-            </ion-col>-->
           </ion-row>
         </div>
       </ion-grid>
@@ -122,6 +115,8 @@ import { collection, query, where, onSnapshot, getFirestore } from 'firebase/fir
 import { useRouter } from 'vue-router'
 import { BateriaService } from '@/service/BateriaService.js';
 import Constantes from '../../Constantes';
+import EventoService from '../../service/EventoService';
+
 export default defineComponent({
   components: {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
@@ -155,7 +150,7 @@ export default defineComponent({
     const diretorSelecionado = store.getters.getDiretorSelecionado;
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
 
     const selectedItem = ref();
@@ -191,28 +186,14 @@ export default defineComponent({
 
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      //await searchDocuments();
-      const db = getFirestore();
-      const q = query(collection(db, Constantes.colecaoEventos), where('idDiretor', '==', diretorSelecionado.id), where('status', '!=', status));
-
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          //items.value.push({ id: doc.id, data: doc.data() });
-          if (!selectedItem.value) {
-            store.dispatch('setEventoSelecionado', { eventoSelecionado: item });
-            selectedItem.value = item;
-          }
-          items.value.push(item);
-        });
-      });
-
+      // Carregue a lista ao iniciar a página
+      buscaRegistros();
     });
+    
+    const buscaRegistros = async () => {
+        items.value = [];
+        items.value = await Evento.getUsuariosByAttribute('idUsuario=${diretorSelecionado._id}').filter(item => !item.status.toLowerCase().includes('Finalizado'));
+    }  
 
     return { isAdmin, searchTerm, selectedItem, 
       selectRow, proximaPagina, paginaAnterio, paginaJuizes, paginaAtleta,
@@ -223,7 +204,7 @@ export default defineComponent({
     abrirModal(novo) {
       if (novo) {
         const lista = this.items;
-        const documentFound = lista.find(evento => evento.idDiretor === this.diretorSelecionado.id);
+        const documentFound = lista.find(evento => evento.idUsuario === this.diretorSelecionado._id);
 
         // Verificando se o documento foi encontrado
         if (documentFound) {
@@ -243,9 +224,14 @@ export default defineComponent({
                 }],
             }).then(a => a.present())
         }
-        let dadosEdicao = new Evento();
-        dadosEdicao.idDiretor = this.diretorSelecionado.id;
-        dadosEdicao.status = 'Aguardando'
+        let dadosEdicao = {
+            idUsuario : this.diretorSelecionado._id,
+            evento    : '',
+            local     : '',
+            dataInicio: null,
+            dataFinal : null,
+            status    : 'Aguardando',
+        }
         this.objetoEdicao = dadosEdicao;
       }
       this.modalAberta = true;
@@ -256,15 +242,14 @@ export default defineComponent({
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.evento);
-      let dadosEdicao = new Evento(
-        objeto.idDiretor,
-        objeto.id,
-        objeto.evento,
-        objeto.local,
-        objeto.dataInicio,
-        objeto.dataFinal,
-        objeto.status
-      );
+      let dadosEdicao = {
+       idUsuario : diretor.idUsuario,
+       evento    : objeto.evento,
+       local     : objeto.local,
+       dataInicio: objeto.dataInicio,
+       dataFinal : objeto.dataFinal,
+       status    : objeto.status
+      };
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
     },
@@ -272,10 +257,20 @@ export default defineComponent({
       // Lógica para salvar o usuário
       try {
         if (objeto.id) {
-          await FirestoreService.set(Constantes.colecaoEventos, objeto.id, objeto);
+          //await FirestoreService.set(Constantes.colecaoEventos, objeto.id, objeto);
+          const evento = await EventoService.atualizarEvento(objeto._id, objeto)
         } else {
           
-          objeto.idDiretor = this.diretorSelecionado.id;
+          const evento = await UsuarioService.createUsuario({
+            idUsuario : this.diretorSelecionado._id,
+            evento    : objeto.evento,
+            local     : objeto.local,
+            dataInicio: objeto.dataInicio,
+            dataFinal : objeto.dataFinal,
+            status    : objeto.status
+          });
+
+          /*objeto.idUsuario = this.diretorSelecionado._id;
           const data = await FirestoreService.add(Constantes.colecaoEventos, objeto);
           
           let categorias = Categoria.categorias;
@@ -298,9 +293,12 @@ export default defineComponent({
           atletas.forEach(element => {
             element.idEvento = data.id;
             FirestoreService.add(Constantes.colecaoAtletas, element);
-          });
+          });*/
 
         }
+
+        buscaRegistros;
+
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
         alert(error.message);
@@ -342,11 +340,15 @@ export default defineComponent({
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
+
+                  await UsuarioService.removeUsuario(objeto._id);
+                  buscaRegistros();
+                  
                   // Gravar o documento no banco de dados local
 
-                  FirestoreService.remove(Constantes.colecaoEventos, objeto.id);
+                  /*FirestoreService.remove(Constantes.colecaoEventos, objeto.id);
                   store.dispatch('setEventoSelecionado', { eventoSelecionado: null });
                   
                   FirestoreService.removeAll(Constantes.colecaoCategorias,'idEvento','==',objeto.id)
@@ -359,7 +361,7 @@ export default defineComponent({
                   store.dispatch('setJuizSelecionado', { juizSelecionada: null });
 
                   FirestoreService.removeAll(Constantes.colecaoAtletas,'idEvento','==',objeto.id)
-                  store.dispatch('setAtletaSelcionado', { atletaSelcionado: null });
+                  store.dispatch('setAtletaSelcionado', { atletaSelcionado: null });*/
 
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);

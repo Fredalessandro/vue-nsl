@@ -6,12 +6,10 @@
                 <ion-title>Login do Sistema</ion-title>
             </ion-item>
             <ion-item class="custom-bordered-list">
-                <ion-input   label="Email" :maxlength="60" v-model="email" type="email"
-                    required></ion-input>
+                <ion-input   label="login" :maxlength="60" v-model="login" required></ion-input>
             </ion-item>
             <ion-item class="custom-bordered-list">
-                <ion-input  label="Password" :maxlength="8" v-model="password" type="password"
-                    required></ion-input>
+                <ion-input  label="Password" :maxlength="6" v-model="senha" type="password"  required></ion-input>
             </ion-item>
             <ion-item class="custom-bordered-list">  
                 <ion-checkbox v-model="offline" @ionChange="handleChange">offline</ion-checkbox>
@@ -42,14 +40,15 @@ import 'ionicons/icons';
 import FirestoreService from '@/database/FirestoreService';
 import store from '@/store';
 import Constantes from '../../Constantes';
+import UsuarioService from '../../service/UsuarioService';
 
 export default {
   components: {
     IonPage, IonTitle, IonContent, IonButton, IonIcon, IonList, IonItem, IonInput, IonCheckbox, store
   },
   data() {
-    return {email: 'fredalessandro@gmail.com',
-    password: '31281704',
+    return {login: ref(''),
+    senha: ref(''),
     router: useRouter(),
     offline: false, // get a reference to our vue router
     googleLogo: ref('logo-google.svg')};    
@@ -62,30 +61,23 @@ export default {
     async signIn() {
       
       try {
-      const user = this.offline? await FirestoreService.executeQuery(Constantes.colecaoUserLocal, 'email', '==', this.email):
+      /**const user = this.offline? await FirestoreService.executeQuery(Constantes.colecaoUserLocal, 'email', '==', this.email):
         await this.$store.dispatch('signInWithEmailAndPassword', {
             email: this.email,
             password: this.password,
-        });
+        });*/
       
-
-      const data =  await FirestoreService.executeQuery('Diretores/', 'email', '==', user.email);
+      //  const data =  await FirestoreService.executeQuery('Diretores/', 'email', '==', user.email);
+      /*const data =  await FirestoreService.executeQuery('Diretores/', 'email', '==', user.email);
       
       console.log('Data :', data);
-      await this.$store.dispatch('setUser', { user : user});
-      await this.$store.dispatch('setDiretor', { diretor : data});
-      await this.$store.dispatch('setDiretorSelecionado', { diretorSelecionado : data});
-
       
-      /*if (data.perfil=='ADMIN') {*/
-        this.router.push({path:data.perfil=='ADMIN'?'diretor':'evento', replace: true });
-      /*} else {
-        const evento =  await FirestoreService.eventoAberto('Eventos/',data.id);
-        await this.$store.dispatch('setEventoSelecionado', { eventoSelecionado : evento});
-        this.$router.push({path:'categoria', replace: true });
-      }*/
-         
-        // Navigate to another page or perform additional actions if needed
+      await this.$store.dispatch('setDiretor', { diretor : data});
+      await this.$store.dispatch('setDiretorSelecionado', { diretorSelecionado : data});*/
+
+      const usuario = await UsuarioService.checkLogin({login: this.login, senha: this.senha});
+      await this.$store.dispatch('setUsuario', { usuario : usuario});
+      this.router.push({path:usuario.tipo=='ADMIN'?'diretor':'evento', replace: true });
       } catch (error) {
         console.error('Error signing in:', error.message);
         alert(error.message);

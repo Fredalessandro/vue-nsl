@@ -20,15 +20,15 @@
           </ion-item>
          
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Valor Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
           </ion-item>
           
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Inscrição"  v-model="objetoEdicao.qtdAtletasBateria" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Atletas Por Bateria"  v-model="objetoEdicao.qtdAtletasBateria" required></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Inscrição"  v-model="objetoEdicao.qtdAtletas" required></ion-input>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Total de atletas"  v-model="objetoEdicao.qtdAtletas" required></ion-input>
           </ion-item>
 
           <ion-item>  

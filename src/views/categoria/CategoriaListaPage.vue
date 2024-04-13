@@ -28,16 +28,16 @@
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.id"
           class="ion-align-items-start">
-          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
             <!--<ion-col size=0.5 style="text-align: center;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.id }}</ion-col>-->
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.descricao }}</ion-col>
-            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col style="text-align: right;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.valorInscricao }}</ion-col>
-            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdAtletasBateria }}</ion-col>
-            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdAtletas }}</ion-col>
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.idade==0?"Sem regra":objeto.regra + ' ' +  objeto.idade + ' anos')
@@ -91,15 +91,12 @@ import {
 } from '@ionic/vue';
 import { add, document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
 import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue';
-import FirestoreService from '@/database/FirestoreService.js';
+
 import '../styles.css';
 import Categoria from '../../model/Categoria';
-import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import store from '@/store';
-import { format } from 'date-fns';
 import { useRouter } from 'vue-router'
-import { BateriaService } from '@/service/BateriaService.js';
-import Constantes from '../../Constantes';
+import CategoriaService from '../../service/CategoriaService';
 
 export default defineComponent({
   components: {
@@ -118,10 +115,8 @@ export default defineComponent({
       iconBack: arrowBack,
       store: store,
       searchTerm: '',
-      items: [],
-      objetoEdicao: new Categoria(),
-      modalAberta: false,
-      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
+      objetoEdicao: {},
+      modalAberta: false
     };
   },
   setup() {
@@ -130,11 +125,11 @@ export default defineComponent({
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.perfil == 'ADMIN');
 
 
     const selectedItem = ref();
-    let isCategorias = true;
+
 
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
@@ -151,45 +146,49 @@ export default defineComponent({
 
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      //await searchDocuments();
-      const db = getFirestore();
-      const q = query(collection(db, Constantes.colecaoCategorias),orderBy('descricao'), where('idEvento', '==', eventoSelecionado.id));
-
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          if (!selectedItem.value) {
-            store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: item });
-            selectedItem.value = item;
-          }
-          items.value.push(item);
-        });
-      });
-
+      // Carregue a lista ao iniciar a página
+      buscaRegistros();
     });
+    
+    const buscaRegistros = async () => {
+        items.value = []; 
+        items.value = await CategoriaService.getCategoriasByAttribute(`idEvento=${eventoSelecionado._id}`);
+
+          if (items.value) {
+            if (!store.getters.getCategoriaSelecionada)
+                 selectedItem.value = items.value[items.value.length-1];
+            else selectedItem.value = store.getters.getCategoriaSelecionada;
+          }
+    } 
     
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
       // Filter items based on whether they include the search term
-      return items?items.value.filter(item => item.descricao.toLowerCase().includes(term)):[];
+      return items.value?items.value.filter(item => item.descricao.toLowerCase().includes(term)):[];
     });
 
     const filterItems = event => {
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, isCategorias, items };
+    return { isAdmin, searchTerm, selectedItem, 
+      selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, 
+      filteredItems, eventoSelecionado, items };
 
   },
   methods: {
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Categoria(null);
+        let dadosEdicao = {
+            idUsuario    : this.eventoSelecionado.idUsuario,
+            idEvento     : this.eventoSelecionado._id,
+            descricao    : '',
+            idade        : 0,
+            regra        : '',
+            valorInscricao : 50,
+            qtdAtletasBateria : 4,
+            qtdAtletas : 16,
+        }
         dadosEdicao.idEvento = this.eventoSelecionado.id;
         this.objetoEdicao = dadosEdicao;
       }
@@ -201,27 +200,40 @@ export default defineComponent({
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto);
-      let dadosEdicao = new Categoria(
-        objeto.id,
-        objeto.descricao,
-        objeto.idade,
-        objeto.regra,
-        objeto.valorInscricao
-      );
+      let dadosEdicao = {
+        _id          : objeto._id,
+        idUsuario    : this.eventoSelecionado.idUsuario,
+        idEvento     : this.eventoSelecionado._id,
+        descricao    : objeto.descricao,
+        idade        : objeto.idade,
+        regra        : objeto.regra,
+        valorInscricao : objeto.valorInscricao,
+        qtdAtletasBateria : objeto.qtdAtletasBateria,
+        qtdAtletas : objeto.qtdAtletas,
+      };
       this.objetoEdicao = dadosEdicao;
-      this.objetoEdicao.idEvento = objeto.idEvento;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        objeto.idEvento = this.eventoSelecionado.id;
-        if (objeto.id) {
-          await FirestoreService.set(Constantes.colecaoCategorias, objeto.id, objeto);
+        if (objeto._id) {
+          const categoria = await CategoriaService.atualizarCategoria(objeto._id, objeto)
         } else {
-          const baterias = BateriaService.gerarBaterias(objeto.qtdAtletas,objeto.qtdAtletasBateria);
-          await FirestoreService.addCategoria(Constantes.colecaoCategorias, objeto, baterias);
+          
+          const categoria = await CategoriaService.createCategoria({
+            idUsuario    : this.eventoSelecionado.idUsuario,
+            idEvento     : this.eventoSelecionado._id,
+            descricao    : objeto.descricao,
+            idade        : objeto.idade,
+            regra        : objeto.regra,
+            valorInscricao : objeto.valorInscricao,
+            qtdAtletasBateria : objeto.qtdAtletasBateria,
+            qtdAtletas : objeto.qtdAtletas 
+          });
+
         }
+        this.buscaRegistros();
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
         alert(error.message);
@@ -244,11 +256,10 @@ export default defineComponent({
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
-                  // Gravar o documento no banco de dados local
-                  FirestoreService.remove(Constantes.colecaoCategorias, objeto.id);
-                  FirestoreService.removeAll(Constantes.colecaoBaterias,'idCategoria','==',objeto.id)
+                  await CategoriaService.removeCategoria(objeto._id);
+                  this.buscaRegistros();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

@@ -28,7 +28,7 @@
           <ion-col>Ativo</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in items" :key="objeto._id">
-          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.nome }}</ion-col>
             <ion-col   style="width: 2px; text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import '../styles.css';
 import { alertController } from '@ionic/core'
 import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
@@ -85,12 +86,9 @@ import {
 } from '@ionic/vue';
 import { add, document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
 import CadastroJuizModal from '@/views/juiz/CadastroJuizModal.vue';
-import FirestoreService from '@/database/FirestoreService.js';
-import '../styles.css';
-import Juiz from '../../model/Juiz';
-import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import store from '@/store';
 import { useRouter } from 'vue-router'
+import UsuarioService from '../../service/UsuarioService';
 
 export default defineComponent({
   components: {
@@ -110,19 +108,17 @@ export default defineComponent({
       collectionName: 'Juizes',
       store: store,
       searchTerm: '',
-      items: [],
-      objetoEdicao: new Juiz(),
+      objetoEdicao: {},
       modalAberta: false,
-      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
+      isAdmin: (this.$store.getters.getUsuario && this.$store.getters.getUsuario.tipo == 'ADMIN'),
     };
   },
   setup() {
     const router = useRouter();
     const eventoSelecionado = store.getters.getEventoSelecionado;
-    const collectionName = 'Juizes';
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
+    const isAdmin = (store.getters.getDiretor && store.getters.getUsuario.tipo == 'ADMIN');
 
 
     const selectedItem = ref();
@@ -139,49 +135,48 @@ export default defineComponent({
     const paginaAnterio = async () => {
       router.push({ path: 'evento', replace: true });
     }
-
-    // Carregue a lista ao iniciar a página
+     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      //await searchDocuments();
-      const db = getFirestore();
-      const q = query(collection(db, collectionName),orderBy('nome'), where('idEvento', '==', eventoSelecionado.id));
 
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          if (!selectedItem.value) {
-            store.dispatch('setJuizSelecionado', { juizSelecionado: item });
-            selectedItem.value = item;
-          }
-          items.value.push(item);
-        });
-      });
+      buscaRegistros();
 
     });
+
+    const buscaRegistros = async () => {
+      items.value = [];
+      items.value = await UsuarioService.getUsuariosByAttribute('tipo=JUIZ/tipo=JUIZ PRINCIPAL');
+      if (items.value) {
+        if (!store.getters.getCategoriaSelecionada)
+          selectedItem.value = items.value[items.value.length - 1];
+        else selectedItem.value = store.getters.getCategoriaSelecionada;
+      }
+    }  
     
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
       // Filter items based on whether they include the search term
-      return items?items.value.filter(item => item.nome.toLowerCase().includes(term)):[];
+      return items.value?items.value.filter(item => item.nome.toLowerCase().includes(term)):[];
     });
 
     const filterItems = event => {
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, items};
+    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, filteredItems, eventoSelecionado, items};
 
   },
   methods: {
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Juiz(null);
-        dadosEdicao.idEvento = this.eventoSelecionado.id;
+        let dadosEdicao = {
+          nome: '',
+          login: '',
+          email: '',
+          telefone: '',
+          tipo: '',
+          senha:'',
+          ativo:true
+        }
         this.objetoEdicao = dadosEdicao;
       }
       this.modalAberta = true;
@@ -191,40 +186,53 @@ export default defineComponent({
     },
     handleRowClick(objeto) {
       // Your click event handling logic goes here
-      console.log('Row clicked! ' + objeto);
-      let dadosEdicao = new Juiz(
-        objeto.idEvento,
-        objeto.id,
-        objeto.nome,
-        objeto.login,
-        objeto.senha,
-        objeto.tipo,
-        objeto.ativo
-      );
+      console.log('Row clicked! ' + objeto.nome);
+      let dadosEdicao = {
+        _id: objeto._id,
+        nome:objeto.nome,
+        login:objeto.login,
+        telefone:objeto.telefone,
+        email:objeto.email,
+        tipo:objeto.tipo,
+        senha:objeto.senha,
+        ativo:objeto.ativo
+      }
       this.objetoEdicao = dadosEdicao;
-      this.objetoEdicao.idEvento = objeto.idEvento;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        objeto.idEvento = this.eventoSelecionado.id;
-        if (objeto.id) {
-          await FirestoreService.set(this.collectionName, objeto.id, objeto);
+        if (objeto._id) {
+          const usuario = await UsuarioService.atualizarUsuario(objeto._id, objeto)
+          
         } else {
-          await FirestoreService.add(this.collectionName, objeto);
+
+          const usuario = await UsuarioService.createUsuario({
+            nome: objeto.nome,
+            login: objeto.login,
+            email: objeto.email,
+            telefone: objeto.telefone,
+            tipo: objeto.tipo,
+            senha: objeto.senha,
+            ativo: objeto.ativo
+          });
+
         }
+
+        buscaRegistros;
+
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
         alert(error.message);
       }
 
     },
-    presentAlertConfirm(objeto) {
+    async presentAlertConfirm(objeto) {
       return alertController
         .create({
           header: 'Confirma!',
-          message: 'Exclusão da Juiz ' + objeto.nome + ' ?',
+          message: 'Exclusão do Juiz ' + objeto.nome + ' ?',
           cssClass: 'default-alert',
           buttons: [
             {
@@ -236,16 +244,15 @@ export default defineComponent({
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  const collectionName = 'Juizes';
-                  FirestoreService.remove(collectionName, objeto.id);
-                  this.searchDocuments();
+                 await UsuarioService.removeUsuario(objeto._id);
+                  buscaRegistros();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }
-                console.log('Confirm Okay', objeto.evento)
+                console.log('Confirm Okay', objeto.nome)
               },
             },
           ],

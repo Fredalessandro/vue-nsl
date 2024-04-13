@@ -11,8 +11,6 @@ const EventoService = {
       throw error.response.data;
     }
   },
-
-  // Retorna um Evento por atributo  
   async getEventosByAttribute(atributos) {
     try {
       // Atributos que você deseja passar para a consulta
@@ -35,8 +33,6 @@ const EventoService = {
       console.error('Erro ao buscar eventos:', error.message);
     }
   },
-  
-  // Cria um novo Evento
   async createEvento(eventoData) {
     try {
       const response = await axios.post(config.backendUrl+'/eventos', eventoData);

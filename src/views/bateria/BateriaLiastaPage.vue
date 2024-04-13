@@ -7,85 +7,108 @@
             <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Baterias :  Evento {{ eventoSelecionado.evento }} Categoria {{ categoriaSelecionada.descricao }} </ion-title>
+        <ion-title>Baterias : Evento {{ eventoSelecionado.evento }} Categoria {{ categoriaSelecionada.descricao }}
+        </ion-title>
       </ion-toolbar>
       <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
         @ionInput="filterItems"></ion-searchbar>
     </ion-header>
-    <ion-content class="ion-padding">
+    <ion-content class="container">
+   
+   <div v-for="(baterias, index) in rounds" :key="index" >
+     <ion-grid class="ion-padding">
+       <ion-row v-for="bateria in baterias" style="height: auto;" class="ion-padding" >
+         <ion-col  style="width: 40vw; height: auto; align-items: center;"> <!-- Define o tamanho e o offset para centralizar -->
+           <ion-card>
+             <ion-card-header>
+                  <ion-card-title style="text-align: left;">{{ bateria.descricao + " " +bateria.round   }}</ion-card-title>
+            </ion-card-header>
+             <ion-card-content>
+              <ion-grid>
+                  <ion-row class="ion-align-items-start" >
+                      <ion-col size="3">Atleta</ion-col>
+                      <ion-col>Notas</ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-start">
+                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-start">
+                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-start">
+                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-start">
+                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                  </ion-row>
+              </ion-grid>
+             </ion-card-content>
+           </ion-card>
+         </ion-col>
+       </ion-row>
+     </ion-grid>
 
-<ion-grid>
-  <ion-row class="ion-align-items-start">
-    <ion-col>Round</ion-col>
-    <ion-col>Descricao</ion-col>
-    <ion-col>Status</ion-col>
-  </ion-row>
-  <div v-for="(objeto, index) in items" :key="objeto.id"
-    class="ion-align-items-start">
-    <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
-      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-      objeto.round }}</ion-col>
-      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-      objeto.descricao }}</ion-col>
-      <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-      objeto.status }}</ion-col>
-    </ion-row>
-  </div>
-</ion-grid>
+ </div>
+
 </ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
           <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="">
-            <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Excluir</ion-label>
+            <ion-button class="round-button" @click="">
+              <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Excluir</ion-label>
           </div>
           <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="handleRowClick(selectedItem)">
-            <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Editar</ion-label>
+            <ion-button class="round-button" @click="handleRowClick(selectedItem)">
+              <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Editar</ion-label>
           </div>
           <div class="label-container" style="margin-right: 30px;">
-          <ion-button class="round-button" @click="abrirModal(true)">
-            <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Inserir</ion-label>
-        </div>
-        <div  v-if="categoriaSelecionada" class="label-container">
-          <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
-            <ion-icon :icon="iconGenerate" style="color: white;" size="large"></ion-icon>
-          </ion-button>
-          <ion-label class="bottom-label">Gerar</ion-label>
-        </div>  
+            <ion-button class="round-button" @click="abrirModal(true)">
+              <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Inserir</ion-label>
+          </div>
+          <div v-if="categoriaSelecionada" class="label-container">
+            <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
+              <ion-icon :icon="iconGenerate" style="color: white;" size="large"></ion-icon>
+            </ion-button>
+            <ion-label class="bottom-label">Gerar</ion-label>
+          </div>
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
-    </ion-page>
-  </template>
+  </ion-page>
+</template>
   
   <script>
-  import { alertController } from '@ionic/core'
-  import Constantes from '../../Constantes';
-  import Organograma from '../components/Organograma.vue';
+  import { alertController } from '@ionic/core';
   import { useRouter } from 'vue-router' 
   import store from '@/store';
   import { ref, defineComponent, computed, onMounted, watch } from 'vue';
-  import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
   import { add, document, create, trash, arrowForward, arrowBack, refreshCircle } from 'ionicons/icons';
-  import {IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonSearchbar, IonButton, IonLabel, IonIcon, IonFooter, IonButtons, IonCard, IonCardContent} from '@ionic/vue';
-  import FirestoreService from '../../database/FirestoreService';
-  import { BateriaService } from '../../service/BateriaService';
+  import {IonPage, IonHeader, IonToolbar, IonTitle, 
+    IonContent, IonGrid, IonRow, IonCol, IonSearchbar, 
+    IonButton, IonLabel, IonIcon, IonFooter, IonCardTitle,
+    IonButtons, IonCard, IonCardContent,IonCardHeader} from '@ionic/vue';
+  import  BateriaService  from '../../service/BateriaService';
+
+
+
 
   export default defineComponent({
     name: 'BateriaOrganograma',
     components: {
       IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
-      IonSearchbar, IonButton, IonIcon, IonFooter,
-      IonButtons, IonLabel, IonCard, IonCardContent,
-        Organograma,
+      IonSearchbar, IonButton, IonIcon, IonFooter,IonCardTitle,
+      IonButtons, IonLabel, IonCard,IonCardHeader, IonCardContent
        
     },
     data() {
@@ -96,8 +119,7 @@
         iconEdit: create,
         iconRigth: arrowForward,
         iconBack: arrowBack,
-        iconGenerate: refreshCircle,
-        items: []
+        iconGenerate: refreshCircle
       }
     },
     setup() {
@@ -106,16 +128,17 @@
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const categoriaSelecionada = store.getters.getCategoriaSelecionada;
     const searchTerm = ref('');
-    const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
-    const dadosBaterias = {};
+    const items  = ref([]);
+    const rounds = {};
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
+
 
     const selectedItem = ref();
 
     
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
-     // store.dispatch('setBateriaSelecionada', { categoriaSelecionada: objeto });
+      store.dispatch('setBateriaSelecionada', { bateriaSelecionada: objeto });
     };
 
     const proximaPagina = async () => {
@@ -126,51 +149,40 @@
       router.push({ path: 'categoria', replace: true });
     }
 
-    // Carregue a lista ao iniciar a página
-    onMounted(async () => {
-      //await searchDocuments();
-      const db = getFirestore();
-      const q  = query(collection(db, Constantes.colecaoBaterias),orderBy('sequencia'), where('idCategoria', '==', categoriaSelecionada.id));
-
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        dadosBaterias.value ={};
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          if (!selectedItem.value) {
-            //store.dispatch('setBateriaSelecionada', { bateriaSelecionada: item });
-            selectedItem.value = item;
-          }
-          
-          items.value.push(item);
-          if (dadosBaterias[item.round]) {
-              const baterias = dadosBaterias[item.round];
-              baterias.push(item);
-            } else {
-              dadosBaterias[item.round] = [item];
-            }
-            
-        });
-        
-      });
-      
+     // Carregue a lista ao iniciar a página
+     onMounted(async () => {
+      // Carregue a lista ao iniciar a página
+      buscaRegistros();
     });
+    
+    const buscaRegistros = async () => {
+        items.value  = [];
+        const data = await BateriaService.getBateriasByAttribute(`idCategoria=${categoriaSelecionada._id}`);
+
+        data.forEach((item)=>{
+          if (!rounds.hasOwnProperty(item.seqRound)) {
+              rounds[item.seqRound] = [item];
+          } else {
+            let objetos = rounds[item.seqRound];
+            objetos.push(item);
+            rounds[item.seqRound]=objetos;
+          }
+        });
+
+
+    } 
     
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
       // Filter items based on whether they include the search term
-      return items?items.value.filter(item => item.descricao.toLowerCase().includes(term)):[];
+      return items.value?items.value.filter(item => item.descricao.toLowerCase().includes(term)):[];
     });
 
     const filterItems = event => {
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, categoriaSelecionada, dadosBaterias, items};
+    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros , filteredItems, eventoSelecionado, categoriaSelecionada, items,rounds};
 
   },
   methods:{
@@ -193,13 +205,7 @@
               handler: () => {
                 try {
                   // Gravar o documento no banco de dados local
-                  FirestoreService.removeAll(Constantes.colecaoBaterias,'idCategoria','==',objeto.id)
-                  const baterias = BateriaService.gerarBaterias(objeto.qtdAtletasBateria,objeto.qtdAtletas);
-                  baterias.forEach(bateria => {
-                    bateria.idEvento = objeto.idEvento;
-                    bateria.idCategoria = objeto.id;
-                    FirestoreService.add(Constantes.colecaoBaterias,bateria);
-                  });
+                 
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

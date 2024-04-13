@@ -26,7 +26,7 @@
           <ion-col>Ativo</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in items" :key="objeto._id">
-          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.nome }}</ion-col>
             <ion-col   style="width: 2px; text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
@@ -143,6 +143,11 @@ export default defineComponent({
     const buscaRegistros = async () => {
         items.value = [];
         items.value = await UsuarioService.getUsuariosByAttribute('tipo=DIRETOR');
+        if (items.value) {
+            if (!store.getters.getCategoriaSelecionada)
+                 selectedItem.value = items.value[items.value.length-1];
+            else selectedItem.value = store.getters.getCategoriaSelecionada;
+        }
     }  
 
     const filteredItems = computed(() => {
@@ -151,7 +156,6 @@ export default defineComponent({
       return items.value?items.value.filter(item => item.nome.toLowerCase().includes(term) ||
         item.telefone.toLowerCase().includes(term) ||
         item.email.toLowerCase().includes(term)):[];
-    
     });
 
     
@@ -160,7 +164,7 @@ export default defineComponent({
       searchTerm.value = event.target.value;
     };
 
-    return {isAdmin, searchTerm,  selectedItem, items, selectRow, proximaPagina, filterItems };
+    return {isAdmin, searchTerm,  selectedItem, items, selectRow, proximaPagina, filterItems, buscaRegistros };
 
   },
 

@@ -9,13 +9,20 @@
           </ion-button>
         </ion-buttons>
         <ion-title>{{ diretorSelecionado.nome }} Evento</ion-title>
-        <ion-buttons v-if="isAdmin" slot="end">
+
+        
+        <ion-buttons slot="end">
+        
+          <div class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="handleSignOut">
             <ion-icon :icon="iconExit" style="color: white;" size="large"></ion-icon>
           </ion-button>
+          <ion-label class="bottom-label">Sair</ion-label>
+        </div>
         </ion-buttons>
-        <!--<ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm" @ionInput="filterItems"></ion-searchbar>-->
       </ion-toolbar>
+        <!--<ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm" @ionInput="filterItems"></ion-searchbar>-->
+     
 
     </ion-header>
 
@@ -32,13 +39,13 @@
         </ion-row>
         <div v-for="(objeto, index) in items" :key="objeto.id"
           class="ion-align-items-start">
-          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
+          <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
             <ion-col size=4 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.evento }}</ion-col>
             <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.local }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-            objeto.dataInicio + ' a ' + objeto.dataFinal }}</ion-col>
+            convertDDMMYYYY(objeto.dataInicio) + ' a ' + convertDDMMYYYY(objeto.dataFinal) }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.status }}</ion-col>
           </ion-row>
@@ -95,27 +102,19 @@
 </template>
 
 <script>
+import '../styles.css';
 import { alertController } from '@ionic/core';
 import { people, add, document, create, trash, man, arrowForward, arrowBack, exit } from 'ionicons/icons';
-import CadastroEventoModal from '@/views/evento/CadastroEventoModal.vue';
-import FirestoreService from '@/database/FirestoreService.js';
-import '../styles.css';
-import Evento from '../../model/Evento';
-import Categoria from '../../model/Categoria';
-import Juiz from '../../model/Juiz';
-import Atleta from '../../model/Atleta';
 import { ref, defineComponent, onMounted, computed } from 'vue';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
   IonSearchbar, IonButton, IonBackButton, IonIcon, IonFooter, IonButtons, IonLabel
 } from '@ionic/vue';
 import store from '@/store';
-import { mapState } from 'vuex';
-import { collection, query, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import { useRouter } from 'vue-router'
-import { BateriaService } from '@/service/BateriaService.js';
-import Constantes from '../../Constantes';
+import CadastroEventoModal from '@/views/evento/CadastroEventoModal.vue';
 import EventoService from '../../service/EventoService';
+import DataUtil from '../../utils/DataUtil';
 
 export default defineComponent({
   components: {
@@ -137,13 +136,10 @@ export default defineComponent({
       iconDelete: trash,
       iconEdit: create,
       items: [],
-      objetoEdicao: new Evento(),
+      objetoEdicao: {},
       modalAberta: false,
 
     };
-  },
-  computed: {
-    ...mapState(['diretor', 'diretorSelecionado', 'user']),
   },
   setup() {
     const router = useRouter();
@@ -160,6 +156,7 @@ export default defineComponent({
       store.dispatch('setEventoSelecionado', { eventoSelecionado: objeto });
     };
 
+  
     const paginaJuizes = async () => {
       router.push({ path: 'juiz', replace: true });
     }
@@ -191,16 +188,25 @@ export default defineComponent({
     });
     
     const buscaRegistros = async () => {
-        items.value = [];
-        items.value = await Evento.getUsuariosByAttribute('idUsuario=${diretorSelecionado._id}').filter(item => !item.status.toLowerCase().includes('Finalizado'));
+        items.value = []; 
+        const data = await EventoService.getEventosByAttribute(`idUsuario=${diretorSelecionado._id}`);
+        items.value = data.filter(filter=>filter.status!='Finalizado');
+        if (items.value) {
+            if (!store.getters.getCategoriaSelecionada)
+                 selectedItem.value = items.value[items.value.length-1];
+            else selectedItem.value = store.getters.getCategoriaSelecionada;
+        }
     }  
 
     return { isAdmin, searchTerm, selectedItem, 
-      selectRow, proximaPagina, paginaAnterio, paginaJuizes, paginaAtleta,
+      selectRow, proximaPagina, paginaAnterio, paginaJuizes, paginaAtleta,  buscaRegistros,
       diretorSelecionado, inicio, final, items };
 
   },
   methods: {
+    convertDDMMYYYY(data) {
+        return DataUtil.ConvertDDMMYYYY(data)
+    },
     abrirModal(novo) {
       if (novo) {
         const lista = this.items;
@@ -243,7 +249,8 @@ export default defineComponent({
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto.evento);
       let dadosEdicao = {
-       idUsuario : diretor.idUsuario,
+        _id      : objeto._id,
+       idUsuario : this.diretorSelecionado._id,
        evento    : objeto.evento,
        local     : objeto.local,
        dataInicio: objeto.dataInicio,
@@ -261,7 +268,7 @@ export default defineComponent({
           const evento = await EventoService.atualizarEvento(objeto._id, objeto)
         } else {
           
-          const evento = await UsuarioService.createUsuario({
+          const evento = await EventoService.createEvento({
             idUsuario : this.diretorSelecionado._id,
             evento    : objeto.evento,
             local     : objeto.local,
@@ -270,34 +277,9 @@ export default defineComponent({
             status    : objeto.status
           });
 
-          /*objeto.idUsuario = this.diretorSelecionado._id;
-          const data = await FirestoreService.add(Constantes.colecaoEventos, objeto);
-          
-          let categorias = Categoria.categorias;
-          
-          categorias.forEach(element => {
-            element.idEvento = data.id;
-            const baterias = BateriaService.gerarBaterias(element.qtdAtletasBateria,element.qtdAtletas);
-            FirestoreService.addCategoria(Constantes.colecaoCategorias, element, baterias);
-          });
-
-          let juizes = Juiz.juizes;
-          
-          juizes.forEach(element => {
-            element.idEvento = data.id;
-            FirestoreService.add(Constantes.colecaoJuizes, element);
-          });
-
-         let atletas = Atleta.atletas;
-          
-          atletas.forEach(element => {
-            element.idEvento = data.id;
-            FirestoreService.add(Constantes.colecaoAtletas, element);
-          });*/
-
         }
 
-        buscaRegistros;
+        buscaRegistros();
 
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -306,24 +288,6 @@ export default defineComponent({
 
     },
     presentAlertConfirm(objeto) {
-
-      /*if (FirestoreService.checkCollectionExistence(CategorConstantes.colecaoCategorias, 'idEvento', '==', objeto.id)) {
-
-        return alertController
-          .create({
-            header: 'Confirma!',
-            message: 'Evento ' + objeto.evento + ' tem categorias relacionadas.',
-            cssClass: 'default-alert',
-            buttons: [
-              {
-                text: 'Ok',
-                role: 'cancel',
-                handler: blah => {
-                  console.log('Confirm Cancel:', objeto.nome)
-                },
-              }],
-          }).then(a => a.present())
-      }*/
 
       return alertController
         .create({
@@ -343,25 +307,8 @@ export default defineComponent({
               handler: async () => {
                 try {
 
-                  await UsuarioService.removeUsuario(objeto._id);
-                  buscaRegistros();
-                  
-                  // Gravar o documento no banco de dados local
-
-                  /*FirestoreService.remove(Constantes.colecaoEventos, objeto.id);
-                  store.dispatch('setEventoSelecionado', { eventoSelecionado: null });
-                  
-                  FirestoreService.removeAll(Constantes.colecaoCategorias,'idEvento','==',objeto.id)
-                  store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: null });
-
-                  FirestoreService.removeAll(Constantes.colecaoBaterias,'idEvento','==',objeto.id)
-                  store.dispatch('setBateriaSelecionada', { bateriaSelecionada: null });
-
-                  FirestoreService.removeAll(Constantes.colecaoJuizes,'idEvento','==',objeto.id)
-                  store.dispatch('setJuizSelecionado', { juizSelecionada: null });
-
-                  FirestoreService.removeAll(Constantes.colecaoAtletas,'idEvento','==',objeto.id)
-                  store.dispatch('setAtletaSelcionado', { atletaSelcionado: null });*/
+                  await EventoService.removeEvento(objeto._id);
+                  this.buscaRegistros();
 
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);

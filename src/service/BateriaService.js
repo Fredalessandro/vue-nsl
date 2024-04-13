@@ -1,43 +1,73 @@
-import Bateria from "../model/Bateria.js";
-export class BateriaService {
+import axios from 'axios';
+import config from '@/configuration/config';
 
-
-  static gerarBaterias(atletasPorBateria, atletas) {
-    
-    const baterias = [];
-    let totalBaterias = Math.ceil(atletas / atletasPorBateria);
-    let strRound = 1;
-    let sequencia = 1;
-    while (totalBaterias>=1) {
-      console.log("Quantidade baterias " + totalBaterias);
-      for (let i = 0; i < totalBaterias; i++) {
-        baterias.push(
-          new Bateria(null,
-            null,
-            null,
-            sequencia,
-            i + 1 + "ª bateria do ",
-            strRound+" Round",
-            null,
-            null,
-            "Aguardando",
-            null
-          )
-        );
-        ++sequencia;
-      }
-
-      if (totalBaterias!=1){
-        strRound++
-        totalBaterias = Math.ceil((atletas/strRound) / atletasPorBateria);
-      } else {
-        totalBaterias = 0;
-      }
-
+const BateriaService = {
+  // Retorna todos os Baterias
+  async getAllBaterias() {
+    try {
+      const response = await axios.get('/baterias');
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
     }
-    
-    // Distribui os atletas em baterias
-    return baterias;
+  },
+  async getBateriasByAttribute(atributos) {
+    try {
+      // Atributos que você deseja passar para a consulta
+      //const atributos = 'tipo=DIRETOR/status=ATIVO';
+  
+      // Fazer a chamada para o endpoint com os atributos na URL
+      const response = await axios.get(config.backendUrl+'/baterias/'+atributos);
+  
+      // Verificar se a requisição foi bem-sucedida (status 200)
+      if (response.status === 200) {
+        // Baterias encontrados
+        console.log('Baterias encontrados:', response.data);
+        return response.data;
+      } else {
+        // O servidor retornou um código de erro
+        console.error('Erro ao buscar baterias:', response.statusText);
+      }
+    } catch (error) {
+      // Erro ao fazer a requisição
+      console.error('Erro ao buscar baterias:', error.message);
+    }
+  },
+  async createBateria(bateriaData) {
+    try {
+      const response = await axios.post(config.backendUrl+'/baterias', bateriaData);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+  async atualizarBateria(id, bateria) {
+    try {
+      // Fazer a chamada para o endpoint de atualização de bateria
+      const response = await axios.put(config.backendUrl+`/baterias/${id}`, bateria);
+  
+      // Verificar se a requisição foi bem-sucedida (status 200)
+      if (response.status === 200) {
+        // Bateria atualizado com sucesso
+        console.log('Bateria atualizado:', response.data);
+      } else {
+        // O servidor retornou um código de erro
+        console.error('Erro ao atualizar bateria:', response.statusText);
+      }
+    } catch (error) {
+      // Erro ao fazer a requisição
+      console.error('Erro ao atualizar bateria:', error.message);
+    }
+  },  
 
-  }  
+  // Remove um Bateria
+  async removeBateria(id) {
+    try {
+      const response = await axios.delete(config.backendUrl+`/baterias/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  }
 }
+export default BateriaService;

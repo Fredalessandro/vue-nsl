@@ -38,7 +38,7 @@
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.telefone }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-              objeto.tipo }}</ion-col>
+              objeto.perfil }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
               objeto.senha }}</ion-col>
             <ion-col  style="text-align: left;"
@@ -118,7 +118,7 @@ export default defineComponent({
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getUsuario.tipo == 'ADMIN');
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
 
     const selectedItem = ref();
@@ -144,7 +144,8 @@ export default defineComponent({
 
     const buscaRegistros = async () => {
       items.value = [];
-      items.value = await UsuarioService.getUsuariosByAttribute('tipo=JUIZ/tipo=JUIZ PRINCIPAL');
+      const parametros = ['tipo=JUIZ'];
+      items.value = await UsuarioService.getUsuariosByAttribute(parametros);
       if (items.value) {
         if (!store.getters.getCategoriaSelecionada)
           selectedItem.value = items.value[items.value.length - 1];

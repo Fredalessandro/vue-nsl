@@ -2,48 +2,32 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button class="round-button" @click="paginaAnterio">
+        <ion-buttons style="width: fit-content; font-size: smaller;" slot="start">
+          <ion-button class="round-button" @click="paginaAnterio">  
             <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Baterias : Evento {{ eventoSelecionado.evento }} Categoria {{ categoriaSelecionada.descricao }}
+        <ion-title style="width: fit-content; font-size: smaller;">Categoria {{ categoriaSelecionada.descricao }}
         </ion-title>
       </ion-toolbar>
-      <ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
-        @ionInput="filterItems"></ion-searchbar>
+      <!--<ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
+        @ionInput="filterItems"></ion-searchbar>-->
     </ion-header>
-    <ion-content class="container">
+    <ion-content  class="container">
    
-   <div v-for="(baterias, index) in rounds" :key="index" >
-     <ion-grid class="ion-padding">
+     <ion-grid v-for="(baterias, index) in items" :key="index" class="ion-padding">
        <ion-row v-for="bateria in baterias" style="height: auto;" class="ion-padding" >
          <ion-col  style="width: 40vw; height: auto; align-items: center;"> <!-- Define o tamanho e o offset para centralizar -->
            <ion-card>
              <ion-card-header>
-                  <ion-card-title style="text-align: left;">{{ bateria.descricao + " " +bateria.round   }}</ion-card-title>
+                  <ion-card-title style="text-align: left;">{{ bateria.descricao + bateria.seqRound+" º Round"}}</ion-card-title>
             </ion-card-header>
              <ion-card-content>
               <ion-grid>
                   <ion-row class="ion-align-items-start" >
+                      <ion-col size="1">Posição</ion-col>
                       <ion-col size="3">Atleta</ion-col>
                       <ion-col>Notas</ion-col>
-                  </ion-row>
-                  <ion-row class="ion-align-items-start">
-                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                  </ion-row>
-                  <ion-row class="ion-align-items-start">
-                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                  </ion-row>
-                  <ion-row class="ion-align-items-start">
-                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                  </ion-row>
-                  <ion-row class="ion-align-items-start">
-                      <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
-                      <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
                   </ion-row>
               </ion-grid>
              </ion-card-content>
@@ -52,7 +36,7 @@
        </ion-row>
      </ion-grid>
 
- </div>
+
 
 </ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
@@ -104,7 +88,7 @@
 
 
   export default defineComponent({
-    name: 'BateriaOrganograma',
+  
     components: {
       IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol,
       IonSearchbar, IonButton, IonIcon, IonFooter,IonCardTitle,
@@ -157,6 +141,7 @@
     
     const buscaRegistros = async () => {
         items.value  = [];
+
         const data = await BateriaService.getBateriasByAttribute(`idCategoria=${categoriaSelecionada._id}`);
 
         data.forEach((item)=>{
@@ -169,6 +154,7 @@
           }
         });
 
+        items.value = rounds;
 
     } 
     

@@ -39,7 +39,7 @@
         </ion-item>  
           <ion-item>
             <ion-label>Selecione tipo juiz</ion-label><br/>
-            <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.tipo">
+            <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.perfil">
                 <ion-select-option v-for="option in options" :key="option.value" :value="option.value">
                     {{ option.label }}
                 </ion-select-option>

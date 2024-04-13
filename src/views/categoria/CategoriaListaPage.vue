@@ -26,7 +26,7 @@
           <ion-col>Quantidades de Atletas</ion-col>
           <ion-col>Regra</ion-col>
         </ion-row>
-        <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.id"
+        <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto._id"
           class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
             <!--<ion-col size=0.5 style="text-align: center;"
@@ -83,6 +83,7 @@
 </template>
 
 <script>
+import '../styles.css';
 import { alertController } from '@ionic/core'
 import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
@@ -91,9 +92,6 @@ import {
 } from '@ionic/vue';
 import { add, document, create, trash, arrowForward, arrowBack } from 'ionicons/icons';
 import CadastroCategoriaModal from '@/views/categoria/CadastroCategoriaModal.vue';
-
-import '../styles.css';
-import Categoria from '../../model/Categoria';
 import store from '@/store';
 import { useRouter } from 'vue-router'
 import CategoriaService from '../../service/CategoriaService';

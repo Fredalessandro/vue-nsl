@@ -82,6 +82,7 @@
 </template>
 
 <script >
+import '../styles.css';
 import { alertController } from '@ionic/core'
 import { ref, defineComponent, computed, onMounted } from 'vue';
 import {
@@ -90,13 +91,9 @@ import {
 } from '@ionic/vue';
 import { add,document, create, trash,arrowBack, } from 'ionicons/icons';
 import CadastroAtletaModal from '@/views/atleta/CadastroAtletaModal.vue';
-import FirestoreService from '@/database/FirestoreService.js';
-import '../styles.css';
-import Atleta from '../../model/Atleta';
-import { collection, query, orderBy, where, onSnapshot, getFirestore } from 'firebase/firestore';
 import store from '@/store'; 
 import { useRouter } from 'vue-router'
-import Constantes from '../../Constantes';
+
 
 export default defineComponent({
   components: {
@@ -113,19 +110,17 @@ export default defineComponent({
       iconEdit: create,
       iconBack: arrowBack,
       store: store,
-      items: [],
-      objetoEdicao: new Atleta(),
+      objetoEdicao: {},
       modalAberta: false,
-      isAdmin: (this.$store.getters.getDiretor && this.$store.getters.getDiretor.perfil == 'ADMIN'),
     };
   },
   setup() {
+
     const router = useRouter();
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getDiretor && store.getters.getDiretor.perfil == 'ADMIN');
-
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
     const selectedItem = ref();
 
@@ -144,28 +139,22 @@ export default defineComponent({
 
     // Carregue a lista ao iniciar a página
     onMounted(async () => {
-      //await searchDocuments();
-      const db = getFirestore();
-      const q = query(collection(db, Constantes.colecaoAtletas),orderBy('nome'), where('idEvento', '==', eventoSelecionado.id));
 
-      // Observando alterações na coleção
-      onSnapshot(q, (snapshot) => {
-        items.value = [];
-        snapshot.forEach((doc) => {
-          const item = {
-            key: doc.id,
-            ...doc.data(),
-          };
-          if (!selectedItem.value) {
-            store.dispatch('setAtletaSelecionado', { atletaSelecionado: item });
-            selectedItem.value = item;
-          }
-          item.idadeAno = Atleta.calcularIdade(item.dataNascimento);
-          items.value.push(item);
-        });
-      });
+      buscaRegistros();
 
     });
+
+    const buscaRegistros = async () => {
+      items.value = [];
+      const parametros = [];
+      items.value = await AtletaService.getAtletaByAttribute(parametros);
+      if (items.value) {
+        if (!store.getters.getAtletaSelecionada) {
+          selectedItem.value = items.value[items.value.length - 1];
+          store.dispatch('setAtletaSelecionado', { atletaSelecionado: items.value[items.value.length - 1] });
+        } else selectedItem.value = store.getters.getAtletaSelecionada;
+      }
+    }  
     
     const filteredItems = computed(() => {
       const term = searchTerm.value.toLowerCase();
@@ -177,14 +166,34 @@ export default defineComponent({
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, filteredItems, eventoSelecionado, items};
+    return { isAdmin, searchTerm, selectedItem, 
+      selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, 
+      filteredItems, eventoSelecionado, items};
 
   },
   methods: {
     abrirModal(novo) {
       if (novo) {
-        let dadosEdicao = new Atleta(null);
-        //dadosEdicao.idEvento = this.eventoSelecionado.id;
+        let dadosEdicao = {
+          idEvento:objeto.idEvento,
+          nome    : '',
+          apelidio: '',
+          email   : '',
+          telefone: '',
+          cpf     : '',
+          dataNascimento: null,
+          cep     : '',
+          endereco: '',
+          numero  : '',
+          complemento: '',
+          bairro  : '',
+          cidade  : '',
+          uf      : '',
+          rankNordestino: 0,
+          rankEstadual: 0,
+          idadeAno: 0,
+          cabecaChave: false,
+        };
         this.objetoEdicao = dadosEdicao;
       }
       this.modalAberta = true;
@@ -195,37 +204,58 @@ export default defineComponent({
     handleRowClick(objeto) {
       // Your click event handling logic goes here
       console.log('Row clicked! ' + objeto);
-      let dadosEdicao = new Atleta(
-        objeto.id,         
-        objeto.nome,       
-        objeto.apelidio,   
-        objeto.email,      
-        objeto.telefone,   
-        objeto.cpf,        
-        objeto.dataNascimento, 
-        objeto.cep,            
-        objeto.endereco,       
-        objeto.numero,         
-        objeto.complemento,    
-        objeto.bairro,         
-        objeto.cidade,         
-        objeto.uf,             
-        objeto.tipo,           
-        objeto.rankNordestino, 
-        objeto.rankEstadual   
-      );
+      let dadosEdicao = {
+        _id: objeto._id,
+       idEvento: objeto.idEvento,
+       nome    : objeto.nome    ,
+       apelidio: objeto.apelidio,
+       email   : objeto.email   ,
+       telefone: objeto.telefone,
+       cpf     : objeto.cpf     ,
+       dataNascimento: objeto.dataNascimento,
+       cep     : objeto.cep     ,
+       endereco: objeto.endereco,
+       numero  : objeto.numero  ,
+       complemento: objeto.complemento,
+       bairro  : objeto.bairro,
+       cidade  : objeto.cidade,
+       uf      : objeto.uf    ,
+       rankNordestino: objeto.rankNordestino,
+       rankEstadual: objeto.rankEstadual,
+       idadeAno: objeto.idadeAno,
+       cabecaChave: objeto.cabecaChave,
+      };
       this.objetoEdicao = dadosEdicao;
-      this.objetoEdicao.idEvento = objeto.idEvento;
       this.abrirModal(false);
     },
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        //objeto.idEvento = this.eventoSelecionado.id;
-        if (objeto.id) {
-          await FirestoreService.set(Constantes.colecaoAtletas, objeto.id, objeto);
+
+        if (objeto._id) {
+          const atleta = await AtletaService.atualizarAtleta(objeto._id, objeto) 
         } else {
-          await FirestoreService.add(Constantes.colecaoAtletas, objeto);
+          const atleta = await AtletaService.createAtleta({
+                idEvento: objeto.idEvento,
+                nome    : objeto.nome    ,
+                apelidio: objeto.apelidio,
+                email   : objeto.email   ,
+                telefone: objeto.telefone,
+                cpf     : objeto.cpf     ,
+                dataNascimento: objeto.dataNascimento,
+                cep     : objeto.cep     ,
+                endereco: objeto.endereco,
+                numero  : objeto.numero  ,
+                complemento: objeto.complemento,
+                bairro  : objeto.bairro,
+                cidade  : objeto.cidade,
+                uf      : objeto.uf    ,
+                rankNordestino: objeto.rankNordestino,
+                rankEstadual: objeto.rankEstadual,
+                idadeAno: objeto.idadeAno,
+                cabecaChave: objeto.cabecaChave,
+          });
+
         }
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -249,10 +279,9 @@ export default defineComponent({
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
-                  // Gravar o documento no banco de dados local
-                  FirestoreService.remove(Constantes.colecaoAtletas, objeto.id);
+                  await UsuarioService.removeUsuario(objeto._id);
                   this.searchDocuments();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);

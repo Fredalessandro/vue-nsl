@@ -29,24 +29,37 @@
     <ion-content class="ion-padding">
 
       <ion-grid>
-        <ion-row class="ion-align-items-start">
+        <ion-row class="ion-align-items-start" style="height: auto;">
           <!--<ion-col size=0.5>id</ion-col>-->
-          <ion-col size=4>Evento</ion-col>
-          <ion-col>Local</ion-col>
+          <ion-col size=2>Evento</ion-col>
+          <ion-col size=2>Local</ion-col>
+          <ion-col>Vl.Inscrição</ion-col>
+          <ion-col>Atletas por Bateria</ion-col>
+          <ion-col>Ondas Surfadas</ion-col>
+          <ion-col>Tempo da Bateria</ion-col>
           <ion-col size=2>Periodo</ion-col>
-          <ion-col size=2>Status</ion-col>
+          <ion-col>Status</ion-col>
           <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
         </ion-row>
+ 
         <div v-for="(objeto, index) in items" :key="objeto.id"
           class="ion-align-items-start">
           <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }">
-            <ion-col size=4 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col size=2 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.evento }}</ion-col>
-            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col size=2 style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.local }}</ion-col>
+            <ion-col style="text-align: right;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.valorInscricao }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.qtdAtletasBateria }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.qtdOndaSurfada }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.tempoBateria }}</ion-col>
             <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             convertDDMMYYYY(objeto.dataInicio) + ' a ' + convertDDMMYYYY(objeto.dataFinal) }}</ion-col>
-            <ion-col size=2 style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.status }}</ion-col>
           </ion-row>
         </div>
@@ -192,9 +205,10 @@ export default defineComponent({
         const data = await EventoService.getEventosByAttribute(`idUsuario=${diretorSelecionado._id}`);
         items.value = data.filter(filter=>filter.status!='Finalizado');
         if (items.value) {
-            if (!store.getters.getCategoriaSelecionada)
+            if (!store.getters.getCategoriaSelecionada) {
                  selectedItem.value = items.value[items.value.length-1];
-            else selectedItem.value = store.getters.getCategoriaSelecionada;
+                 store.dispatch('setEventoSelecionado', { eventoSelecionado: items.value[items.value.length-1] });
+            } else selectedItem.value = store.getters.getCategoriaSelecionada;
         }
     }  
 
@@ -237,6 +251,10 @@ export default defineComponent({
             dataInicio: null,
             dataFinal : null,
             status    : 'Aguardando',
+            valorInscricao    : 0,
+            qtdAtletasBateria : 4,
+            qtdOndaSurfada    : 10,
+            tempoBateria      : 30
         }
         this.objetoEdicao = dadosEdicao;
       }
@@ -255,7 +273,11 @@ export default defineComponent({
        local     : objeto.local,
        dataInicio: objeto.dataInicio,
        dataFinal : objeto.dataFinal,
-       status    : objeto.status
+       status    : objeto.status,
+       valorInscricao    : objeto.valorInscricao,
+       qtdAtletasBateria : objeto.qtdAtletasBateria,
+       qtdOndaSurfada    : objeto.qtdOndaSurfada   ,
+       tempoBateria      : objeto.tempoBateria     
       };
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -274,12 +296,16 @@ export default defineComponent({
             local     : objeto.local,
             dataInicio: objeto.dataInicio,
             dataFinal : objeto.dataFinal,
-            status    : objeto.status
+            status    : objeto.status,
+            valorInscricao    : objeto.valorInscricao,
+            qtdAtletasBateria : objeto.qtdAtletasBateria,
+            qtdOndaSurfada    : objeto.qtdOndaSurfada   ,
+            tempoBateria      : objeto.tempoBateria 
           });
 
         }
 
-        buscaRegistros();
+        this.buscaRegistros();
 
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);

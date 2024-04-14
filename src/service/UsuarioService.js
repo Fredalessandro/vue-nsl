@@ -16,10 +16,10 @@ const UsuarioService = {
   async getUsuariosByAttribute(atributos) {
     try {
       // Atributos que você deseja passar para a consulta
-      //const atributos = 'tipo=DIRETOR/status=ATIVO';
+      //const atributos = 'tipo=JUIZ';
   
       // Fazer a chamada para o endpoint com os atributos na URL
-      const response = await axios.get(config.backendUrl+'/usuarios/'+atributos);
+      const response = await axios.get(config.backendUrl+`/usuarios/${atributos}`);
   
       // Verificar se a requisição foi bem-sucedida (status 200)
       if (response.status === 200) {

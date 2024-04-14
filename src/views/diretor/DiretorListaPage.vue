@@ -144,9 +144,10 @@ export default defineComponent({
         items.value = [];
         items.value = await UsuarioService.getUsuariosByAttribute('tipo=DIRETOR');
         if (items.value) {
-            if (!store.getters.getCategoriaSelecionada)
+            if (!store.getters.getCategoriaSelecionada) {
                  selectedItem.value = items.value[items.value.length-1];
-            else selectedItem.value = store.getters.getCategoriaSelecionada;
+                 store.dispatch('setDiretorSelecionado', { diretorSelecionado: items.value[items.value.length-1] });
+             } else selectedItem.value = store.getters.getCategoriaSelecionada;
         }
     }  
 

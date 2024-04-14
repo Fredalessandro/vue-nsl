@@ -40,7 +40,9 @@
             <ion-input style="margin-right: 5px;  width: 450px;"   :maxlength="50"  label="Cidade"       v-model="objetoEdicao.cidade"        required></ion-input>
             <ion-input style="margin-right: 5px;  width: 150px;"   :maxlength="2"   label="UF"           v-model="objetoEdicao.uf"        required></ion-input>
           </ion-item>
-
+          <ion-item>  
+            <ion-checkbox v-model="objetoEdicao.cabecaChave" @ionChange="handleChange">Ativo</ion-checkbox>
+          </ion-item>  
       </ion-content>
       <ion-footer fixed>
         <div class="ion-text-center" style=" bottom: 0; width: 100%;">
@@ -52,7 +54,7 @@
   </template>
   
   <script >
-  import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonFooter, IonButtons, IonInput, IonItem, IonLabel  
+  import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonFooter, IonButtons, IonInput, IonItem, IonLabel, IonCheckbox  
 } from '@ionic/vue'; 
   import Usuario from '../../model/Usuario';
   import {CepService} from '@/service/CepService';
@@ -64,7 +66,7 @@
     components: {
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
     IonButton, IonFooter,
-    IonButtons, IonInput, IonItem, IonLabel,
+    IonButtons, IonInput, IonItem, IonLabel, IonCheckbox,
     Usuario
   },
     data() {

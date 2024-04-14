@@ -32,6 +32,23 @@
         </ion-item>       
         
         <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="40" label="Valor Inscrição"  v-model="objetoEdicao.valorInscricao" required></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Atletas Por Bateria"  v-model="objetoEdicao.qtdAtletasBateria" required></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Qtd. Ondas Surfadas"  v-model="objetoEdicao.qtdOndaSurfada" required></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-input style="margin-right: 5px; width: 250px;" :maxlength="2" label="Tempo por bateria"  v-model="objetoEdicao.tempoBateria" required></ion-input>
+          </ion-item>
+
+          
+        <ion-item>
           <ion-label>Status</ion-label><br/>
           <ion-select style="margin-right: 5px; width: 450px;" v-model="objetoEdicao.status">
               <!--<ion-select-option v-for="option in options" :key="option.value" :value="option.value">
@@ -40,6 +57,8 @@
               <ion-select-option value="Iniciado">Iniciado</ion-select-option>
           </ion-select>
         </ion-item>
+
+
 
     </ion-content>
     <ion-footer>

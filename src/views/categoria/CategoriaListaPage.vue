@@ -39,6 +39,10 @@
             objeto.qtdAtletasBateria }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdAtletas }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.qtdOndaSurfada }}</ion-col>
+            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+            objeto.tempoBateria }}</ion-col>
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.idade==0?"Sem regra":objeto.regra + ' ' +  objeto.idade + ' anos')
               }}</ion-col>
@@ -153,9 +157,10 @@ export default defineComponent({
         items.value = await CategoriaService.getCategoriasByAttribute(`idEvento=${eventoSelecionado._id}`);
 
           if (items.value) {
-            if (!store.getters.getCategoriaSelecionada)
+            if (!store.getters.getCategoriaSelecionada) {
                  selectedItem.value = items.value[items.value.length-1];
-            else selectedItem.value = store.getters.getCategoriaSelecionada;
+                 store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: items.value[items.value.length-1] });
+            } else selectedItem.value = store.getters.getCategoriaSelecionada;
           }
     } 
     
@@ -183,9 +188,11 @@ export default defineComponent({
             descricao    : '',
             idade        : 0,
             regra        : '',
-            valorInscricao : 50,
-            qtdAtletasBateria : 4,
+            valorInscricao : this.eventoSelecionado.valorInscricao,
+            qtdAtletasBateria : this.eventoSelecionado.qtdAtletasBateria,
             qtdAtletas : 16,
+            qtdOndaSurfada : this.eventoSelecionado.qtdOndaSurfada,
+            tempoBateria : this.eventoSelecionado.tempoBateria
         }
         dadosEdicao.idEvento = this.eventoSelecionado.id;
         this.objetoEdicao = dadosEdicao;
@@ -208,6 +215,8 @@ export default defineComponent({
         valorInscricao : objeto.valorInscricao,
         qtdAtletasBateria : objeto.qtdAtletasBateria,
         qtdAtletas : objeto.qtdAtletas,
+        qtdOndaSurfada : this.eventoSelecionado.qtdOndaSurfada,
+        tempoBateria : this.eventoSelecionado.tempoBateria
       };
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -227,7 +236,9 @@ export default defineComponent({
             regra        : objeto.regra,
             valorInscricao : objeto.valorInscricao,
             qtdAtletasBateria : objeto.qtdAtletasBateria,
-            qtdAtletas : objeto.qtdAtletas 
+            qtdAtletas : objeto.qtdAtletas,
+            qtdOndaSurfada : objeto.qtdOndaSurfada,
+            tempoBateria : objeto.tempoBateria 
           });
 
         }

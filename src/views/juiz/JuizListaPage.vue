@@ -147,9 +147,10 @@ export default defineComponent({
       const parametros = ['tipo=JUIZ'];
       items.value = await UsuarioService.getUsuariosByAttribute(parametros);
       if (items.value) {
-        if (!store.getters.getCategoriaSelecionada)
+        if (!store.getters.getCategoriaSelecionada) {
           selectedItem.value = items.value[items.value.length - 1];
-        else selectedItem.value = store.getters.getCategoriaSelecionada;
+          store.dispatch('setJuizSelecionado', { juizSelecionado: items.value[items.value.length - 1] });
+        } else selectedItem.value = store.getters.getCategoriaSelecionada;
       }
     }  
     
@@ -170,6 +171,7 @@ export default defineComponent({
     abrirModal(novo) {
       if (novo) {
         let dadosEdicao = {
+          idEvento:objeto.idEvento,
           nome: '',
           login: '',
           email: '',
@@ -190,6 +192,7 @@ export default defineComponent({
       console.log('Row clicked! ' + objeto.nome);
       let dadosEdicao = {
         _id: objeto._id,
+        idEvento:objeto.idEvento,
         nome:objeto.nome,
         login:objeto.login,
         telefone:objeto.telefone,
@@ -221,7 +224,7 @@ export default defineComponent({
 
         }
 
-        buscaRegistros;
+        this.buscaRegistros();
 
       } catch (error) {
         console.error('Erro ao gravar localmente=', error);
@@ -249,7 +252,7 @@ export default defineComponent({
                 try {
                   // Gravar o documento no banco de dados local
                  await UsuarioService.removeUsuario(objeto._id);
-                  buscaRegistros();
+                  this.buscaRegistros();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

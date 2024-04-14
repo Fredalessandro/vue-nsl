@@ -2,12 +2,12 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons style="width: fit-content; font-size: smaller;" slot="start">
+        <ion-buttons style="width: fit-content; font-size: large;" slot="start">
           <ion-button class="round-button" @click="paginaAnterio">  
             <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title style="width: fit-content; font-size: smaller;">Categoria {{ categoriaSelecionada.descricao }}
+        <ion-title style="width: fit-content; font-size: large;">Categoria {{ categoriaSelecionada.descricao }}
         </ion-title>
       </ion-toolbar>
       <!--<ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
@@ -16,11 +16,11 @@
     <ion-content  class="container">
    
      <ion-grid v-for="(baterias, index) in items" :key="index" class="ion-padding">
-       <ion-row v-for="bateria in baterias" style="height: auto;" class="ion-padding" >
-         <ion-col  style="width: 40vw; height: auto; align-items: center;"> <!-- Define o tamanho e o offset para centralizar -->
-           <ion-card>
+       <ion-row v-for="objeto in baterias" @click="selectRow(objeto)" >
+         <ion-col  style="width: 40vw; height: auto; align-items: center;">
+           <ion-card class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }"">
              <ion-card-header>
-                  <ion-card-title style="text-align: left;">{{ bateria.descricao + bateria.seqRound+" º Round"}}</ion-card-title>
+                  <ion-card-title style="text-align: left;">{{ bateria.descricao + bateria.round}}</ion-card-title>
             </ion-card-header>
              <ion-card-content>
               <ion-grid>

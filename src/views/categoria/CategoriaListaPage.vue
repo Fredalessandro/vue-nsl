@@ -56,19 +56,19 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="selectedItem" class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="presentAlertConfirm(selectedItem)">
             <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
           </ion-button>
           <ion-label class="bottom-label">Excluir</ion-label>
           </div>
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="selectedItem" class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="handleRowClick(selectedItem)">
             <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
           </ion-button>
           <ion-label class="bottom-label">Editar</ion-label>
           </div>
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="isAdmin" class="label-container" style="margin-right: 30px;">
           <ion-button class="round-button" @click="abrirModal(true)">
             <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
           </ion-button>
@@ -129,7 +129,7 @@ export default defineComponent({
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const searchTerm = ref('');
     const items = ref([]);
-    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.perfil == 'ADMIN');
+    const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
 
     const selectedItem = ref();

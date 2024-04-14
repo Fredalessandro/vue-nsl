@@ -60,7 +60,7 @@
             </ion-button>
             <ion-label class="bottom-label">Inserir</ion-label>
           </div>
-          <div v-if="categoriaSelecionada && isAdmin && !categoriaSelecionada.bateriasGerada" class="label-container">
+          <div v-if="categoriaSelecionada && isAdmin" class="label-container">
             <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
               <ion-icon :icon="iconGenerate" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -193,8 +193,8 @@
                   const dadosCategoria = 
                   {idEvento: objeto.idEvento, 
                    idCategoria: objeto._id, 
-                   atletasPorBateria, 
-                   atletas}; 
+                   qtdAtletasBateria: objeto.qtdAtletasBateria, 
+                   qtdAtletas: objeto.qtdAtletas}; 
                   BateriaService.gerarBateria(dadosCategoria)
                   objeto.bateriasGerada = true;
                   CategoriaService.atualizarCategoria(objeto._id,objeto);

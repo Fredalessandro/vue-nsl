@@ -29,17 +29,17 @@
     <ion-content class="ion-padding">
 
       <ion-grid>
-        <ion-row class="ion-align-items-start" style="height: auto;">
-          <!--<ion-col size=0.5>id</ion-col>-->
+
+        <ion-row class="ion-align-items-start">
+
           <ion-col size=2>Evento</ion-col>
           <ion-col size=2>Local</ion-col>
           <ion-col>Vl.Inscrição</ion-col>
-          <ion-col>Atletas por Bateria</ion-col>
           <ion-col>Ondas Surfadas</ion-col>
           <ion-col>Tempo da Bateria</ion-col>
           <ion-col size=2>Periodo</ion-col>
           <ion-col>Status</ion-col>
-          <!--<ion-col size=0.80 style="text-align: center;">Ação</ion-col>-->
+
         </ion-row>
  
         <div v-for="(objeto, index) in items" :key="objeto.id"
@@ -52,8 +52,6 @@
             <ion-col style="text-align: right;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.valorInscricao }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-            objeto.qtdAtletasBateria }}</ion-col>
-            <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdOndaSurfada }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.tempoBateria }}</ion-col>
@@ -63,8 +61,11 @@
             objeto.status }}</ion-col>
           </ion-row>
         </div>
+
       </ion-grid>
+
     </ion-content>
+
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
@@ -109,9 +110,12 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-footer>
+    
     <CadastroEventoModal :is-modal-open="modalAberta" :objetoEdicao="this.objetoEdicao" :isReadOnly="isAdmin"
       @fechar-modal="fecharModal" @salvarEdicao="handleSalvar" />
+
   </ion-page>
+
 </template>
 
 <script>
@@ -162,7 +166,7 @@ export default defineComponent({
     const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
 
 
-    const selectedItem = ref();
+    let selectedItem = ref();
 
     const selectRow = async (objeto) => {
       selectedItem.value = objeto;
@@ -208,7 +212,9 @@ export default defineComponent({
             if (!store.getters.getCategoriaSelecionada) {
                  selectedItem.value = items.value[items.value.length-1];
                  store.dispatch('setEventoSelecionado', { eventoSelecionado: items.value[items.value.length-1] });
-            } else selectedItem.value = store.getters.getCategoriaSelecionada;
+            } else {
+                 selectedItem.value = store.getters.getCategoriaSelecionada;
+            }
         }
     }  
 

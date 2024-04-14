@@ -41,6 +41,14 @@ const BateriaService = {
       throw error.response.data;
     }
   },
+  async gerarBateria(dadosCategoria) {
+    try {
+      const response = await axios.post(config.backendUrl+'/baterias/gerar', dadosCategoria);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
   async atualizarBateria(id, bateria) {
     try {
       // Fazer a chamada para o endpoint de atualização de bateria

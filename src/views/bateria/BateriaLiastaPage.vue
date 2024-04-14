@@ -42,25 +42,25 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button class="round-button" @click="">
               <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Excluir</ion-label>
           </div>
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada" class="label-container" style="margin-right: 30px;">
             <ion-button class="round-button" @click="handleRowClick(selectedItem)">
               <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Editar</ion-label>
           </div>
-          <div class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button class="round-button" @click="abrirModal(true)">
               <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Inserir</ion-label>
           </div>
-          <div v-if="categoriaSelecionada" class="label-container">
+          <div v-if="categoriaSelecionada && isAdmin && !categoriaSelecionada.bateriasGerada" class="label-container">
             <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
               <ion-icon :icon="iconGenerate" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -83,7 +83,7 @@
     IonButton, IonLabel, IonIcon, IonFooter, IonCardTitle,
     IonButtons, IonCard, IonCardContent,IonCardHeader} from '@ionic/vue';
   import  BateriaService  from '../../service/BateriaService';
-
+  import  CategoriaService  from '../../service/CategoriaService';
 
 
 
@@ -190,8 +190,16 @@
               text: 'Sim',
               handler: () => {
                 try {
-                  // Gravar o documento no banco de dados local
-                 
+                  const dadosCategoria = 
+                  {idEvento: objeto.idEvento, 
+                   idCategoria: objeto._id, 
+                   atletasPorBateria, 
+                   atletas}; 
+                  BateriaService.gerarBateria(dadosCategoria)
+                  objeto.bateriasGerada = true;
+                  CategoriaService.atualizarCategoria(objeto._id,objeto);
+                  store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
+                  this.buscaRegistros();
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

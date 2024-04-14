@@ -24,6 +24,8 @@
           <ion-col>Valor Inscrição</ion-col>
           <ion-col>Atletas por Bateria</ion-col>
           <ion-col>Quantidades de Atletas</ion-col>
+          <ion-col>Qtd.Ondas</ion-col>
+          <ion-col>Tempo</ion-col>
           <ion-col>Regra</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto._id"

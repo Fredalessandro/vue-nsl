@@ -41,8 +41,14 @@
             <ion-input style="margin-right: 5px;  width: 150px;"   :maxlength="2"   label="UF"           v-model="objetoEdicao.uf"        required></ion-input>
           </ion-item>
           <ion-item>  
-            <ion-checkbox v-model="objetoEdicao.cabecaChave" @ionChange="handleChange">Ativo</ion-checkbox>
+            <ion-checkbox v-model="objetoEdicao.profissional" @ionChange="handleChangeProfissonal">Profissional</ion-checkbox>
           </ion-item>  
+          <ion-item>  
+            <ion-checkbox v-model="objetoEdicao.cabecaChave" @ionChange="handleChangeCabecaChave">Cabeça de Chave</ion-checkbox>
+          </ion-item>  
+          <ion-item>  
+            <ion-checkbox v-model="objetoEdicao.isento" @ionChange="handleChangeIsento">Isento</ion-checkbox>
+          </ion-item> 
       </ion-content>
       <ion-footer fixed>
         <div class="ion-text-center" style=" bottom: 0; width: 100%;">
@@ -94,7 +100,19 @@
       } catch (error) {
         console.error('Erro ao consultar CEP:', error);
       }
-    }}
+    }},
+    handleChangeProfissional(event){
+      // This function will be called whenever the checkbox state changes
+        this.objetoEdicao.profissional = event.detail.checked;
+    },
+    handleChangeAtivo(event) {
+      // This function will be called whenever the checkbox state changes
+      this.objetoEdicao.ativo = event.detail.checked;
+    },
+    handleChangeIsento(event) {
+      // This function will be called whenever the checkbox state changes
+      this.objetoEdicao.isento = event.detail.checked;
+    }
     
   }; 
   

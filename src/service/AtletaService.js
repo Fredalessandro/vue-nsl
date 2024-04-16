@@ -59,7 +59,6 @@ const AtletaService = {
       console.error('Erro ao atualizar atleta:', error.message);
     }
   },  
-
   // Remove um Atleta
   async removeAtleta(id) {
     try {

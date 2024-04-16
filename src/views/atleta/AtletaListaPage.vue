@@ -18,10 +18,10 @@
       <ion-grid>
         <ion-row class="ion-align-items-start">
           <ion-col>Nome</ion-col>
-          <ion-col >e-mail</ion-col>
+          <ion-col size="3">e-mail</ion-col>
           <ion-col >Telefone</ion-col>
           <ion-col >Dt. Nascimento</ion-col>
-          <ion-col >CPF</ion-col>
+          <ion-col style="width: auto;">CPF</ion-col>
           <ion-col >Cidade - Estado</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto.key"
@@ -30,17 +30,17 @@
             <ion-row @click="selectRow(objeto)" class="rowSelect" :class="{ 'rowSelected': selectedItem === objeto }">
               <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.nome }}</ion-col>
-              <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
+              <ion-col size="3" style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.email }}</ion-col>
               <ion-col  style="text-align: center;"
                 :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.telefone }}</ion-col>
             <ion-col  style="text-align: center;"
                 :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
-            objeto.dataNascimento+" => "+objeto.idadeAno+" anos " }}</ion-col>
-              <ion-col  style="text-align: center;"
+            ConvertDDMMYYYY(objeto.dataNascimento)+" => "+calcularIdade(objeto)+" anos " }}</ion-col>
+              <ion-col style="width: auto; text-align: center;"
                 :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ objeto.cpf }}</ion-col>
-              <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
+            <ion-col style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">
                 {{ objeto.cidade + " - " +
                 objeto.uf
                 }}</ion-col>
@@ -93,6 +93,8 @@ import { add,document, create, trash,arrowBack, } from 'ionicons/icons';
 import CadastroAtletaModal from '@/views/atleta/CadastroAtletaModal.vue';
 import store from '@/store'; 
 import { useRouter } from 'vue-router'
+import AtletaService from '../../service/AtletaService';
+import DataUtil from '../../utils/DataUtil';
 
 
 export default defineComponent({
@@ -147,11 +149,11 @@ export default defineComponent({
     const buscaRegistros = async () => {
       items.value = [];
       const parametros = [];
-      items.value = await AtletaService.getAtletaByAttribute(parametros);
+      items.value = await AtletaService.getAtletasByAttribute(parametros);
       if (items.value) {
         if (!store.getters.getAtletaSelecionada) {
-          selectedItem.value = items.value[items.value.length - 1];
-          store.dispatch('setAtletaSelecionado', { atletaSelecionado: items.value[items.value.length - 1] });
+          selectedItem.value = items.value[0];
+          store.dispatch('setAtletaSelecionado', { atletaSelecionado: items.value[0] });
         } else selectedItem.value = store.getters.getAtletaSelecionada;
       }
     }  
@@ -166,8 +168,16 @@ export default defineComponent({
       searchTerm.value = event.target.value;
     };
 
+    const ConvertDDMMYYYY = (dataOriginal) => {
+          return DataUtil.ConvertDDMMYYYY(dataOriginal);
+    };
+
+    const calcularIdade = (objeto) => {
+          return DataUtil.calcularIdade(objeto);
+    };
+
     return { isAdmin, searchTerm, selectedItem, 
-      selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, 
+      selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, ConvertDDMMYYYY, calcularIdade,
       filteredItems, eventoSelecionado, items};
 
   },
@@ -193,6 +203,8 @@ export default defineComponent({
           rankEstadual: 0,
           idadeAno: 0,
           cabecaChave: false,
+          profisional: false,
+          isento: false
         };
         this.objetoEdicao = dadosEdicao;
       }
@@ -224,6 +236,8 @@ export default defineComponent({
        rankEstadual: objeto.rankEstadual,
        idadeAno: objeto.idadeAno,
        cabecaChave: objeto.cabecaChave,
+       profisional: objeto.profisional,
+       isento: objeto.isento
       };
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -254,6 +268,8 @@ export default defineComponent({
                 rankEstadual: objeto.rankEstadual,
                 idadeAno: objeto.idadeAno,
                 cabecaChave: objeto.cabecaChave,
+                profisional: objeto.profisional,
+                isento: objeto.isento
           });
 
         }

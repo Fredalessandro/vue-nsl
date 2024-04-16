@@ -29,6 +29,7 @@ ion-col {
     background-color: #f9fcfba4;
     /* Cor da linha ímpar, ajuste conforme necessário */
     font-weight: normal;
+    font-size: small;
     color: rgb(0, 0, 0);
     /* Cor do texto na linha ímpar, ajuste conforme necessário*/ 
   }
@@ -37,6 +38,7 @@ ion-col {
     background-color: #f9fcfba4;
     /* Cor da linha ímpar, ajuste conforme necessário */
     font-weight: normal;
+    font-size: small;
     color: rgb(0, 0, 0);
     /* Cor do texto na linha ímpar, ajuste conforme necessário*/ 
   }

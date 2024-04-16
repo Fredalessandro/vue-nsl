@@ -210,8 +210,8 @@ export default defineComponent({
         items.value = data.filter(filter=>filter.status!='Finalizado');
         if (items.value) {
             if (!store.getters.getCategoriaSelecionada) {
-                 selectedItem.value = items.value[items.value.length-1];
-                 store.dispatch('setEventoSelecionado', { eventoSelecionado: items.value[items.value.length-1] });
+                 selectedItem.value = items.value[0];
+                 store.dispatch('setEventoSelecionado', { eventoSelecionado: items.value[0] });
             } else {
                  selectedItem.value = store.getters.getCategoriaSelecionada;
             }
@@ -282,7 +282,7 @@ export default defineComponent({
        status    : objeto.status,
        valorInscricao    : objeto.valorInscricao,
        qtdAtletasBateria : objeto.qtdAtletasBateria,
-       qtdOndaSurfada    : objeto.qtdOndaSurfada   ,
+       qtdOndaSurfada    : objeto.qtdOndaSurfada,
        tempoBateria      : objeto.tempoBateria     
       };
       this.objetoEdicao = dadosEdicao;

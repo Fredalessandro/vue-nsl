@@ -10,30 +10,53 @@
         <ion-title style="width: fit-content; font-size: large;">Categoria {{ categoriaSelecionada.descricao }}
         </ion-title>
       </ion-toolbar>
-      <!--<ion-searchbar v-if="isAdmin" placeholder="Pesquisar" v-model="searchTerm"
-        @ionInput="filterItems"></ion-searchbar>-->
+
     </ion-header>
     <ion-content  class="container">
    
      <ion-grid v-for="(baterias, index) in items" :key="index" class="ion-padding">
-       <ion-row v-for="objeto in baterias" @click="selectRow(objeto)" >
-         <ion-col  style="width: 40vw; height: auto; align-items: center;">
-           <ion-card class="rowSelect" :class="{ 'rowSelected': selectedItem._id === objeto._id }"">
-             <ion-card-header>
-                  <ion-card-title style="text-align: left;">{{ bateria.descricao + bateria.round}}</ion-card-title>
-            </ion-card-header>
-             <ion-card-content>
+       <ion-row>
+        <ion-col>
+          {{ index }} 
+        </ion-col>
+       </ion-row>
+       <ion-row v-for="objeto in baterias">
+        <ion-grid>
+          <ion-row>
+              <ion-col  style="width: 40vw; height: auto; align-items: center;">
+                    <ion-title style="text-align: left;">{{ objeto.descricao }}</ion-title> 
+              </ion-col>
+          </ion-row>
+          <ion-row>    
               <ion-grid>
                   <ion-row class="ion-align-items-start" >
-                      <ion-col size="1">Posição</ion-col>
+                      <ion-col size="1">Cor</ion-col>
                       <ion-col size="3">Atleta</ion-col>
                       <ion-col>Notas</ion-col>
                   </ion-row>
+                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
+                      <ion-col size="1"></ion-col>
+                      <ion-col size="3"></ion-col>
+                      <ion-col></ion-col>
+                  </ion-row> <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
+                      <ion-col size="1"></ion-col>
+                      <ion-col size="3"></ion-col>
+                      <ion-col></ion-col>
+                  </ion-row>
+                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
+                      <ion-col size="1"></ion-col>
+                      <ion-col size="3"></ion-col>
+                      <ion-col></ion-col>
+                  </ion-row>
+                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
+                      <ion-col size="1"></ion-col>
+                      <ion-col size="3"></ion-col>
+                      <ion-col></ion-col>
+                  </ion-row>
               </ion-grid>
-             </ion-card-content>
-           </ion-card>
-         </ion-col>
-       </ion-row>
+        </ion-row>
+       </ion-grid>
+      </ion-row>
      </ion-grid>
 
 
@@ -42,7 +65,7 @@
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
-          <div v-if="categoriaSelecionada && isAdmin" class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button class="round-button" @click="">
               <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -54,17 +77,17 @@
             </ion-button>
             <ion-label class="bottom-label">Editar</ion-label>
           </div>
-          <div v-if="categoriaSelecionada && isAdmin" class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container" style="margin-right: 30px;">
             <ion-button class="round-button" @click="abrirModal(true)">
               <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Inserir</ion-label>
           </div>
-          <div v-if="categoriaSelecionada && isAdmin" class="label-container">
+          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container">
             <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
-              <ion-icon :icon="iconGenerate" style="color: white;" size="large"></ion-icon>
+              <ion-icon :icon="iconSurfer" style="color: white;" size="large"></ion-icon>
             </ion-button>
-            <ion-label class="bottom-label">Gerar</ion-label>
+            <ion-label class="bottom-label">Distribuir</ion-label>
           </div>
         </ion-buttons>
       </ion-toolbar>
@@ -77,7 +100,7 @@
   import { useRouter } from 'vue-router' 
   import store from '@/store';
   import { ref, defineComponent, computed, onMounted, watch } from 'vue';
-  import { add, document, create, trash, arrowForward, arrowBack, refreshCircle } from 'ionicons/icons';
+  import { add, document, create, trash, arrowForward, arrowBack, refreshCircle, man } from 'ionicons/icons';
   import {IonPage, IonHeader, IonToolbar, IonTitle, 
     IonContent, IonGrid, IonRow, IonCol, IonSearchbar, 
     IonButton, IonLabel, IonIcon, IonFooter, IonCardTitle,
@@ -98,6 +121,7 @@
     data() {
       return {
         iconAdd: add,
+        iconSurfer: man,
         iconDocumet: document,
         iconDelete: trash,
         iconEdit: create,
@@ -145,12 +169,12 @@
         const data = await BateriaService.getBateriasByAttribute(`idCategoria=${categoriaSelecionada._id}`);
 
         data.forEach((item)=>{
-          if (!rounds.hasOwnProperty(item.seqRound)) {
-              rounds[item.seqRound] = [item];
+          if (!rounds.hasOwnProperty(item.round)) {
+              rounds[item.round] = [item];
           } else {
-            let objetos = rounds[item.seqRound];
+            let objetos = rounds[item.round];
             objetos.push(item);
-            rounds[item.seqRound]=objetos;
+            rounds[item.round]=objetos;
           }
         });
 
@@ -188,18 +212,20 @@
             },
             {
               text: 'Sim',
-              handler: () => {
+              handler: async () => {
                 try {
                   const dadosCategoria = 
                   {idEvento: objeto.idEvento, 
                    idCategoria: objeto._id, 
                    qtdAtletasBateria: objeto.qtdAtletasBateria, 
                    qtdAtletas: objeto.qtdAtletas}; 
-                  BateriaService.gerarBateria(dadosCategoria)
+                  BateriaService.gerarBateria(dadosCategoria).then(() => {
+                    this.buscaRegistros();
+                  });
                   objeto.bateriasGerada = true;
-                  CategoriaService.atualizarCategoria(objeto._id,objeto);
+                  await CategoriaService.atualizarCategoria(objeto._id,objeto);
                   store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: objeto });
-                  this.buscaRegistros();
+                  
                 } catch (error) {
                   console.error('Erro ao delete registro:', error);
                 }

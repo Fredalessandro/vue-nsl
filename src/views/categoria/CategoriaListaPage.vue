@@ -27,6 +27,7 @@
           <ion-col>Qtd.Ondas</ion-col>
           <ion-col>Tempo</ion-col>
           <ion-col>Regra</ion-col>
+          <ion-col>Atletas</ion-col>
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto._id"
           class="ion-align-items-start">
@@ -48,6 +49,8 @@
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.idade==0?"Sem regra":objeto.regra + ' ' +  objeto.idade + ' anos')
               }}</ion-col>
+            <ion-col style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.atletas.length) }}</ion-col>
 
           </ion-row>
         </div>
@@ -160,8 +163,8 @@ export default defineComponent({
 
           if (items.value) {
             if (!store.getters.getCategoriaSelecionada) {
-                 selectedItem.value = items.value[items.value.length-1];
-                 store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: items.value[items.value.length-1] });
+                 selectedItem.value = items.value[0];
+                 store.dispatch('setCategoriaSelecionada', { categoriaSelecionada: items.value[0] });
             } else selectedItem.value = store.getters.getCategoriaSelecionada;
           }
     } 

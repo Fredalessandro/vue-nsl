@@ -22,12 +22,13 @@
 
           <ion-col>Descrição</ion-col>
           <ion-col>Valor Inscrição</ion-col>
-          <ion-col>Atletas por Bateria</ion-col>
-          <ion-col>Quantidades de Atletas</ion-col>
+          <ion-col>Qtd por Bateria</ion-col>
+          <ion-col>Qtd de Atletas</ion-col>       
+          <ion-col>Disponível</ion-col>
           <ion-col>Qtd.Ondas</ion-col>
           <ion-col>Tempo</ion-col>
           <ion-col>Regra</ion-col>
-          <ion-col>Atletas</ion-col>
+  
         </ion-row>
         <div v-for="(objeto, index) in filteredItems ? filteredItems : items" :key="objeto._id"
           class="ion-align-items-start">
@@ -42,6 +43,8 @@
             objeto.qtdAtletasBateria }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdAtletas }}</ion-col>
+            <ion-col style="text-align: left;"
+              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.atletas.length) }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
             objeto.qtdOndaSurfada }}</ion-col>
             <ion-col style="text-align: center;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{
@@ -49,8 +52,7 @@
             <ion-col style="text-align: left;"
               :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.idade==0?"Sem regra":objeto.regra + ' ' +  objeto.idade + ' anos')
               }}</ion-col>
-            <ion-col style="text-align: left;"
-              :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ (objeto.atletas.length) }}</ion-col>
+
 
           </ion-row>
         </div>

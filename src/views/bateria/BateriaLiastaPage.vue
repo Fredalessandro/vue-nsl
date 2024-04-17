@@ -3,70 +3,60 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons style="width: fit-content; font-size: large;" slot="start">
-          <ion-button class="round-button" @click="paginaAnterio">  
+          <ion-button class="round-button" @click="paginaAnterio">
             <ion-icon :icon="iconBack" style="color: white;" size="large"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title style="width: fit-content; font-size: large;">Categoria {{ categoriaSelecionada.descricao }}
+        <ion-title>{{ eventoSelecionado.evento }}</ion-title>
+        <ion-title style="width: fit-content; font-size: large;">Bateria Categoria {{ categoriaSelecionada.descricao }}
         </ion-title>
       </ion-toolbar>
 
     </ion-header>
-    <ion-content  class="container">
-   
-     <ion-grid v-for="(baterias, index) in items" :key="index" >
-       <ion-row>
-        <ion-col>
-          {{ index }} 
-        </ion-col>
-       </ion-row>
-       <ion-row v-for="objeto in baterias">
-        <ion-grid>
-          <ion-row>
-              <ion-col  style="width: 40vw; height: auto; align-items: center;">
-                    <ion-title style="text-align: left;">{{ objeto.descricao }}</ion-title> 
-              </ion-col>
-          </ion-row>
-          <ion-row>    
-              <ion-grid>
-                  <ion-row class="ion-align-items-start" >
-                      <ion-col size="1">Cor</ion-col>
-                      <ion-col size="3">Atleta</ion-col>
-                      <ion-col>Notas</ion-col>
-                  </ion-row>
-                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
-                      <ion-col size="1"></ion-col>
-                      <ion-col size="3"></ion-col>
-                      <ion-col></ion-col>
-                  </ion-row> 
-                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
-                      <ion-col size="1"></ion-col>
-                      <ion-col size="3"></ion-col>
-                      <ion-col></ion-col>
-                  </ion-row>
-                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
-                      <ion-col size="1"></ion-col>
-                      <ion-col size="3"></ion-col>
-                      <ion-col></ion-col>
-                  </ion-row>
-                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
-                      <ion-col size="1"></ion-col>
-                      <ion-col size="3"></ion-col>
-                      <ion-col></ion-col>
-                  </ion-row>
-              </ion-grid>
+    <ion-content class="container">
+
+      <ion-grid v-for="(baterias, index) in items" :key="index">
+        <ion-row>
+          <ion-col>
+            {{ index }}
+          </ion-col>
         </ion-row>
-       </ion-grid>
-      </ion-row>
-     </ion-grid>
+        <ion-row >
+          <ion-col v-for="objeto in baterias">
+        
+          <ion-grid>
+            <ion-row>
+              <ion-col >
+                <ion-title >{{ objeto.descricao }}</ion-title>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-grid>
+                <ion-row>
+                  <ion-col >Camiseta</ion-col>
+                  <ion-col >Atleta</ion-col>
+                </ion-row>
+                <div v-for="(atleta, index) in objeto.atletas" :key="objeto.id" class="ion-align-items-start">
+                  <ion-row>
+                    <ion-col   style="text-align: left;" :style="{backgroundColor:cores[index]}" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }"></ion-col>
+                    <ion-col    style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }">{{ atleta.apelidio }}</ion-col>
+                  </ion-row>
+                </div>
+              </ion-grid>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+        </ion-row>
+      </ion-grid>
 
 
 
-</ion-content>
+    </ion-content>
     <ion-footer class="ion-footer-fixed ion-padding" slot="end">
       <ion-toolbar class="right-aligned-toolbar">
         <ion-buttons slot="end">
-          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container"
+            style="margin-right: 30px;">
             <ion-button class="round-button" @click="">
               <ion-icon :icon="iconDelete" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -78,7 +68,8 @@
             </ion-button>
             <ion-label class="bottom-label">Editar</ion-label>
           </div>
-          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container" style="margin-right: 30px;">
+          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container"
+            style="margin-right: 30px;">
             <ion-button class="round-button" @click="">
               <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -132,7 +123,7 @@
       }
     },
     setup() {
-        
+         
     const router = useRouter();
     const eventoSelecionado = store.getters.getEventoSelecionado;
     const categoriaSelecionada = store.getters.getCategoriaSelecionada;
@@ -140,7 +131,7 @@
     const items  = ref([]);
     const rounds = {};
     const isAdmin = (store.getters.getUsuario && store.getters.getUsuario.tipo == 'ADMIN');
-
+    const cores = ['#ff0000', '#00ff00', '#0000ff','#000000']
 
     const selectedItem = ref();
 
@@ -193,7 +184,7 @@
       searchTerm.value = event.target.value;
     };
 
-    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros , filteredItems, eventoSelecionado, categoriaSelecionada, items,rounds};
+    return { isAdmin, searchTerm, selectedItem, selectRow, proximaPagina, paginaAnterio, filterItems, buscaRegistros, cores, filteredItems, eventoSelecionado, categoriaSelecionada, items,rounds};
 
   },
   methods:{

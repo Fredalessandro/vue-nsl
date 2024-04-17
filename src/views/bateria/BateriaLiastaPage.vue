@@ -14,7 +14,7 @@
     </ion-header>
     <ion-content  class="container">
    
-     <ion-grid v-for="(baterias, index) in items" :key="index" class="ion-padding">
+     <ion-grid v-for="(baterias, index) in items" :key="index" >
        <ion-row>
         <ion-col>
           {{ index }} 
@@ -38,7 +38,8 @@
                       <ion-col size="1"></ion-col>
                       <ion-col size="3"></ion-col>
                       <ion-col></ion-col>
-                  </ion-row> <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
+                  </ion-row> 
+                  <ion-row style="text-align: left;" :class="{ 'cor1': index % 2 === 0, 'cor2': index % 2 !== 0 }" >
                       <ion-col size="1"></ion-col>
                       <ion-col size="3"></ion-col>
                       <ion-col></ion-col>
@@ -72,18 +73,18 @@
             <ion-label class="bottom-label">Excluir</ion-label>
           </div>
           <div v-if="categoriaSelecionada" class="label-container" style="margin-right: 30px;">
-            <ion-button class="round-button" @click="handleRowClick(selectedItem)">
+            <ion-button class="round-button" @click="">
               <ion-icon :icon="iconEdit" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Editar</ion-label>
           </div>
           <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container" style="margin-right: 30px;">
-            <ion-button class="round-button" @click="abrirModal(true)">
+            <ion-button class="round-button" @click="">
               <ion-icon :icon="iconAdd" style="color: white;" size="large"></ion-icon>
             </ion-button>
             <ion-label class="bottom-label">Inserir</ion-label>
           </div>
-          <div v-if="categoriaSelecionada && !categoriaSelecionada.bateriasGerada && isAdmin" class="label-container">
+          <div v-if="categoriaSelecionada && isAdmin" class="label-container">
             <ion-button class="round-button" @click="gerarBaterias(categoriaSelecionada)">
               <ion-icon :icon="iconSurfer" style="color: white;" size="large"></ion-icon>
             </ion-button>
@@ -218,7 +219,9 @@
                   {idEvento: objeto.idEvento, 
                    idCategoria: objeto._id, 
                    qtdAtletasBateria: objeto.qtdAtletasBateria, 
-                   qtdAtletas: objeto.qtdAtletas}; 
+                   qtdAtletas: objeto.qtdAtletas,
+                   atletas: objeto.atletas
+                  }; 
                   BateriaService.gerarBateria(dadosCategoria).then(() => {
                     this.buscaRegistros();
                   });

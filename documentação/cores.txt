@@ -1,0 +1,7 @@
+{Preta    :'#000000',
+ Branca   :'#FFFFFF',
+ Azul	  :'#0000FF',
+ Verde	  :'#008000',
+ Amarela  :'#FFFF00',
+ Vermelha :'#FF0000',
+ Marom    :'#800000'}

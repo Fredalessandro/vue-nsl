@@ -17,6 +17,7 @@
         <!--<ion-item v-if="objetoEdicao.id && objetoEdicao.id!=0">
           <ion-label>Código {{ objetoEdicao.id }}</ion-label>
         </ion-item>-->
+        <ion-list>
 
         <ion-item>
           <ion-input style="margin-right: 5px; width: 350px;" :maxlength="40" label="Evento" v-model="objetoEdicao.evento" required></ion-input>
@@ -58,6 +59,12 @@
           </ion-select>
         </ion-item>
 
+        <ion-item v-for="(cor, index) in cores" :key="index">
+          <ion-label :style="{backgroundColor:cor.value}">{{ cor.label }}</ion-label>
+          <ion-checkbox :slot="start" :value="cor.value" v-model="coresSelecionadas"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+
 
 
     </ion-content>
@@ -72,7 +79,7 @@
 <script >
 import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, 
   IonButton, IonFooter, IonButtons, IonInput , IonItem, IonLabel,
-  IonSelect, IonSelectOption, IonText
+  IonSelect, IonSelectOption, IonText,IonList,IonCheckbox
 } from '@ionic/vue'; 
 import Evento from '../../model/Evento';
 
@@ -84,7 +91,7 @@ export default {
   IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
   IonButton, IonFooter,IonLabel,
   IonButtons, IonInput, IonItem,
-  IonSelect, IonSelectOption, IonText,
+  IonSelect, IonSelectOption, IonText, IonList,IonCheckbox,
   Evento
 },
   data() {
@@ -92,14 +99,15 @@ export default {
       seuModelo: '',
       selectedOption: null,
       options: [
-      { label: 'Aguardando', value: 'Aguardando' },
-      { label: 'Iniciado',   value: 'Iniciado' },
-      { label: 'Pausa',   value: 'Pausa' },
-      { label: 'Finalizado', value: 'Finalizado' },
-      // Adicione mais opções conforme necessário
-    ]
-    };
-  },
+        { label: 'Aguardando', value: 'Aguardando' },
+        { label: 'Iniciado', value: 'Iniciado' },
+        { label: 'Pausa', value: 'Pausa' },
+        { label: 'Finalizado', value: 'Finalizado' },
+        // Adicione mais opções conforme necessário
+      ]
+      }},
+     
+
   methods: {
     fecharModal() {
       this.$emit('fechar-modal');
@@ -109,6 +117,27 @@ export default {
       this.$emit('salvarEdicao', this.objetoEdicao);
       this.fecharModal();
     }
+  },
+  setup() {
+    const cores = [{label:'Preta', value: '#000000'},
+              { label:'Branca', value: '#FFFFFF', },
+              { label:'Azul', value: '#0000FF', },
+              { label:'Verde', value: '#008000', },
+              { label:'Amarela', value: '#FFFF00', },
+              { label:'Vermelha', value: '#FF0000', },
+              { label:'Marom', value: '#800000' }];
+    
+    const coresSelecionadas = ref([]);
+
+    const showSelectedColors = () => {
+      console.log("Selected colors:", coresSelecionadas.value);
+    };
+
+    return {
+      cores,
+      coresSelecionadas,
+      showSelectedColors
+    };
   }
 
   

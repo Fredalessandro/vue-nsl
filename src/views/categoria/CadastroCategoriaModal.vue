@@ -44,6 +44,17 @@
             </ion-select>
           </ion-item>
 
+          <ion-radio-group v-model="objetoEdicao.sexo">
+          <ion-item>
+            <ion-label>Masculino</ion-label>
+            <ion-radio slot="start" value="Masculino"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>Feminino</ion-label>
+            <ion-radio slot="start" value="Feminino"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+
       </ion-content>
       <ion-footer>
         <div class="ion-text-center" style="margin-bottom: 2%;position: absolute; bottom: 0; width: 100%;">
@@ -56,7 +67,7 @@
   <script >
   import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, 
     IonButton, IonFooter, IonButtons, IonInput , IonItem, IonLabel,
-    IonSelect, IonSelectOption, IonText
+    IonSelect, IonSelectOption, IonText, IonRadioGroup, IonRadio
 } from '@ionic/vue'; 
   import Categoria from '../../model/Categoria';
 
@@ -66,7 +77,7 @@
     emits: ['fechar-modal', 'salvarEdicao'],
     components: {
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
-    IonButton, IonFooter,IonLabel,
+    IonButton, IonFooter,IonLabel,IonRadioGroup, IonRadio,
     IonButtons, IonInput, IonItem,
     IonSelect, IonSelectOption, IonText,
     Categoria
@@ -93,6 +104,18 @@
         this.$emit('salvarEdicao', this.objetoEdicao);
         this.fecharModal();
       }
+    },
+    setup() {
+      const sexoSelecionado = ref(null);
+
+      const showSelectedGender = () => {
+        console.log("Selected gender:", objetoEdicao.sexo);
+      };
+
+      return {
+        sexoSelecionado,
+        showSelectedGender
+      };
     }
   
     

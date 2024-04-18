@@ -40,6 +40,16 @@
             <ion-input style="margin-right: 5px;  width: 450px;"   :maxlength="50"  label="Cidade"       v-model="objetoEdicao.cidade"        required></ion-input>
             <ion-input style="margin-right: 5px;  width: 150px;"   :maxlength="2"   label="UF"           v-model="objetoEdicao.uf"        required></ion-input>
           </ion-item>
+          <ion-radio-group v-model="objetoEdicao.sexo">
+          <ion-item>
+            <ion-label>Masculino</ion-label>
+            <ion-radio slot="start" value="Masculino"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>Feminino</ion-label>
+            <ion-radio slot="start" value="Feminino"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
           <ion-item>  
             <ion-checkbox v-model="objetoEdicao.profissional" @ionChange="handleChangeProfissonal">Profissional</ion-checkbox>
           </ion-item>  
@@ -60,7 +70,8 @@
   </template>
   
   <script >
-  import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonFooter, IonButtons, IonInput, IonItem, IonLabel, IonCheckbox  
+  import {IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonFooter, 
+    IonButtons, IonInput, IonItem, IonLabel, IonCheckbox, IonRadioGroup, IonRadio  
 } from '@ionic/vue'; 
   import Usuario from '../../model/Usuario';
   import {CepService} from '@/service/CepService';
@@ -71,7 +82,7 @@
     emits: ['fechar-modal', 'salvarEdicao'],
     components: {
     IonModal, IonHeader, IonToolbar, IonTitle, IonContent,  
-    IonButton, IonFooter,
+    IonButton, IonFooter, IonRadioGroup, IonRadio,
     IonButtons, IonInput, IonItem, IonLabel, IonCheckbox,
     Usuario
   },
@@ -100,7 +111,7 @@
       } catch (error) {
         console.error('Erro ao consultar CEP:', error);
       }
-    }},
+    },
     handleChangeProfissional(event){
       // This function will be called whenever the checkbox state changes
         this.objetoEdicao.profissional = event.detail.checked;
@@ -113,6 +124,20 @@
       // This function will be called whenever the checkbox state changes
       this.objetoEdicao.isento = event.detail.checked;
     }
+  },    
+  setup() {
+      const sexoSelecionado = ref(null);
+
+      const showSelectedGender = () => {
+        console.log("Selected gender:", objetoEdicao.sexo);
+      };
+
+      return {
+        sexoSelecionado,
+        showSelectedGender
+      };
+    }
+
     
   }; 
   

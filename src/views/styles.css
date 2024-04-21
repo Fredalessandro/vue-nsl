@@ -7,7 +7,12 @@ ion-col {
     text-align: center;
     height: auto;
   }
-  
+
+.ion-col-checkBox {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    text-align: center;
+}  
 .ion-col-card {
     background-color: #ffee00;  
     color: rgb(2, 2, 2);
@@ -58,6 +63,14 @@ ion-col {
     justify-content: flex-end; 
   }
 
+  .row-colors-checkbox {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 4px;
+    margin-left: 4px;
+    padding-right: 4px;
+    align-items: center;
+  }
 
   .label-container {
     display: flex;

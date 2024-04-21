@@ -1,0 +1,2 @@
+5 juizes
+remove as duas menores notas, soma 3 notas e divide por 3.

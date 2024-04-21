@@ -260,7 +260,8 @@ export default defineComponent({
             valorInscricao    : 0,
             qtdAtletasBateria : 4,
             qtdOndaSurfada    : 10,
-            tempoBateria      : 30
+            tempoBateria      : 30,
+            cores: []
         }
         this.objetoEdicao = dadosEdicao;
       }
@@ -283,7 +284,8 @@ export default defineComponent({
        valorInscricao    : objeto.valorInscricao,
        qtdAtletasBateria : objeto.qtdAtletasBateria,
        qtdOndaSurfada    : objeto.qtdOndaSurfada,
-       tempoBateria      : objeto.tempoBateria     
+       tempoBateria      : objeto.tempoBateria, 
+       cores : objeto.cores    
       };
       this.objetoEdicao = dadosEdicao;
       this.abrirModal(false);
@@ -291,7 +293,7 @@ export default defineComponent({
     async handleSalvar(objeto) {
       // Lógica para salvar o usuário
       try {
-        if (objeto.id) {
+        if (objeto._id) {
           //await FirestoreService.set(Constantes.colecaoEventos, objeto.id, objeto);
           const evento = await EventoService.atualizarEvento(objeto._id, objeto)
         } else {
@@ -306,7 +308,8 @@ export default defineComponent({
             valorInscricao    : objeto.valorInscricao,
             qtdAtletasBateria : objeto.qtdAtletasBateria,
             qtdOndaSurfada    : objeto.qtdOndaSurfada   ,
-            tempoBateria      : objeto.tempoBateria 
+            tempoBateria      : objeto.tempoBateria, 
+            cores : objeto.cores
           });
 
         }
